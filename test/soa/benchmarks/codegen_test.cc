@@ -22,11 +22,11 @@ class TestClass : public SoaLayout<TestClass, 17,
   int_<4> field1;
 
   void increase_field0() {
-    field0 *= 2;
+    field0 *= 0x5555;
   }
 
   void increase_field1() {
-    field1 *= 2;
+    field1 *= 0x4444;
   }
 };
 
