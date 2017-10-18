@@ -6,8 +6,8 @@ cc_library(
 cc_test(
   name = "soa_test",
   srcs = [
-#    "test/soa_test.cc",
-    "test/soa/simple_class_test.cc",
+    "test/soa/basic_class_test.cc",
+    "test/soa/pointer_arithmetics_test.cc",
   ],
   copts = ["-Iexternal/gtest/include"],
   deps = [

@@ -7,10 +7,13 @@
 #include "../../../soa/soa.h"
 
 using ikra::soa::SoaLayout;
+using ikra::soa::kAddressModeZero;
+using ikra::soa::kAddressModeValid;
 
 static const uint32_t kClassMaxInst = 0x1234;
 
-class TestClass : public SoaLayout<TestClass, 17, kClassMaxInst> {
+class TestClass : public SoaLayout<TestClass, 17,
+                                   kClassMaxInst, kAddressModeZero> {
  public:
   static Storage storage;
 
