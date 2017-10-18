@@ -44,3 +44,17 @@ int main() {
   printf("FIELD0: %i, FIELD1: %i\n", (int) instance->field0,
                                      (int) instance->field1);
 }
+
+// Extra methods for code isolation: Will show up in .S file.
+TestClass* new_instance() {
+  return new TestClass();
+}
+
+void write_field0(TestClass* instance) {
+  instance->field0 = 0x7777;
+}
+
+int read_field0(TestClass* instance) {
+  return instance->field0;
+}
+
