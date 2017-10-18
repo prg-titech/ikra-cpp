@@ -6,8 +6,8 @@ using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeValid;
 using ikra::soa::kAddressModeZero;
 
-static const uint32_t kClassMaxInst = 1024;
-static const uint32_t kTestSize = 40;
+static const int kClassMaxInst = 1024;
+static const int kTestSize = 40;
 
 // Note: All the extra keywords (typename etc.) are required because this
 // class is templatized.
@@ -24,6 +24,12 @@ class TestClass : public SoaLayout<TestClass<AddressMode>, 17,
   typename SelfSuper::template double_<4> field1;
   typename SelfSuper::template bool_<12> field2;
   typename SelfSuper::template int_<13> field4;
+
+  TestClass() {}
+
+  TestClass(int field0_a, int field4_a) : field4(field4_a) {
+    field0 = field0_a;
+  }
 
   void add_field0_to_field4() {
     field4 = field4 + field0;
@@ -84,8 +90,24 @@ TYPED_TEST_P(BasicClassTest, Fields) {
   }
 }
 
+TYPED_TEST_P(BasicClassTest, Constructor) {
+  TypeParam** instances = new TypeParam*[kTestSize];
 
-REGISTER_TYPED_TEST_CASE_P(BasicClassTest, Fields);
+  // Create a few instances
+  for (int i = 0; i < kTestSize; ++i) {
+    instances[i] = new TypeParam(3*i, 5*i);
+  }
+
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    EXPECT_EQ((int) instances[i]->field0, 3*i);
+    EXPECT_EQ((int) instances[i]->field4, 5*i);
+  }
+}
+
+REGISTER_TYPED_TEST_CASE_P(BasicClassTest,
+                           Fields,
+                           Constructor);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest,
                               TestClass<kAddressModeValid>);

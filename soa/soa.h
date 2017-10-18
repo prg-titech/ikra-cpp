@@ -86,12 +86,18 @@ class Field_ {
   // TODO: Implement special operators:
   // http://en.cppreference.com/w/cpp/language/operator_logical
 
- protected:
+ private:
   // Only Owner can create new fields for itself.
   friend Owner;
   Field_() {}
 
- private:
+  // Initialize the field with a given value. Used in class constructor.
+  Field_(T value) {
+    *this = value;
+  }
+
+  // Initialize the field with the value of another field. Used in class
+  // constructor. TODO: Unclear why exactly we need this one...
   Field_(const Field_& other) {}
 
   template<int A = AddressMode>
