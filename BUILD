@@ -15,3 +15,9 @@ cc_test(
     ":soa",
   ],
 )
+
+cc_binary(
+  name = "codegen_test",
+  srcs = ["test/soa/benchmarks/codegen_test.cc"],
+  deps = [":soa"],
+)

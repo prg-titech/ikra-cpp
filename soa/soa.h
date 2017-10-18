@@ -4,7 +4,6 @@
 
 #include <tuple>
 #include <type_traits>
-#include <stdio.h>
 
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
@@ -133,6 +132,12 @@ class SoaLayout {
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(double);
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(float);
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(int);
+
+  // Return a pointer to an object with a given ID.
+  static Self* get(uintptr_t id) {
+    assert(id <= Self::storage.size);
+    return reinterpret_cast<Self*>(id);
+  }
 
  private:
   // Force size of this class to be 0.
