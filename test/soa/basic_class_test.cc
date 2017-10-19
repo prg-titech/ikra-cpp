@@ -9,21 +9,23 @@ using ikra::soa::kAddressModeZero;
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
+const static uint32_t kOffsetBase = IKRA_BASE;
 // Note: All the extra keywords (typename etc.) are required because this
 // class is templatized.
 template<int AddressMode>
 class TestClass : public SoaLayout<TestClass<AddressMode>, 17,
-                                   kClassMaxInst, AddressMode> {
+                                   kClassMaxInst, kOffsetBase, AddressMode> {
  public:
   using SelfSuper = SoaLayout<TestClass<AddressMode>, 17,
-                              kClassMaxInst, AddressMode>;
+                              kClassMaxInst, kOffsetBase, AddressMode>;
 
   static typename SelfSuper::Storage storage;
 
-  typename SelfSuper::template int_<0> field0;
-  typename SelfSuper::template double_<4> field1;
-  typename SelfSuper::template bool_<12> field2;
-  typename SelfSuper::template int_<13> field4;
+  //typename SelfSuper::template int_<0> field0;
+  typename SelfSuper::template int_ field0;
+  typename SelfSuper::template double_ field1;
+  typename SelfSuper::template bool_ field2;
+  typename SelfSuper::template int_ field4;
 
   TestClass() {}
 

@@ -13,13 +13,13 @@ using ikra::soa::kAddressModeValid;
 
 static const uint32_t kClassMaxInst = 0x1234;
 
-class TestClass : public SoaLayout<TestClass, 17,
-                                   kClassMaxInst, kAddressModeZero> {
+class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst,
+                                   IKRA_BASE, kAddressModeZero> {
  public:
   static Storage storage;
 
-  int_<0> field0;
-  int_<4> field1;
+  int_ field0;
+  int_ field1;
 
   void increase_field0() {
     field0 *= 0x5555;
@@ -40,7 +40,7 @@ int main() {
   instance->increase_field0();
   instance->increase_field1();
 
-  // Expected output: FIELD0: 61166, FIELD1: 69904
+  // Expected output: FIELD0: 668085635, FIELD1: 610821152
   printf("FIELD0: %i, FIELD1: %i\n", (int) instance->field0,
                                      (int) instance->field1);
 }

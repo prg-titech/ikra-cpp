@@ -20,7 +20,23 @@ namespace soa {
 
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
   template<int Offset> \
-  using type ## _ = Field<type, Offset>;
+  using type ## __ = Field<type, Offset>; \
+  template<int Offset, typename EatExtra> \
+  using type ## _ ## extra = Field<type, Offset - OffsetCounterBase>;
+
+template<int... N>
+struct SwallowInts {};
+
+#define IKRA_BASE __COUNTER__
+#define bool_ bool_extra<__COUNTER__ - 1, ikra::soa::SwallowInts<0>>
+#define char_ char_extra<__COUNTER__ - 1, ikra::soa::SwallowInts<0>>
+#define double_ double_extra<__COUNTER__ - 1,\
+  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__, __COUNTER__,\
+                         __COUNTER__, __COUNTER__, __COUNTER__>>
+#define int_ int_extra<__COUNTER__ - 1,\
+  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
+#define float_ float_extra<__COUNTER__ - 1,\
+  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
 
 static const int kAddressModeZero = 0;
 static const int kAddressModeValid = 1;
@@ -160,6 +176,7 @@ struct Size1Dummy {};
 template<class Self,
          uint32_t ObjectSize,
          uintptr_t ContainerSize,
+         uint32_t OffsetCounterBase = 0,
          int AddressMode = kAddressModeValid>
 class SoaLayout
     : std::conditional<AddressMode == kAddressModeZero,
