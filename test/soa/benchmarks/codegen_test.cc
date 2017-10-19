@@ -14,12 +14,12 @@ using ikra::soa::kAddressModeValid;
 static const uint32_t kClassMaxInst = 0x1234;
 
 class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst,
-                                   IKRA_BASE, kAddressModeZero> {
+                                   kAddressModeZero> {
  public:
   static Storage storage;
 
-  int_ field0;
-  int_ field1;
+  int_<0> field0;
+  int_<4> field1;
 
   void increase_field0() {
     field0 *= 0x5555;

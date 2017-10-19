@@ -23,44 +23,9 @@ namespace soa {
 // This marco is expanded for every primitive data type (such as int, float)
 // and generates alias types for SOA field declarations. For example:
 // int__<Offset> --> Field<int, Offset>
-// An additional alias type is generated for field declarations that are
-// generated using a macro (e.g., int_). Such a macro expansion determines the
-// correct offset using the __COUNTER__ preprocessor macro. Since there is no
-// guarantee that the counter starts at zero, SoaLayout has an additional
-// template parameter OffsetCounterBase, which contains the state (number) of
-// the counter before class definition. That base offset is subtracted from
-// the current counter to calculate the actual offset.
-// In addition, _counter types may take an additional template parameter
-// which is not used at all. It is needed because __COUNTER__ can only be
-// incremented in steps of 1 and we have to store the intermediate results
-// (states) somewhere.
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
   template<int Offset> \
-  using type ## __ = Field<type, Offset>; \
-  template<int Offset, typename EatExtra = void> \
-  using type ## _ ## counter = Field<type, Offset - OffsetCounterBase>;
-
-// This template can take an arbitrary number of ints. It is used in cases
-// where additional int values are generated but not used. (It is a "type
-// no-operation".)
-template<int... N>
-struct SwallowInts {};
-
-// This macro should be used during class definition to mark the current
-// state of the preprocessor counter.
-#define IKRA_BASE __COUNTER__
-
-// The following macros generate types for SOA fields, including field offsets.
-// Add additional types as needed.
-#define bool_ bool_counter<__COUNTER__ - 1>
-#define char_ char_counter<__COUNTER__ - 1>
-#define double_ double_counter<__COUNTER__ - 1,\
-  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__, __COUNTER__,\
-                         __COUNTER__, __COUNTER__, __COUNTER__>>
-#define int_ int_counter<__COUNTER__ - 1,\
-  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
-#define float_ float_counter<__COUNTER__ - 1,\
-  ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
+  using type ## _ = Field<type, Offset>; \
 
 // In Zero Addressing Mode, the address of an object is its ID. E.g., the
 // address of the first object (ID 0) is nullptr. Pointer arithmetics is not
@@ -223,7 +188,6 @@ struct Size1Dummy {};
 template<class Self,
          uint32_t ObjectSize,
          uintptr_t ContainerSize,
-         uint32_t OffsetCounterBase = 0,
          int AddressMode = kAddressModeValid>
 class SoaLayout
     : std::conditional<AddressMode == kAddressModeZero,
