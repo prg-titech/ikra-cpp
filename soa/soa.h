@@ -12,33 +12,80 @@
 namespace ikra {
 namespace soa {
 
+// This marco is expanded for every inplace assignment operator and forwards
+// the operation to the wrapped data.
 #define IKRA_DEFINE_FIELD_ASSIGNMENT(symbol) \
   Self operator symbol ## = (T value) { \
     *data_ptr() symbol ## = value; \
     return *this; \
   }
 
+// This marco is expanded for every primitive data type (such as int, float)
+// and generates alias types for SOA field declarations. For example:
+// int__<Offset> --> Field<int, Offset>
+// An additional alias type is generated for field declarations that are
+// generated using a macro (e.g., int_). Such a macro expansion determines the
+// correct offset using the __COUNTER__ preprocessor macro. Since there is no
+// guarantee that the counter starts at zero, SoaLayout has an additional
+// template parameter OffsetCounterBase, which contains the state (number) of
+// the counter before class definition. That base offset is subtracted from
+// the current counter to calculate the actual offset.
+// In addition, _counter types may take an additional template parameter
+// which is not used at all. It is needed because __COUNTER__ can only be
+// incremented in steps of 1 and we have to store the intermediate results
+// (states) somewhere.
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
   template<int Offset> \
   using type ## __ = Field<type, Offset>; \
-  template<int Offset, typename EatExtra> \
-  using type ## _ ## extra = Field<type, Offset - OffsetCounterBase>;
+  template<int Offset, typename EatExtra = void> \
+  using type ## _ ## counter = Field<type, Offset - OffsetCounterBase>;
 
+// This template can take an arbitrary number of ints. It is used in cases
+// where additional int values are generated but not used. (It is a "type
+// no-operation".)
 template<int... N>
 struct SwallowInts {};
 
+// This macro should be used during class definition to mark the current
+// state of the preprocessor counter.
 #define IKRA_BASE __COUNTER__
-#define bool_ bool_extra<__COUNTER__ - 1, ikra::soa::SwallowInts<0>>
-#define char_ char_extra<__COUNTER__ - 1, ikra::soa::SwallowInts<0>>
-#define double_ double_extra<__COUNTER__ - 1,\
+
+// The following macros generate types for SOA fields, including field offsets.
+// Add additional types as needed.
+#define bool_ bool_counter<__COUNTER__ - 1>
+#define char_ char_counter<__COUNTER__ - 1>
+#define double_ double_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__, __COUNTER__,\
                          __COUNTER__, __COUNTER__, __COUNTER__>>
-#define int_ int_extra<__COUNTER__ - 1,\
+#define int_ int_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
-#define float_ float_extra<__COUNTER__ - 1,\
+#define float_ float_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
 
+// In Zero Addressing Mode, the address of an object is its ID. E.g., the
+// address of the first object (ID 0) is nullptr. Pointer arithmetics is not
+// possible in Zero Addressing Mode, because the size of a SOA class is zero.
+// I.e., sizeof(MyClass) = 0. Increasing the size to 1 does not work, because
+// instance create will attempt to zero-initialize data at an invalid address.
+// Zero Addressing Mode results in efficient assembly code for field reads/
+// writes. The address of a field `i` in object with ID t is defined as:
+// this*sizeof(type(i)) + ContainerSize*Offset(i) + ClassStorageBase.
+// Notice that the second operand is a compile-time constant if the container
+// size (max. number of elements of a class) is a compile-time constant.
+// See test/soa/benchmarks/codegen_test.cc for inspection of assembly code.
 static const int kAddressModeZero = 0;
+
+// In Valid Addressing Mode, the address of an object is its ID plus the
+// beginning of the class storage data chunk (ClassStorageBase). The size of
+// an object is now defined as 1, allowing for pointer arithmetics on objects.
+// Generated assembly code is less efficient, because the address of a field is
+// now complex:
+// (this - ClassStorageBase)*sizeof(type(i)) + ContainerSize*Offset(i) +
+//     ClassStorageBase
+// This can be rewritten as:
+// ClassStorageBase*(1-sizeof(type(i)) + this*sizeof(type(i)) +
+//     ContainerSize*Offset(i)
+// See test/soa/pointer_arithmetics_test.cc for pointer arithmetics examples.
 static const int kAddressModeValid = 1;
 
 
