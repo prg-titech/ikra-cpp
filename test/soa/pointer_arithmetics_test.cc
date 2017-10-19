@@ -14,7 +14,7 @@ class TestClass : public SoaLayout<TestClass, 4, kClassMaxInst,
  public:
   static Storage storage;
 
-  int_ field0;
+  int__ field0;
 };
 
 TestClass::Storage TestClass::storage;

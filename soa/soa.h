@@ -36,7 +36,7 @@ namespace soa {
 // (states) somewhere.
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
   template<int Offset> \
-  using type ## __ = Field<type, Offset>; \
+  using type ## _ = Field<type, Offset>; \
   template<int Offset, typename EatExtra = void> \
   using type ## _ ## counter = Field<type, Offset - OffsetCounterBase>;
 
@@ -52,14 +52,14 @@ struct SwallowInts {};
 
 // The following macros generate types for SOA fields, including field offsets.
 // Add additional types as needed.
-#define bool_ bool_counter<__COUNTER__ - 1>
-#define char_ char_counter<__COUNTER__ - 1>
-#define double_ double_counter<__COUNTER__ - 1,\
+#define bool__ bool_counter<__COUNTER__ - 1>
+#define char__ char_counter<__COUNTER__ - 1>
+#define double__ double_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__, __COUNTER__,\
                          __COUNTER__, __COUNTER__, __COUNTER__>>
-#define int_ int_counter<__COUNTER__ - 1,\
+#define int__ int_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
-#define float_ float_counter<__COUNTER__ - 1,\
+#define float__ float_counter<__COUNTER__ - 1,\
   ikra::soa::SwallowInts<__COUNTER__, __COUNTER__, __COUNTER__>>
 
 // In Zero Addressing Mode, the address of an object is its ID. E.g., the

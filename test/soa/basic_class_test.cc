@@ -22,10 +22,10 @@ class TestClass : public SoaLayout<TestClass<AddressMode>, 17,
   static typename SelfSuper::Storage storage;
 
   //typename SelfSuper::template int_<0> field0;
-  typename SelfSuper::template int_ field0;
-  typename SelfSuper::template double_ field1;
-  typename SelfSuper::template bool_ field2;
-  typename SelfSuper::template int_ field4;
+  typename SelfSuper::template int__ field0;
+  typename SelfSuper::template double__ field1;
+  typename SelfSuper::template bool__ field2;
+  typename SelfSuper::template int__ field4;
 
   TestClass() {}
 
