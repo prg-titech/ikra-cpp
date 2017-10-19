@@ -1,4 +1,3 @@
-
 #ifndef SOA_SOA_H
 #define SOA_SOA_H
 
@@ -7,7 +6,6 @@
 
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
-
 
 namespace ikra {
 namespace soa {
@@ -72,11 +70,12 @@ class Field_ {
   void* operator new(size_t count) = delete;
 
   // TODO: What should we do with the dereference operator?
+  //T& operator*() const {
+  //  return *data_ptr();
+  //}
 
-  T operator->() const {
-    static_assert(std::is_pointer<T>::value,
-                  "Cannot dereference non-pointer type value.");
-    return *data_ptr();
+  T* operator->() const {
+    return data_ptr();
   }
 
   T* operator&() const {
@@ -85,12 +84,12 @@ class Field_ {
 
   // Get the value of this field. This method is not usually needed and the
   // preferred way to retrieve a value is through implicit conversion.
-  T get() const {
+  T& get() const {
     return *data_ptr();
   }
 
   // Operator for implicit conversion to type T.
-  operator T() const {
+  operator T&() const {
     return *data_ptr();
   }
 
@@ -114,7 +113,7 @@ class Field_ {
   // TODO: Implement special operators:
   // http://en.cppreference.com/w/cpp/language/operator_logical
 
- private:
+ protected:
   // Only Owner can create new fields for itself.
   friend Owner;
   Field_() {}
@@ -172,6 +171,8 @@ class Field_ {
   // Force size of this class to be 0.
   char dummy_[0];
 };
+
+#include "soa/array.h"
 
 #undef IKRA_DEFINE_FIELD_ASSIGNMENT
 
@@ -233,6 +234,10 @@ class SoaLayout
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(double);
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(float);
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(int);
+
+  template<typename T, size_t N, int Offset>
+  using aos_array_ = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
+                                               Offset, AddressMode, Self>;
 
   // Return a pointer to an object with a given ID.
   static Self* get(uintptr_t id) {

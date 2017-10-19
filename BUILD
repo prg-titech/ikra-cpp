@@ -1,11 +1,15 @@
 cc_library(
   name = "soa",
-  hdrs = ["soa/soa.h"],
+  hdrs = [
+    "soa/array.h",
+    "soa/soa.h",
+  ],
 )
 
 cc_test(
   name = "soa_test",
   srcs = [
+    "test/soa/array_test.cc",
     "test/soa/basic_class_test.cc",
     "test/soa/pointer_arithmetics_test.cc",
   ],
