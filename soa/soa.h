@@ -38,18 +38,16 @@ namespace soa {
 // See test/soa/benchmarks/codegen_test.cc for inspection of assembly code.
 static const int kAddressModeZero = 0;
 
-// In Valid Addressing Mode, the address of an object is its ID plus the
-// beginning of the class storage data chunk (ClassStorageBase). The size of
-// an object is now defined as 1, allowing for pointer arithmetics on objects.
-// Generated assembly code is less efficient, because the address of a field is
-// now complex:
-// (this - ClassStorageBase)*sizeof(type(i)) + ContainerSize*Offset(i) +
-//     ClassStorageBase
-// This can be rewritten as:
-// ClassStorageBase*(1-sizeof(type(i)) + this*sizeof(type(i)) +
-//     ContainerSize*Offset(i)
+// In Valid Addressing Mode, the address of an object is the address of its
+// first field, i.e., the beginning of the class storage data chunk
+// (ClassStorageBase) plus ID*sizeof(first field type). The size of an object
+// now defined as the size of the first field, allowing for pointer arithmetics
+// on objects. Generated assembly code is less efficient, because the address
+// of a field is now complex:
+// (this - ClassStorageBase - sizeof(first field type))
+//         / sizeof(first field type) * sizeof(type(i)) + 
+//     ContainerSize*Offset(i) + ClassStorageBase
 // See test/soa/pointer_arithmetics_test.cc for pointer arithmetics examples.
-static const int kAddressModeValid = 1;
 
 
 namespace {
@@ -128,11 +126,11 @@ class Field_ {
   Field_(const Field_& other) {}
 
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeValid, uintptr_t>::type 
+  typename std::enable_if<A != kAddressModeZero, uintptr_t>::type 
   id() const {
-    static_assert(AddressMode == kAddressModeValid, "Internal error.");
-    return reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Owner::storage.data);
+    static_assert(AddressMode != kAddressModeZero, "Internal error.");
+    return (reinterpret_cast<uintptr_t>(this) - 
+           reinterpret_cast<uintptr_t>(Owner::storage.data)) / A - 1;
   }
 
   template<int A = AddressMode>
@@ -145,18 +143,18 @@ class Field_ {
   // Calculate the address of this field based on the "this" pointer of this
   // Field instance.
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeValid, T*>::type
+  typename std::enable_if<A != kAddressModeZero, T*>::type
   data_ptr() const {
-    static_assert(AddressMode == kAddressModeValid, "Internal error.");
+    static_assert(AddressMode != kAddressModeZero, "Internal error.");
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(id() < Owner::storage.size);
 
-    uintptr_t column_skip = ContainerSize*Offset;
-    uintptr_t p1 = reinterpret_cast<uintptr_t>(Owner::storage.data) *
-                   (1 - sizeof(T));
-    uintptr_t p2 = reinterpret_cast<uintptr_t>(this)*sizeof(T);
-    return reinterpret_cast<T*>(p1 + p2  + column_skip);
+    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
+    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
+    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                         ContainerSize*Offset;
+    return reinterpret_cast<T*>(p_result);
   }
 
   template<int A = AddressMode>
@@ -176,23 +174,19 @@ class Field_ {
 
 #undef IKRA_DEFINE_FIELD_ASSIGNMENT
 
-// sizeof(Size0Dummy) = 0;
-struct Size0Dummy {
-  char dummy_[0];
+// sizeof(SizeNDummy) = N;
+template<size_t N>
+struct SizeNDummy {
+  char dummy_[N];
 };
-
-// sizeof(Size1Dummy) = 1;
-struct Size1Dummy {};
 
 }  // namespace
 
 template<class Self,
          uint32_t ObjectSize,
          uintptr_t ContainerSize,
-         int AddressMode = kAddressModeValid>
-class SoaLayout
-    : std::conditional<AddressMode == kAddressModeZero,
-                       Size0Dummy, Size1Dummy>::type {
+         int AddressMode = kAddressModeZero>
+class SoaLayout : SizeNDummy<AddressMode> {
  public:
   void* operator new(size_t count) {
     check_sizeof_class();
@@ -207,7 +201,7 @@ class SoaLayout
     check_sizeof_class();
     // Size of this class is 1. "count" is the number of new instances.
     Self* first_ptr = get(Self::storage.size);
-    Self::storage.size += count;
+    Self::storage.size += count/AddressMode;
     return first_ptr;
   }
 
@@ -239,6 +233,10 @@ class SoaLayout
   using aos_array_ = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
                                                Offset, AddressMode, Self>;
 
+  template<typename T, size_t N, int Offset>
+  using soa_array_ = ikra::soa::SoaArrayField_<T, N, ContainerSize,
+                                               Offset, AddressMode, Self>;
+
   // Return a pointer to an object with a given ID.
   static Self* get(uintptr_t id) {
     assert(id <= Self::storage.size);
@@ -246,10 +244,10 @@ class SoaLayout
   }
 
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeValid, uintptr_t>::type 
+  typename std::enable_if<A != kAddressModeZero, uintptr_t>::type 
   id() const {
-    return reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Self::storage.data);
+    return (reinterpret_cast<uintptr_t>(this) - 
+           reinterpret_cast<uintptr_t>(Self::storage.data)) / AddressMode;
   }
 
   template<int A = AddressMode>
@@ -261,9 +259,10 @@ class SoaLayout
  private:
   // Return a pointer to an object with a given ID.
   template<int A = AddressMode>
-  static typename std::enable_if<A == kAddressModeValid, Self*>::type
+  static typename std::enable_if<A != kAddressModeZero, Self*>::type
   get_(uintptr_t id) {
-    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) + id;
+    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) +
+                        id*AddressMode;
     return reinterpret_cast<Self*>(address);
   }
 
@@ -274,10 +273,10 @@ class SoaLayout
   }
 
   template<int A = AddressMode>
-  static typename std::enable_if<A == kAddressModeValid, void>::type
+  static typename std::enable_if<A != kAddressModeZero, void>::type
   check_sizeof_class() {
-    static_assert(AddressMode == kAddressModeValid, "Internal error.");
-    static_assert(sizeof(Self) == 1,
+    static_assert(AddressMode != kAddressModeZero, "Internal error.");
+    static_assert(sizeof(Self) == AddressMode,
                   "SOA class must have only SOA fields.");
   }
 

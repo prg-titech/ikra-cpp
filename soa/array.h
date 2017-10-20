@@ -20,6 +20,112 @@ class AosArrayField_ : public Field_<T, ContainerSize, Offset,
   }
 };
 
+template<typename T,
+         size_t ArraySize,
+         uintptr_t ContainerSize,
+         uint32_t Offset,
+         int AddressMode,
+         class Owner>
+class SoaArrayField_ : public Field_<T, ContainerSize, Offset,
+                                     AddressMode, Owner> {
+ private:
+  using Self = SoaArrayField_<T, ArraySize, ContainerSize, Offset,
+                              AddressMode, Owner>;
+
+ public:
+  // Support calling methods using -> syntax.
+  const Self* operator->() const {
+    return this;
+  }
+
+  T* operator&() const  = delete;
+
+  T& get() const = delete;
+
+  operator T&() const = delete;
+
+  // Implement std::array interface.
+
+  T& operator[](size_t pos) const {
+    return *this->array_data_ptr(pos);
+  }
+
+  T& at(size_t pos) const {
+    // TODO: This function should throw an exception.
+    assert(pos < ArraySize);
+    return this->operator[](pos);
+  }
+
+  template<size_t Pos>
+  T& at() const {
+    static_assert(Pos < ArraySize, "Index out of bounds.");
+    return *array_data_ptr<Pos>();
+  }
+
+  T& front() const {
+    return at<0>();
+  }
+
+  T& back() const {
+    return at<ArraySize - 1>();
+  }
+
+  // TODO: Implement iterator and other methods.
+
+ protected:
+  // Calculate the address of an array element. For details, see comment
+  // of data_ptr in Field_.
+  template<size_t Pos, int A = AddressMode>
+  typename std::enable_if<A != kAddressModeZero, T*>::type
+  array_data_ptr() const {
+    static_assert(AddressMode != kAddressModeZero, "Internal error.");
+    // Ensure that this is a valid pointer: Only those objects may be accessed
+    // which were created with the "new" keyword and are thus initialized.
+    assert(this->id() < Owner::storage.size);
+
+    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
+    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
+    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                         ContainerSize*(Offset + Pos*sizeof(T));
+    return reinterpret_cast<T*>(p_result);
+  }
+
+  template<size_t Pos, int A = AddressMode>
+  typename std::enable_if<A == kAddressModeZero, T*>::type
+  array_data_ptr() const {
+    static_assert(AddressMode == kAddressModeZero, "Internal error.");
+    assert(this->id() < Owner::storage.size);
+    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+                                Owner::storage.data +
+                                ContainerSize*(Offset + Pos*sizeof(T)));
+  }
+
+  template<int A = AddressMode>
+  typename std::enable_if<A != kAddressModeZero, T*>::type
+  array_data_ptr(size_t pos) const {
+    static_assert(AddressMode != kAddressModeZero, "Internal error.");
+    // Ensure that this is a valid pointer: Only those objects may be accessed
+    // which were created with the "new" keyword and are thus initialized.
+    assert(this->id() < Owner::storage.size);
+
+    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
+    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
+    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                         ContainerSize*(Offset + pos*sizeof(T));
+    return reinterpret_cast<T*>(p_result);
+  }
+
+  template<int A = AddressMode>
+  typename std::enable_if<A == kAddressModeZero, T*>::type
+  array_data_ptr(size_t pos) const {
+    static_assert(AddressMode == kAddressModeZero, "Internal error.");
+    assert(this->id() < Owner::storage.size);
+    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+                                Owner::storage.data +
+                                ContainerSize*(Offset + pos*sizeof(T)));
+  }
+};
+
 }  // namespace
 }  // namespace soa
 }  // namespace ikra

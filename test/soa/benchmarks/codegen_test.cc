@@ -9,12 +9,17 @@
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
-using ikra::soa::kAddressModeValid;
+
+// Compiler flag determines addressing mode.
+#ifdef ADDR_ZERO
+#define ADDR_MODE kAddressModeZero
+#else
+#define ADDR_MODE 4
+#endif
 
 static const uint32_t kClassMaxInst = 0x1234;
 
-class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst,
-                                   kAddressModeZero> {
+class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst, ADDR_MODE> {
  public:
   static Storage storage;
 
@@ -32,7 +37,6 @@ class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst,
 
 TestClass::Storage TestClass::storage;
 
-
 int main() {
   TestClass* instance = new TestClass();
   instance->field0 = 0x7777;
@@ -43,6 +47,9 @@ int main() {
   // Expected output: FIELD0: 668085635, FIELD1: 610821152
   printf("FIELD0: %i, FIELD1: %i\n", (int) instance->field0,
                                      (int) instance->field1);
+
+  // Return 0 if correct result.
+  return !(instance->field0 == 668085635 && instance->field1 == 610821152);
 }
 
 // Extra methods for code isolation: Will show up in .S file.

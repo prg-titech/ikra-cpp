@@ -3,14 +3,13 @@
 
 namespace {
 using ikra::soa::SoaLayout;
-using ikra::soa::kAddressModeValid;
 
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
 // Pointer arithmetics works only in valid addressing mode.
 class TestClass : public SoaLayout<TestClass, 4,
-                                   kClassMaxInst, kAddressModeValid> {
+                                   kClassMaxInst, sizeof(int)> {
  public:
   static Storage storage;
 

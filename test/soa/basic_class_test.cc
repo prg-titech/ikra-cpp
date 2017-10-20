@@ -3,7 +3,6 @@
 
 namespace {
 using ikra::soa::SoaLayout;
-using ikra::soa::kAddressModeValid;
 using ikra::soa::kAddressModeZero;
 
 static const int kClassMaxInst = 1024;
@@ -46,7 +45,7 @@ class TestClass : public SoaLayout<TestClass<AddressMode>, 17,
 };
 
 template<>
-TestClass<kAddressModeValid>::Storage TestClass<kAddressModeValid>::storage;
+TestClass<sizeof(int)>::Storage TestClass<sizeof(int)>::storage;
 
 template<>
 TestClass<kAddressModeZero>::Storage TestClass<kAddressModeZero>::storage;
@@ -66,6 +65,38 @@ TYPED_TEST_P(BasicClassTest, Fields) {
 
   // Set values.
   for (int i = 0; i < kTestSize; ++i) {
+    instances[i]->field0 = i + 99;
+    EXPECT_EQ(instances[i]->field0, i + 99);
+
+    instances[i]->field4 = i*i;
+    EXPECT_EQ(instances[i]->field4, i*i);
+
+    instances[i]->field2 = i % 3 == 0;
+    EXPECT_EQ(instances[i]->field2, i % 3 == 0);
+
+    int expected = i % 3 == 0 ? i*i : -1;
+    EXPECT_EQ(instances[i]->get_field4_if_field2(), expected);
+  }
+
+  // Do increment.
+  for (int i = 0; i < kTestSize; ++i) {
+    instances[i]->add_field0_to_field4();
+  }
+
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    int expected = i % 3 == 0 ? i + i*i + 99: -1;
+    EXPECT_EQ(instances[i]->get_field4_if_field2(), expected);
+  }
+}
+
+TYPED_TEST_P(BasicClassTest, SetFieldsAfterNew) {
+  TypeParam** instances = new TypeParam*[kTestSize];
+
+  // Create a few instances
+  for (int i = 0; i < kTestSize; ++i) {
+    instances[i] = new TypeParam();
+
     instances[i]->field0 = i;
     EXPECT_EQ(instances[i]->field0, i);
 
@@ -108,10 +139,11 @@ TYPED_TEST_P(BasicClassTest, Constructor) {
 
 REGISTER_TYPED_TEST_CASE_P(BasicClassTest,
                            Fields,
+                           SetFieldsAfterNew,
                            Constructor);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest,
-                              TestClass<kAddressModeValid>);
+                              TestClass<sizeof(int)>);
 INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest,
                               TestClass<kAddressModeZero>);
 
