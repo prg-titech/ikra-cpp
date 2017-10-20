@@ -22,11 +22,11 @@ class TestClass : public SoaLayout<TestClass<AddressMode>, 36,
   typename SelfSuper::template int_<0> field0;
 
   // Array has size 12 bytes.
-  typename SelfSuper::template aos_array_<int, 3, 4> field1;
+  typename SelfSuper::array::template aos<int, 3, 4> field1;
   typename SelfSuper::template int_<16> field2;
 
   // Array has size 12 bytes.
-  typename SelfSuper::template soa_array_<int, 3, 20> field3;
+  typename SelfSuper::array::template soa<int, 3, 20> field3;
 
   typename SelfSuper::template int_<32> field4;
 

@@ -229,13 +229,16 @@ class SoaLayout : SizeNDummy<AddressMode> {
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(float);
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(int);
 
-  template<typename T, size_t N, int Offset>
-  using aos_array_ = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
-                                               Offset, AddressMode, Self>;
+  class array {
+   public:
+    template<typename T, size_t N, int Offset>
+    using aos = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
+                                          Offset, AddressMode, Self>;
 
-  template<typename T, size_t N, int Offset>
-  using soa_array_ = ikra::soa::SoaArrayField_<T, N, ContainerSize,
-                                               Offset, AddressMode, Self>;
+    template<typename T, size_t N, int Offset>
+    using soa = ikra::soa::SoaArrayField_<T, N, ContainerSize,
+                                          Offset, AddressMode, Self>;
+  };
 
   // Return a pointer to an object with a given ID.
   static Self* get(uintptr_t id) {
