@@ -1,7 +1,7 @@
 cc_library(
   name = "soa",
   hdrs = [
-    "soa/array.h",
+    "soa/array_field.h",
     "soa/soa.h",
   ],
 )

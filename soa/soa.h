@@ -170,7 +170,7 @@ class Field_ {
   char dummy_[0];
 };
 
-#include "soa/array.h"
+#include "soa/array_field.h"
 
 #undef IKRA_DEFINE_FIELD_ASSIGNMENT
 
