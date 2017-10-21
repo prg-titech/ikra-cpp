@@ -4,6 +4,15 @@ cc_library(
     "soa/array_field.h",
     "soa/soa.h",
   ],
+  deps = [":executor"],
+)
+
+cc_library(
+  name = "executor",
+  hdrs = [
+    "executor/array.h",
+    "executor/iterator.h",
+  ],
 )
 
 cc_test(
@@ -17,6 +26,16 @@ cc_test(
   deps = [
     "@googletest//:gtest_main",
     ":soa",
+  ],
+)
+
+cc_test(
+  name = "executor_test",
+  srcs = ["test/executor_test.cc"],
+  deps = [
+    "@googletest//:gtest_main",
+    ":soa",
+    ":executor"
   ],
 )
 

@@ -7,6 +7,8 @@
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
 
+#include "../executor/iterator.h"
+
 namespace ikra {
 namespace soa {
 
@@ -188,6 +190,8 @@ template<class Self,
          int AddressMode = kAddressModeZero>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
+  static const int kAddressMode = AddressMode;
+
   void* operator new(size_t count) {
     check_sizeof_class();
     assert(count == sizeof(Self));
@@ -213,11 +217,27 @@ class SoaLayout : SizeNDummy<AddressMode> {
   template<uint32_t TotalSize>
   class InternalStorage {
    public:
+    executor::Iterator_<Self*> begin() {
+      return executor::Iterator<Self*>(Self::get(0));
+    }
+
+    executor::Iterator_<Self*> end() {
+      return executor::Iterator<Self*>(Self::get(size));
+    }
+
     uint32_t size;
     char data[TotalSize];
   };
 
   using Storage = InternalStorage<ObjectSize*ContainerSize>;
+
+  static executor::Iterator_<Self*> begin() {
+    return Self::storage.begin();
+  }
+
+  static executor::Iterator_<Self*> end() {
+    return Self::storage.end();
+  }
 
   template<typename T, int Offset>
   using Field = Field_<T, ContainerSize, Offset, AddressMode, Self>;
