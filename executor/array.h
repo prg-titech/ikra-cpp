@@ -6,7 +6,8 @@
 namespace ikra {
 namespace executor {
 
-// This class works only for SOA types.
+// This class executes a method on all SOA objects that are enumerated by an
+// iterator. This is currently a fully sequential operation.
 template<typename T>
 class IteratorExecutor_ {
  public:
@@ -16,6 +17,7 @@ class IteratorExecutor_ {
   template<typename F, typename... Args>
   void execute(F function, Args... args) {
     for (auto iter = begin_; iter != end_; ++iter) {
+      // TODO: Should we override and use operator->* here?
       ((**iter).*function)(args...);
     }
   }
@@ -25,6 +27,8 @@ class IteratorExecutor_ {
   T end_;
 };
 
+// Helper function/constructor for IteratorExecutor_ for automatic template 
+// parameter deduction.
 template<typename T>
 IteratorExecutor_<T> IteratorExecutor(T begin, T end) {
   return IteratorExecutor_<T>(begin, end);

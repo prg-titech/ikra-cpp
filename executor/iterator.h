@@ -6,6 +6,9 @@
 namespace ikra {
 namespace executor {
 
+// This class implements an iterator for SOA objects, starting a given ID. It
+// points to an object with ID i and forwards the pointer to i + 1. This class
+// can handle both valid and zero addressing mode.
 template<typename T>
 class Iterator_ {
  private:
@@ -13,7 +16,6 @@ class Iterator_ {
 
  public:
   // This iterator should be used on pointers to SOA objects.
-  //static_assert(std::is_pointer<T>::value, "Expected pointer type.");
   static_assert(std::is_pointer<T>::value, "Expected pointer type.");
 
   T& operator*() {
@@ -36,6 +38,8 @@ class Iterator_ {
   T position_;
 };
 
+// Helper function/constructor for Iterator_ for automatic template parameter
+// deduction.
 template<typename T>
 Iterator_<T> Iterator(T position) {
   return Iterator_<T>(position);

@@ -5,6 +5,9 @@ namespace ikra {
 namespace soa {
 namespace {
 
+// Class for field declarations of type array. This class is intended to be
+// used with T = std::array and forwards all method invocations to the wrapped
+// array object. The array is stored in AoS format.
 template<typename T,
          uintptr_t ContainerSize,
          uint32_t Offset,
@@ -20,6 +23,9 @@ class AosArrayField_ : public Field_<T, ContainerSize, Offset,
   }
 };
 
+// Class for field declarations of type array. T is the base type of the array.
+// This class is the SoA counter part of AosArrayField_. Array slots are
+// layouted as if they were SoA fields (columns).
 template<typename T,
          size_t ArraySize,
          uintptr_t ContainerSize,
