@@ -8,35 +8,6 @@
 namespace ikra {
 namespace soa {
 
-// This macro is used when generating field types. A field type in user code
-// such as int__(idx) should expand to an offset counter increment and a field
-// type template instantiation (e.g., int_) at the computed offset.
-// Note: This macro must not be undefined even though it is only called within
-// this class. It is used from other macros and cannot be called anymore when
-// undefined here.
-#define IKRA_FIELD_TYPE_GENERATOR(type, field_id) \
-  template<typename DummyT> \
-  struct OffsetCounter<field_id + 1, DummyT> { \
-    static const uint32_t value = OffsetCounter<field_id>::value + \
-                                  sizeof(type); \
-    static const bool kIsSpecialization = true; \
-  }; \
-  type ## _<OffsetCounter<field_id>::value>
-
-// Generate types that keep track of offsets by themselves. Add more types
-// as needed.
-#define bool__(field_id) IKRA_FIELD_TYPE_GENERATOR(bool, field_id)
-#define char__(field_id) IKRA_FIELD_TYPE_GENERATOR(char, field_id)
-#define double__(field_id) IKRA_FIELD_TYPE_GENERATOR(double, field_id)
-#define float__(field_id) IKRA_FIELD_TYPE_GENERATOR(float, field_id)
-#define int__(field_id) IKRA_FIELD_TYPE_GENERATOR(int, field_id)
-
-#define bool___ IKRA_FIELD_TYPE_GENERATOR(bool, __COUNTER__ - kCounterFirstIndex - 1)
-#define char___ IKRA_FIELD_TYPE_GENERATOR(char, __COUNTER__ - kCounterFirstIndex - 1)
-#define double___ IKRA_FIELD_TYPE_GENERATOR(double, __COUNTER__ - kCounterFirstIndex - 1)
-#define float___ IKRA_FIELD_TYPE_GENERATOR(float, __COUNTER__ - kCounterFirstIndex - 1)
-#define int___ IKRA_FIELD_TYPE_GENERATOR(int, __COUNTER__ - kCounterFirstIndex - 1)
-
 // This marco is expanded for every primitive data type (such as int, float)
 // and generates alias types for SOA field declarations. For example:
 // int_<Offset> --> Field<int, Offset>
@@ -64,7 +35,7 @@ template<class Self,
          int AddressMode = kAddressModeZero>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
-  #include "soa/storage.def"
+  #include "soa/storage.inc"
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>

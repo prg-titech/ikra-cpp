@@ -11,14 +11,14 @@ static const int kTestSize = 40;
 // Zero addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassZ
 #define IKRA_TEST_ADDRESS_MODE kAddressModeZero
-#include "basic_class_test_layout.def"
+#include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
 
 // Valid addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassV
 #define IKRA_TEST_ADDRESS_MODE sizeof(int)
-#include "basic_class_test_layout.def"
+#include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
 

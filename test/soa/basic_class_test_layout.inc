@@ -27,4 +27,5 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
     }
   }
 };
+
 IKRA_TEST_CLASSNAME::Storage IKRA_TEST_CLASSNAME::storage;

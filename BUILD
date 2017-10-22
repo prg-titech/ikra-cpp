@@ -4,12 +4,13 @@ cc_library(
     "soa/array_field.h",
     "soa/constants.h",
     "soa/field.h",
+    "soa/field_type_generator.h",
     "soa/layout.h",
     "soa/soa.h",
   ],
   textual_hdrs = [
-    "soa/class_initialization.def",
-    "soa/storage.def",
+    "soa/class_initialization.inc",
+    "soa/storage.inc",
   ],
   deps = [":executor"],
 )
@@ -25,14 +26,15 @@ cc_library(
 cc_library(
   name = "soa_test_headers",
   textual_hdrs = [
-    "test/soa/basic_class_test_layout.def",
+    "test/soa/array_test_layout.inc",
+    "test/soa/basic_class_test_layout.inc",
   ],
 )
 
 cc_test(
   name = "soa_test",
   srcs = [
-#    "test/soa/array_test.cc",
+    "test/soa/array_test.cc",
     "test/soa/basic_class_test.cc",
     "test/soa/pointer_arithmetics_test.cc",
   ],
