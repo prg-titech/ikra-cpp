@@ -8,12 +8,11 @@ static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
 // Pointer arithmetics works only in valid addressing mode.
-class TestClass : public SoaLayout<TestClass, 4,
-                                   kClassMaxInst, sizeof(int)> {
+class TestClass : public SoaLayout<TestClass, kClassMaxInst, sizeof(int)> {
  public:
-  static Storage storage;
+  #include IKRA_INITIALIZE_CLASS
 
-  int_<0> field0;
+  int___ field0;
 };
 
 TestClass::Storage TestClass::storage;

@@ -8,47 +8,20 @@ using ikra::soa::kAddressModeZero;
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
-// Note: All the extra keywords (typename etc.) are required because this
-// class is templatized.
-template<int AddressMode>
-class TestClass : public SoaLayout<TestClass<AddressMode>, 17,
-                                   kClassMaxInst, AddressMode> {
- public:
-  using SelfSuper = SoaLayout<TestClass<AddressMode>, 17,
-                              kClassMaxInst, AddressMode>;
+// Zero addressing mode.
+#define IKRA_TEST_CLASSNAME TestClassZ
+#define IKRA_TEST_ADDRESS_MODE kAddressModeZero
+#include "basic_class_test_layout.def"
+#undef IKRA_TEST_CLASSNAME
+#undef IKRA_TEST_ADDRESS_MODE
 
-  static typename SelfSuper::Storage storage;
+// Valid addressing mode.
+#define IKRA_TEST_CLASSNAME TestClassV
+#define IKRA_TEST_ADDRESS_MODE sizeof(int)
+#include "basic_class_test_layout.def"
+#undef IKRA_TEST_CLASSNAME
+#undef IKRA_TEST_ADDRESS_MODE
 
-  //typename SelfSuper::template int_<0> field0;
-  typename SelfSuper::template int_<0> field0;
-  typename SelfSuper::template double_<4> field1;
-  typename SelfSuper::template bool_<12> field2;
-  typename SelfSuper::template int_<13> field4;
-
-  TestClass() {}
-
-  TestClass(int field0_a, int field4_a) : field4(field4_a) {
-    field0 = field0_a;
-  }
-
-  void add_field0_to_field4() {
-    field4 = field4 + field0;
-  }
-
-  int get_field4_if_field2() {
-    if (field2) {
-      return field4;
-    } else {
-      return -1;
-    }
-  }
-};
-
-template<>
-TestClass<sizeof(int)>::Storage TestClass<sizeof(int)>::storage;
-
-template<>
-TestClass<kAddressModeZero>::Storage TestClass<kAddressModeZero>::storage;
 
 template<typename T>
 class BasicClassTest : public testing::Test {};
@@ -142,9 +115,7 @@ REGISTER_TYPED_TEST_CASE_P(BasicClassTest,
                            SetFieldsAfterNew,
                            Constructor);
 
-INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest,
-                              TestClass<sizeof(int)>);
-INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest,
-                              TestClass<kAddressModeZero>);
+INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest, TestClassV);
+INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest, TestClassZ);
 
 }  // namespace

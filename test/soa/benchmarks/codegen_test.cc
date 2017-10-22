@@ -19,12 +19,12 @@ using ikra::soa::kAddressModeZero;
 
 static const uint32_t kClassMaxInst = 0x1234;
 
-class TestClass : public SoaLayout<TestClass, 8, kClassMaxInst, ADDR_MODE> {
+class TestClass : public SoaLayout<TestClass, kClassMaxInst, ADDR_MODE> {
  public:
-  static Storage storage;
+  #include IKRA_INITIALIZE_CLASS
 
-  int_<0> field0;
-  int_<4> field1;
+  int___ field0;
+  int___ field1;
 
   void increase_field0() {
     field0 *= 0x5555;
@@ -65,3 +65,13 @@ int read_field0(TestClass* instance) {
   return instance->field0;
 }
 
+// Compare with explicit, hand-written SOA code.
+int* explicit_field0;
+
+void explicit_write_field0(uintptr_t id) {
+  explicit_field0[id] = 0x7777;
+}
+
+int explicit_read_field0(uintptr_t id) {
+  return explicit_field0[id];
+}

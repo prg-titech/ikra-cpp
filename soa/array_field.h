@@ -1,9 +1,11 @@
 #ifndef SOA_ARRAY_H
 #define SOA_ARRAY_H
 
+#include "soa/constants.h"
+#include "soa/field.h"
+
 namespace ikra {
 namespace soa {
-namespace {
 
 // Class for field declarations of type array. This class is intended to be
 // used with T = std::array and forwards all method invocations to the wrapped
@@ -132,7 +134,6 @@ class SoaArrayField_ : public Field_<T, ContainerSize, Offset,
   }
 };
 
-}  // namespace
 }  // namespace soa
 }  // namespace ikra
 

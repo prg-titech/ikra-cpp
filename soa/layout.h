@@ -1,0 +1,193 @@
+#ifndef SOA_LAYOUT_H
+#define SOA_LAYOUT_H
+
+#include "soa/array_field.h"
+#include "soa/constants.h"
+#include "soa/field.h"
+
+namespace ikra {
+namespace soa {
+
+// This macro is used when generating field types. A field type in user code
+// such as int__(idx) should expand to an offset counter increment and a field
+// type template instantiation (e.g., int_) at the computed offset.
+// Note: This macro must not be undefined even though it is only called within
+// this class. It is used from other macros and cannot be called anymore when
+// undefined here.
+#define IKRA_FIELD_TYPE_GENERATOR(type, field_id) \
+  template<typename DummyT> \
+  struct OffsetCounter<field_id + 1, DummyT> { \
+    static const uint32_t value = OffsetCounter<field_id>::value + \
+                                  sizeof(type); \
+    static const bool kIsSpecialization = true; \
+  }; \
+  type ## _<OffsetCounter<field_id>::value>
+
+// Generate types that keep track of offsets by themselves. Add more types
+// as needed.
+#define bool__(field_id) IKRA_FIELD_TYPE_GENERATOR(bool, field_id)
+#define char__(field_id) IKRA_FIELD_TYPE_GENERATOR(char, field_id)
+#define double__(field_id) IKRA_FIELD_TYPE_GENERATOR(double, field_id)
+#define float__(field_id) IKRA_FIELD_TYPE_GENERATOR(float, field_id)
+#define int__(field_id) IKRA_FIELD_TYPE_GENERATOR(int, field_id)
+
+#define bool___ IKRA_FIELD_TYPE_GENERATOR(bool, __COUNTER__ - kCounterFirstIndex - 1)
+#define char___ IKRA_FIELD_TYPE_GENERATOR(char, __COUNTER__ - kCounterFirstIndex - 1)
+#define double___ IKRA_FIELD_TYPE_GENERATOR(double, __COUNTER__ - kCounterFirstIndex - 1)
+#define float___ IKRA_FIELD_TYPE_GENERATOR(float, __COUNTER__ - kCounterFirstIndex - 1)
+#define int___ IKRA_FIELD_TYPE_GENERATOR(int, __COUNTER__ - kCounterFirstIndex - 1)
+
+// This marco is expanded for every primitive data type (such as int, float)
+// and generates alias types for SOA field declarations. For example:
+// int_<Offset> --> Field<int, Offset>
+#define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
+  template<int Offset> \
+  using type ## _ = Field<type, Offset>; \
+
+// sizeof(SizeNDummy) = N;
+template<size_t N>
+struct SizeNDummy {
+  char dummy_[N];
+};
+
+// This class is the superclass of user-defined class that should be layouted
+// according to SOA (Structure of Arrays). In zero addressing mode, the size
+// of this class will be 0. In valid addressing mode, the size of this class
+// will be the size of first field.
+// Self is the type of the subclass being defined (see also F-bound
+// polymorphism or "Curiously Recurring Template Pattern"). ContainerSize is
+// the maximum number of instances this class can have. It is a compile-time
+// constant to allow for efficient field address computation. AddressMode can
+// be either "Zero Addressing Mode" or "Valid Addressing Mode".
+template<class Self,
+         uintptr_t ContainerSize,
+         int AddressMode = kAddressModeZero>
+class SoaLayout : SizeNDummy<AddressMode> {
+ public:
+  #include "soa/storage.def"
+
+  // Define a Field_ alias as a shortcut.
+  template<typename T, int Offset>
+  using Field = Field_<T, ContainerSize, Offset, AddressMode, Self>;
+
+  // Generate field types. Implement more types as necessary.
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool);
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(char);
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(double);
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(float);
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(int);
+
+  // This struct serves as a namespace and contains array field types.
+  struct array {
+    template<typename T, size_t N, int Offset>
+    using aos = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
+                                          Offset, AddressMode, Self>;
+
+    template<typename T, size_t N, int Offset>
+    using soa = ikra::soa::SoaArrayField_<T, N, ContainerSize,
+                                          Offset, AddressMode, Self>;
+  };
+
+  static const int kAddressMode = AddressMode;
+
+  // Create a new instance of this class. Data will be allocated inside
+  // storage.data.
+  void* operator new(size_t count) {
+    check_sizeof_class();
+    assert(count == sizeof(Self));
+    // Check if out of memory.
+    assert(Self::storage.size <= ContainerSize);
+
+    return get(Self::storage.size++);
+  }
+
+  // Create multiple new instances of this class. Data will be allocated inside
+  // storage.data.
+  void* operator new[](size_t count) {
+    check_sizeof_class();
+    // Size of this class is 1. "count" is the number of new instances.
+    Self* first_ptr = get(Self::storage.size);
+    Self::storage.size += count/AddressMode;
+    return first_ptr;
+  }
+
+  // TODO: Implement delete operator.
+  void operator delete(void* ptr) {
+    assert(false);
+  }
+
+  // Return an iterator pointing to the first instance of this class.
+  static executor::Iterator_<Self*> begin() {
+    return Self::storage.begin();
+  }
+
+  // Return an iterator pointing to the last instance of this class.
+  static executor::Iterator_<Self*> end() {
+    return Self::storage.end();
+  }
+
+  // Return a pointer to an object with a given ID.
+  static Self* get(uintptr_t id) {
+    assert(id <= Self::storage.size);
+    return get_(id);
+  }
+
+  // Calculate the ID of this object (assuming valid addressing mode).
+  template<int A = AddressMode>
+  typename std::enable_if<A != kAddressModeZero, uintptr_t>::type 
+  id() const {
+    return (reinterpret_cast<uintptr_t>(this) - 
+           reinterpret_cast<uintptr_t>(Self::storage.data)) / AddressMode;
+  }
+
+  // Calculate the ID of this object (assuming zero addressing mode).
+  template<int A = AddressMode>
+  typename std::enable_if<A == kAddressModeZero, uintptr_t>::type 
+  id() const {
+    return reinterpret_cast<uintptr_t>(this);
+  }
+
+ private:
+  // Return a pointer to an object by ID (assuming valid addressing mode).
+  template<int A = AddressMode>
+  static typename std::enable_if<A != kAddressModeZero, Self*>::type
+  get_(uintptr_t id) {
+    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) +
+                        id*AddressMode;
+    return reinterpret_cast<Self*>(address);
+  }
+
+  // Return a pointer to an object by ID (assuming zero addressing mode).
+  template<int A = AddressMode>
+  static typename std::enable_if<A == kAddressModeZero, Self*>::type
+  get_(uintptr_t id) {
+    return reinterpret_cast<Self*>(id);
+  }
+
+  // Compile-time check for the size of this class. This check should fail
+  // if this class contains fields that are not declared with the SOA DSL.
+  // Assuming valid addressing mode.
+  template<int A = AddressMode>
+  static typename std::enable_if<A != kAddressModeZero, void>::type
+  check_sizeof_class() {
+    static_assert(sizeof(Self) == AddressMode,
+                  "SOA class must have only SOA fields.");
+  }
+
+  // Compile-time check for the size of this class. This check should fail
+  // if this class contains fields that are not declared with the SOA DSL.
+  // Assuming zero addressing mode.
+  template<int A = AddressMode>
+  static typename std::enable_if<A == kAddressModeZero, void>::type
+  check_sizeof_class() {
+    static_assert(sizeof(Self) == 0,
+                  "SOA class must have only SOA fields.");
+  }
+};
+
+#undef IKRA_DEFINE_LAYOUT_FIELD_TYPE
+
+}  // namespace soa
+}  // namespace ikra
+
+#endif  // SOA_LAYOUT_H
