@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include "../executor/array.h"
-#include "../executor/iterator.h"
-#include "../soa/soa.h"
+#include "executor/array.h"
+#include "executor/iterator.h"
+#include "soa/soa.h"
 
 namespace {
 using ikra::soa::SoaLayout;

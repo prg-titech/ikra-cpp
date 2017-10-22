@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../../soa/soa.h"
+#include "soa/soa.h"
 
 namespace {
 using ikra::soa::SoaLayout;

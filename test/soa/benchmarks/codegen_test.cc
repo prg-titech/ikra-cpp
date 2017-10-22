@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define NDEBUG    // No asserts.
-#include "../../../soa/soa.h"
+#include "soa/soa.h"
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
