@@ -14,13 +14,13 @@ class InternalStorage {
   }
 
   // Return an iterator pointing to the first element.
-  executor::Iterator_<Self*> begin() {
+  executor::Iterator<Self*> begin() {
     return executor::Iterator<Self*>(Self::get(0));
   }
 
-  // Return an iterator pointing to the last element.
-  executor::Iterator_<Self*> end() {
-    return executor::Iterator<Self*>(Self::get(size));
+  // Return an iterator pointing to the last element + 1.
+  executor::Iterator<Self*> end() {
+    return ++executor::Iterator<Self*>(Self::get(size - 1));
   }
 
   uint32_t size;

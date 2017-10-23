@@ -88,12 +88,12 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Return an iterator pointing to the first instance of this class.
-  static executor::Iterator_<Self*> begin() {
+  static executor::Iterator<Self*> begin() {
     return Self::storage.begin();
   }
 
   // Return an iterator pointing to the last instance of this class.
-  static executor::Iterator_<Self*> end() {
+  static executor::Iterator<Self*> end() {
     return Self::storage.end();
   }
 

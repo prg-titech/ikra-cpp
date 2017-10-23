@@ -18,7 +18,7 @@ cc_library(
 cc_library(
   name = "executor",
   hdrs = [
-    "executor/array.h",
+    "executor/executor.h",
     "executor/iterator.h",
   ],
 )
@@ -68,4 +68,13 @@ cc_binary(
   name = "codegen_test",
   srcs = ["test/soa/benchmarks/codegen_test.cc"],
   deps = [":soa"],
+)
+
+cc_binary(
+  name = "particle_simulation",
+  srcs = ["example/particle_simulation.cc"],
+  deps = [
+    ":soa",
+    ":executor",
+  ],
 )

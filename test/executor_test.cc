@@ -1,13 +1,13 @@
 #include "gtest/gtest.h"
-#include "executor/array.h"
+#include "executor/executor.h"
 #include "executor/iterator.h"
 #include "soa/soa.h"
 
 namespace {
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
-using ikra::executor::IteratorExecutor;
-using ikra::executor::Iterator;
+using ikra::executor::execute;
+using ikra::executor::make_iterator;
 
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
@@ -38,8 +38,7 @@ TYPED_TEST_P(ExecutorTest, StdArray) {
     arr[i] = new TypeParam(i + 1, 100*i + 1);
   }
 
-  auto executor = IteratorExecutor(arr.begin(), arr.end());
-  executor.execute(&TypeParam::add_field1_and_a_to_field0, 50);
+  execute(arr.begin(), arr.end(), &TypeParam::add_field1_and_a_to_field0, 50);
 
   // Check result
   for (int i = 0; i < kTestSize; ++i) {
@@ -55,9 +54,10 @@ TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
     arr[i] = new TypeParam(i + 1, 200*i + 1);
   }
 
-  auto executor = IteratorExecutor(Iterator(arr[0]),
-                                   ++Iterator(arr[kTestSize - 1]));
-  executor.execute(&TypeParam::add_field1_and_a_to_field0, 50);
+  execute(make_iterator(arr[0]),
+          ++make_iterator(arr[kTestSize - 1]),
+          &TypeParam::add_field1_and_a_to_field0,
+          50);
 
   // Check result
   for (int i = 0; i < kTestSize; ++i) {
