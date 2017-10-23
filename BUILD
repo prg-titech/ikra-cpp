@@ -46,13 +46,21 @@ cc_test(
   ],
 )
 
+cc_library(
+  name = "executor_test_headers",
+  textual_hdrs = [
+    "test/executor_test_layout.inc",
+  ],
+)
+
 cc_test(
   name = "executor_test",
   srcs = ["test/executor_test.cc"],
   deps = [
     "@googletest//:gtest_main",
     ":soa",
-    ":executor"
+    ":executor",
+    ":executor_test_headers",
   ],
 )
 

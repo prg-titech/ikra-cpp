@@ -62,8 +62,8 @@ Disassembly of section .text:
   400559:	48 83 e4 f0          	and    $0xfffffffffffffff0,%rsp
   40055d:	50                   	push   %rax
   40055e:	54                   	push   %rsp
-  40055f:	49 c7 c0 f0 07 40 00 	mov    $0x4007f0,%r8
-  400566:	48 c7 c1 80 07 40 00 	mov    $0x400780,%rcx
+  40055f:	49 c7 c0 30 08 40 00 	mov    $0x400830,%r8
+  400566:	48 c7 c1 c0 07 40 00 	mov    $0x4007c0,%rcx
   40056d:	48 c7 c7 50 06 40 00 	mov    $0x400650,%rdi
   400574:	e8 97 ff ff ff       	callq  400510 <__libc_start_main@plt>
   400579:	f4                   	hlt    
@@ -161,7 +161,7 @@ Disassembly of section .text:
   4006a6:	44 44 00 00 
   4006aa:	89 94 01 d0 48 00 00 	mov    %edx,0x48d0(%rcx,%rax,1)
   4006b1:	8b 34 01             	mov    (%rcx,%rax,1),%esi
-  4006b4:	bf 04 08 40 00       	mov    $0x400804,%edi
+  4006b4:	bf 44 08 40 00       	mov    $0x400844,%edi
   4006b9:	31 c0                	xor    %eax,%eax
   4006bb:	e8 30 fe ff ff       	callq  4004f0 <printf@plt>
   4006c0:	48 8b 05 89 09 20 00 	mov    0x200989(%rip),%rax        # 601050 <_ZN9TestClass7storageE+0x8>
@@ -207,64 +207,82 @@ Disassembly of section .text:
   400752:	66 66 66 66 66 2e 0f 	data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
   400759:	1f 84 00 00 00 00 00 
 
-0000000000400760 <_Z21explicit_write_field0m>:
-  400760:	48 8b 05 f1 08 20 00 	mov    0x2008f1(%rip),%rax        # 601058 <explicit_field0>
-  400767:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
-  40076e:	c3                   	retq   
-  40076f:	90                   	nop
+0000000000400760 <_Z12write_field1P9TestClass>:
+  400760:	48 8b 05 e9 08 20 00 	mov    0x2008e9(%rip),%rax        # 601050 <_ZN9TestClass7storageE+0x8>
+  400767:	48 29 c7             	sub    %rax,%rdi
+  40076a:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
+  40076e:	c7 84 38 d0 48 00 00 	movl   $0x7777,0x48d0(%rax,%rdi,1)
+  400775:	77 77 00 00 
+  400779:	c3                   	retq   
+  40077a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
 
-0000000000400770 <_Z20explicit_read_field0m>:
-  400770:	48 8b 05 e1 08 20 00 	mov    0x2008e1(%rip),%rax        # 601058 <explicit_field0>
-  400777:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
-  40077a:	c3                   	retq   
-  40077b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+0000000000400780 <_Z11read_field1P9TestClass>:
+  400780:	48 8b 05 c9 08 20 00 	mov    0x2008c9(%rip),%rax        # 601050 <_ZN9TestClass7storageE+0x8>
+  400787:	48 29 c7             	sub    %rax,%rdi
+  40078a:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
+  40078e:	8b 84 38 d0 48 00 00 	mov    0x48d0(%rax,%rdi,1),%eax
+  400795:	c3                   	retq   
+  400796:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  40079d:	00 00 00 
 
-0000000000400780 <__libc_csu_init>:
-  400780:	41 57                	push   %r15
-  400782:	41 56                	push   %r14
-  400784:	41 89 ff             	mov    %edi,%r15d
-  400787:	41 55                	push   %r13
-  400789:	41 54                	push   %r12
-  40078b:	4c 8d 25 46 06 20 00 	lea    0x200646(%rip),%r12        # 600dd8 <__frame_dummy_init_array_entry>
-  400792:	55                   	push   %rbp
-  400793:	48 8d 2d 4e 06 20 00 	lea    0x20064e(%rip),%rbp        # 600de8 <__init_array_end>
-  40079a:	53                   	push   %rbx
-  40079b:	49 89 f6             	mov    %rsi,%r14
-  40079e:	49 89 d5             	mov    %rdx,%r13
-  4007a1:	4c 29 e5             	sub    %r12,%rbp
-  4007a4:	48 83 ec 08          	sub    $0x8,%rsp
-  4007a8:	48 c1 fd 03          	sar    $0x3,%rbp
-  4007ac:	e8 0f fd ff ff       	callq  4004c0 <_init>
-  4007b1:	48 85 ed             	test   %rbp,%rbp
-  4007b4:	74 20                	je     4007d6 <__libc_csu_init+0x56>
-  4007b6:	31 db                	xor    %ebx,%ebx
-  4007b8:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
-  4007bf:	00 
-  4007c0:	4c 89 ea             	mov    %r13,%rdx
-  4007c3:	4c 89 f6             	mov    %r14,%rsi
-  4007c6:	44 89 ff             	mov    %r15d,%edi
-  4007c9:	41 ff 14 dc          	callq  *(%r12,%rbx,8)
-  4007cd:	48 83 c3 01          	add    $0x1,%rbx
-  4007d1:	48 39 eb             	cmp    %rbp,%rbx
-  4007d4:	75 ea                	jne    4007c0 <__libc_csu_init+0x40>
-  4007d6:	48 83 c4 08          	add    $0x8,%rsp
-  4007da:	5b                   	pop    %rbx
-  4007db:	5d                   	pop    %rbp
-  4007dc:	41 5c                	pop    %r12
-  4007de:	41 5d                	pop    %r13
-  4007e0:	41 5e                	pop    %r14
-  4007e2:	41 5f                	pop    %r15
-  4007e4:	c3                   	retq   
-  4007e5:	90                   	nop
-  4007e6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  4007ed:	00 00 00 
+00000000004007a0 <_Z21explicit_write_field0m>:
+  4007a0:	48 8b 05 b1 08 20 00 	mov    0x2008b1(%rip),%rax        # 601058 <explicit_field0>
+  4007a7:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
+  4007ae:	c3                   	retq   
+  4007af:	90                   	nop
 
-00000000004007f0 <__libc_csu_fini>:
-  4007f0:	f3 c3                	repz retq 
+00000000004007b0 <_Z20explicit_read_field0m>:
+  4007b0:	48 8b 05 a1 08 20 00 	mov    0x2008a1(%rip),%rax        # 601058 <explicit_field0>
+  4007b7:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
+  4007ba:	c3                   	retq   
+  4007bb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+
+00000000004007c0 <__libc_csu_init>:
+  4007c0:	41 57                	push   %r15
+  4007c2:	41 56                	push   %r14
+  4007c4:	41 89 ff             	mov    %edi,%r15d
+  4007c7:	41 55                	push   %r13
+  4007c9:	41 54                	push   %r12
+  4007cb:	4c 8d 25 06 06 20 00 	lea    0x200606(%rip),%r12        # 600dd8 <__frame_dummy_init_array_entry>
+  4007d2:	55                   	push   %rbp
+  4007d3:	48 8d 2d 0e 06 20 00 	lea    0x20060e(%rip),%rbp        # 600de8 <__init_array_end>
+  4007da:	53                   	push   %rbx
+  4007db:	49 89 f6             	mov    %rsi,%r14
+  4007de:	49 89 d5             	mov    %rdx,%r13
+  4007e1:	4c 29 e5             	sub    %r12,%rbp
+  4007e4:	48 83 ec 08          	sub    $0x8,%rsp
+  4007e8:	48 c1 fd 03          	sar    $0x3,%rbp
+  4007ec:	e8 cf fc ff ff       	callq  4004c0 <_init>
+  4007f1:	48 85 ed             	test   %rbp,%rbp
+  4007f4:	74 20                	je     400816 <__libc_csu_init+0x56>
+  4007f6:	31 db                	xor    %ebx,%ebx
+  4007f8:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  4007ff:	00 
+  400800:	4c 89 ea             	mov    %r13,%rdx
+  400803:	4c 89 f6             	mov    %r14,%rsi
+  400806:	44 89 ff             	mov    %r15d,%edi
+  400809:	41 ff 14 dc          	callq  *(%r12,%rbx,8)
+  40080d:	48 83 c3 01          	add    $0x1,%rbx
+  400811:	48 39 eb             	cmp    %rbp,%rbx
+  400814:	75 ea                	jne    400800 <__libc_csu_init+0x40>
+  400816:	48 83 c4 08          	add    $0x8,%rsp
+  40081a:	5b                   	pop    %rbx
+  40081b:	5d                   	pop    %rbp
+  40081c:	41 5c                	pop    %r12
+  40081e:	41 5d                	pop    %r13
+  400820:	41 5e                	pop    %r14
+  400822:	41 5f                	pop    %r15
+  400824:	c3                   	retq   
+  400825:	90                   	nop
+  400826:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  40082d:	00 00 00 
+
+0000000000400830 <__libc_csu_fini>:
+  400830:	f3 c3                	repz retq 
 
 Disassembly of section .fini:
 
-00000000004007f4 <_fini>:
-  4007f4:	48 83 ec 08          	sub    $0x8,%rsp
-  4007f8:	48 83 c4 08          	add    $0x8,%rsp
-  4007fc:	c3                   	retq   
+0000000000400834 <_fini>:
+  400834:	48 83 ec 08          	sub    $0x8,%rsp
+  400838:	48 83 c4 08          	add    $0x8,%rsp
+  40083c:	c3                   	retq   

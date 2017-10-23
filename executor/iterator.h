@@ -2,6 +2,7 @@
 #define EXECUTOR_ITERATOR_H
 
 #include <type_traits>
+#include "soa/constants.h"
 
 namespace ikra {
 namespace executor {
@@ -22,10 +23,24 @@ class Iterator_ {
     return position_;
   }
 
-  Iterator_& operator++() {
-    auto next = reinterpret_cast<uintptr_t>(position_) + InnerT::kAddressMode;
+  template<int A = InnerT::kAddressMode>
+  typename std::enable_if<A == soa::kAddressModeZero, Iterator_<T>>::type&
+  operator+=(int distance) {
+    auto next = reinterpret_cast<uintptr_t>(position_) + distance;
     position_ = reinterpret_cast<T>(next);
     return *this;
+  }
+
+  template<int A = InnerT::kAddressMode>
+  typename std::enable_if<A != soa::kAddressModeZero, Iterator_<T>>::type&
+  operator+=(int distance) {
+    auto next = reinterpret_cast<uintptr_t>(position_) + A*distance;
+    position_ = reinterpret_cast<T>(next);
+    return *this;
+  }
+
+  Iterator_<T>& operator++() {
+    return this->operator+=(1);
   }
 
   bool operator!=(Iterator_<T> other) const {

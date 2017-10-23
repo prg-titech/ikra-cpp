@@ -65,6 +65,14 @@ int read_field0(TestClass* instance) {
   return instance->field0;
 }
 
+void write_field1(TestClass* instance) {
+  instance->field1 = 0x7777;
+}
+
+int read_field1(TestClass* instance) {
+  return instance->field1;
+}
+
 // Compare with explicit, hand-written SOA code.
 int* explicit_field0;
 
