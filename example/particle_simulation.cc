@@ -10,13 +10,16 @@ using ikra::executor::execute;
 using ikra::executor::Iterator;
 using ikra::soa::SoaLayout;
 
-static const int kIterations = 1000;
-static const int kNumWells = 2;
+static const int kIterations = 10000;
+static const int kNumWells = 1;
 static const int kNumParticles = 20;
-static const double kTimeInterval = 0.01;
+static const double kTimeInterval = 100;
 
 static const double kGravityConstant = 6.673e-11;   // gravitational constant
 static const double kSolarMass = 1.98892e30;
+static const double kEarthMass = 5.972e24;
+static const double kEarthSunDistance = 149600000000;
+static const double kEarthVelocity = 30000;
 
 class Particle;
 
@@ -89,31 +92,34 @@ Particle::Storage Particle::storage;
 
 
 void Well::add_force() {
+  // Add force induced by this well to all particles.
   execute<Particle>(&Particle::add_force, this);
 }
 
 
 int main() {
   // Create objects.
-  // TODO: Use meaningful parameters.
   for (int i = 0; i < kNumWells; ++i) {
-    new Well(1, 2, 3);
+    new Well(kSolarMass, 0, 0);
   }
 
   for (int i = 0; i < kNumParticles; ++i) {
-    new Particle(1, 2, 3, 4, 5);
+    new Particle(kEarthMass, kEarthSunDistance, 0, 0, kEarthVelocity);
   }
 
   for (int i = 0; i < kIterations; ++i) {
-    // Update velocities.
+    // Reset forces.
+    execute<Particle>(&Particle::reset_force);
+
+    // Update forces.
     execute<Well>(&Well::add_force);
 
-    // Update positions.
+    // Update velocities and positions.
     execute<Particle>(&Particle::update, kTimeInterval);
 
     // TODO: Draw to screen.
-    printf("Well 1 pos: %f, %f\n",
-           (float) Well::get(0)->position_[0],
-           (float) Well::get(0)->position_[1]);
+    printf("Particle 1 pos: %f, %f\n",
+           (float) Particle::get(0)->position_[0],
+           (float) Particle::get(0)->position_[1]);
   }
 }
