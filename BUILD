@@ -1,4 +1,13 @@
 cc_library(
+  name = "sdl2",
+  hdrs = glob(["include/SDL2/*.h"]),
+  defines = ["_REENTRANT"],
+  includes = ["include/SDL2"],
+  linkopts = ["-lSDL2"],
+  visibility = ["//visibility:public"],
+)
+
+cc_library(
   name = "soa",
   hdrs = [
     "soa/array_field.h",
@@ -74,6 +83,7 @@ cc_binary(
   name = "particle_simulation",
   srcs = ["example/particle_simulation.cc"],
   deps = [
+    ":sdl2",
     ":soa",
     ":executor",
   ],
