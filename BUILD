@@ -7,10 +7,10 @@ cc_library(
     "soa/field_type_generator.h",
     "soa/layout.h",
     "soa/soa.h",
+    "soa/storage.h",
   ],
   textual_hdrs = [
     "soa/class_initialization.inc",
-    "soa/storage.inc",
   ],
   deps = [":executor"],
 )

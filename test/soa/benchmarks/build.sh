@@ -1,42 +1,28 @@
+#!/bin/bash
 set -e
 echo "Script will stop on error or incorrect result."
 
 mkdir -p bin
 mkdir -p assembly
 
-# Valid addressing mode
-g++ -std=c++11 -O0 codegen_test.cc -I../../.. -o bin/valid_gcc_O0
-bin/valid_gcc_O0
-objdump -S bin/valid_gcc_O0 > assembly/valid_gcc_O0.S
-
-g++ -std=c++11 -O3 codegen_test.cc -I../../.. -o bin/valid_gcc_O3
-bin/valid_gcc_O3
-objdump -S bin/valid_gcc_O3 > assembly/valid_gcc_O3.S
-
-clang++-3.8 -std=c++11 -O0 codegen_test.cc -I../../.. -o bin/valid_clang38_O0
-bin/valid_clang38_O0
-objdump -S bin/valid_clang38_O0 > assembly/valid_clang38_O0.S
-
-clang++-3.8 -std=c++11 -O3 codegen_test.cc -I../../.. -o bin/valid_clang38_O3
-bin/valid_clang38_O3
-objdump -S bin/valid_clang38_O3 > assembly/valid_clang38_O3.S
-
-
-# Zero addressing mode
-g++ -std=c++11 -O0 -DADDR_ZERO codegen_test.cc -I../../.. -o bin/zero_gcc_O0
-bin/zero_gcc_O0
-objdump -S bin/zero_gcc_O0 > assembly/zero_gcc_O0.S
-
-g++ -std=c++11 -O3 -DADDR_ZERO codegen_test.cc -I../../.. -o bin/zero_gcc_O3
-bin/zero_gcc_O3
-objdump -S bin/zero_gcc_O3 > assembly/zero_gcc_O3.S
-
-clang++-3.8 -std=c++11 -O0 -DADDR_ZERO codegen_test.cc -I../../.. \
-    -o bin/zero_clang38_O0
-bin/zero_clang38_O0
-objdump -S bin/zero_clang38_O0 > assembly/zero_clang38_O0.S
-
-clang++-3.8 -std=c++11 -O3 -DADDR_ZERO codegen_test.cc -I../../.. \
-    -o bin/zero_clang38_O3
-bin/zero_clang38_O3
-objdump -S bin/zero_clang38_O3 > assembly/zero_clang38_O3.S
+for v_compiler in "g++" "clang++-3.8"
+do
+  for v_storage in "StaticStorage" "DynamicStorage"
+  do
+    for v_opt_mode in "-O0" "-O3"
+    do
+      for v_addr_mode in "0" "4"
+      do
+        out_name="${v_compiler}_${v_opt_mode}_${v_storage}_${v_addr_mode}"
+        ${v_compiler} -std=c++11 ${v_opt_mode} \
+            -DSTORAGE_STRATEGY=${v_storage} \
+            -DADDRESS_MODE=${v_addr_mode} \
+            codegen_test.cc \
+            -I../../.. \
+            -o bin/${out_name}
+        bin/${out_name}
+        objdump -S bin/${out_name} > assembly/${out_name}.S
+      done
+    done
+  done
+done

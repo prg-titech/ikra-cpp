@@ -1,5 +1,5 @@
 
-bin/valid_gcc_O3:     file format elf64-x86-64
+bin/g++_-O3_DynamicStorage_4:     file format elf64-x86-64
 
 
 Disassembly of section .init:

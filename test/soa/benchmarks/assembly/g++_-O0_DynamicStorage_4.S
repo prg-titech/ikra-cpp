@@ -1,5 +1,5 @@
 
-bin/valid_gcc_O0:     file format elf64-x86-64
+bin/g++_-O0_DynamicStorage_4:     file format elf64-x86-64
 
 
 Disassembly of section .init:
@@ -142,7 +142,7 @@ Disassembly of section .text:
   4005e8:	48 89 45 e8          	mov    %rax,-0x18(%rbp)
   4005ec:	31 c0                	xor    %eax,%eax
   4005ee:	bf 04 00 00 00       	mov    $0x4,%edi
-  4005f3:	e8 44 04 00 00       	callq  400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEnwEm>
+  4005f3:	e8 44 04 00 00       	callq  400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEnwEm>
   4005f8:	48 89 c3             	mov    %rax,%rbx
   4005fb:	b8 00 00 00 00       	mov    $0x0,%eax
   400600:	c6 04 03 00          	movb   $0x0,(%rbx,%rax,1)
@@ -222,7 +222,7 @@ Disassembly of section .text:
   400703:	53                   	push   %rbx
   400704:	48 83 ec 08          	sub    $0x8,%rsp
   400708:	bf 04 00 00 00       	mov    $0x4,%edi
-  40070d:	e8 2a 03 00 00       	callq  400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEnwEm>
+  40070d:	e8 2a 03 00 00       	callq  400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEnwEm>
   400712:	48 89 c3             	mov    %rax,%rbx
   400715:	b8 00 00 00 00       	mov    $0x0,%eax
   40071a:	c6 04 03 00          	movb   $0x0,(%rbx,%rax,1)
@@ -350,7 +350,7 @@ Disassembly of section .text:
   40086d:	81 7d f8 ff ff 00 00 	cmpl   $0xffff,-0x8(%rbp)
   400874:	75 0a                	jne    400880 <_Z41__static_initialization_and_destruction_0ii+0x27>
   400876:	bf 60 20 60 00       	mov    $0x602060,%edi
-  40087b:	e8 98 01 00 00       	callq  400a18 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE15InternalStorageC1Ev>
+  40087b:	e8 98 01 00 00       	callq  400a18 <_ZN4ikra3soa14DynamicStorageI9TestClassEC1Ev>
   400880:	90                   	nop
   400881:	c9                   	leaveq 
   400882:	c3                   	retq   
@@ -423,7 +423,7 @@ Disassembly of section .text:
   40093e:	c3                   	retq   
   40093f:	90                   	nop
 
-0000000000400940 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEC1Ev>:
+0000000000400940 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEC1Ev>:
   400940:	55                   	push   %rbp
   400941:	48 89 e5             	mov    %rsp,%rbp
   400944:	48 83 ec 10          	sub    $0x10,%rsp
@@ -443,7 +443,7 @@ Disassembly of section .text:
   400964:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400968:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
   40096c:	48 89 c7             	mov    %rax,%rdi
-  40096f:	e8 cc ff ff ff       	callq  400940 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEC1Ev>
+  40096f:	e8 cc ff ff ff       	callq  400940 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEC1Ev>
   400974:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
   400978:	48 83 c0 04          	add    $0x4,%rax
   40097c:	48 89 c7             	mov    %rax,%rdi
@@ -501,7 +501,7 @@ Disassembly of section .text:
   400a16:	c9                   	leaveq 
   400a17:	c3                   	retq   
 
-0000000000400a18 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE15InternalStorageC1Ev>:
+0000000000400a18 <_ZN4ikra3soa14DynamicStorageI9TestClassEC1Ev>:
   400a18:	55                   	push   %rbp
   400a19:	48 89 e5             	mov    %rsp,%rbp
   400a1c:	48 83 ec 10          	sub    $0x10,%rsp
@@ -515,18 +515,18 @@ Disassembly of section .text:
   400a3a:	c9                   	leaveq 
   400a3b:	c3                   	retq   
 
-0000000000400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEnwEm>:
+0000000000400a3c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEnwEm>:
   400a3c:	55                   	push   %rbp
   400a3d:	48 89 e5             	mov    %rsp,%rbp
   400a40:	48 83 ec 10          	sub    $0x10,%rsp
   400a44:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
-  400a48:	e8 9e 01 00 00       	callq  400beb <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
+  400a48:	e8 9e 01 00 00       	callq  400beb <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
   400a4d:	8b 05 0d 16 20 00    	mov    0x20160d(%rip),%eax        # 602060 <_ZN9TestClass7storageE>
   400a53:	8d 50 01             	lea    0x1(%rax),%edx
   400a56:	89 15 04 16 20 00    	mov    %edx,0x201604(%rip)        # 602060 <_ZN9TestClass7storageE>
   400a5c:	89 c0                	mov    %eax,%eax
   400a5e:	48 89 c7             	mov    %rax,%rdi
-  400a61:	e8 8c 01 00 00       	callq  400bf2 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE3getEm>
+  400a61:	e8 8c 01 00 00       	callq  400bf2 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE3getEm>
   400a66:	c9                   	leaveq 
   400a67:	c3                   	retq   
 
@@ -547,7 +547,7 @@ Disassembly of section .text:
   400a7d:	5d                   	pop    %rbp
   400a7e:	c3                   	retq   
 
-0000000000400a7f <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EEdlEPv>:
+0000000000400a7f <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEEdlEPv>:
   400a7f:	55                   	push   %rbp
   400a80:	48 89 e5             	mov    %rsp,%rbp
   400a83:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
@@ -683,25 +683,25 @@ Disassembly of section .text:
   400be9:	5d                   	pop    %rbp
   400bea:	c3                   	retq   
 
-0000000000400beb <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>:
+0000000000400beb <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>:
   400beb:	55                   	push   %rbp
   400bec:	48 89 e5             	mov    %rsp,%rbp
   400bef:	90                   	nop
   400bf0:	5d                   	pop    %rbp
   400bf1:	c3                   	retq   
 
-0000000000400bf2 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE3getEm>:
+0000000000400bf2 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE3getEm>:
   400bf2:	55                   	push   %rbp
   400bf3:	48 89 e5             	mov    %rsp,%rbp
   400bf6:	48 83 ec 10          	sub    $0x10,%rsp
   400bfa:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400bfe:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
   400c02:	48 89 c7             	mov    %rax,%rdi
-  400c05:	e8 02 00 00 00       	callq  400c0c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400c05:	e8 02 00 00 00       	callq  400c0c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
   400c0a:	c9                   	leaveq 
   400c0b:	c3                   	retq   
 
-0000000000400c0c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4EE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
+0000000000400c0c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
   400c0c:	55                   	push   %rbp
   400c0d:	48 89 e5             	mov    %rsp,%rbp
   400c10:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)

@@ -1,4 +1,4 @@
-#include <tuple>    // TODO: Only need uintptr_t here.
+#include <cstdint>
 #include <type_traits>
 
 #ifndef EXECUTOR_ARRAY_H

@@ -1,7 +1,9 @@
 #ifndef SOA_SOA_H
 #define SOA_SOA_H
 
-#include <tuple>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <type_traits>
 
 // Asserts active only in debug mode (NDEBUG).

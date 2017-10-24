@@ -1,5 +1,5 @@
 
-bin/valid_clang38_O3:     file format elf64-x86-64
+bin/clang++-3.8_-O3_DynamicStorage_4:     file format elf64-x86-64
 
 
 Disassembly of section .init:

@@ -4,6 +4,7 @@
 #include "soa/array_field.h"
 #include "soa/constants.h"
 #include "soa/field.h"
+#include "soa/storage.h"
 
 namespace ikra {
 namespace soa {
@@ -32,10 +33,12 @@ struct SizeNDummy {
 // be either "Zero Addressing Mode" or "Valid Addressing Mode".
 template<class Self,
          uintptr_t ContainerSize,
-         int AddressMode = kAddressModeZero>
+         int AddressMode = kAddressModeZero,
+         template<class Owner> class StorageStrategy = DynamicStorage>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
-  #include "soa/storage.inc"
+  using Storage = StorageStrategy<Self>;
+  const static uintptr_t kContainerSize = ContainerSize;
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
@@ -87,20 +90,25 @@ class SoaLayout : SizeNDummy<AddressMode> {
     assert(false);
   }
 
-  // Return an iterator pointing to the first instance of this class.
-  static executor::Iterator<Self*> begin() {
-    return Self::storage.begin();
-  }
-
-  // Return an iterator pointing to the last instance of this class.
-  static executor::Iterator<Self*> end() {
-    return Self::storage.end();
+  // Return the number of instances of this class.
+  static uintptr_t size() {
+    return Self::storage.size;
   }
 
   // Return a pointer to an object with a given ID.
   static Self* get(uintptr_t id) {
     assert(id <= Self::storage.size);
     return get_(id);
+  }
+
+  // Return an iterator pointing to the first instance of this class.
+  static executor::Iterator<Self*> begin() {
+    return executor::Iterator<Self*>(Self::get(0));
+  }
+
+  // Return an iterator pointing to the last instance of this class + 1.
+  static executor::Iterator<Self*> end() {
+    return ++executor::Iterator<Self*>(Self::get(size() - 1));
   }
 
   // Calculate the ID of this object (assuming valid addressing mode).

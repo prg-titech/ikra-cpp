@@ -6,20 +6,26 @@
 
 #define NDEBUG    // No asserts.
 #include "soa/soa.h"
+#include "soa/storage.h"
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
+using ikra::soa::DynamicStorage;
+using ikra::soa::StaticStorage;
 
-// Compiler flag determines addressing mode.
-#ifdef ADDR_ZERO
-#define ADDR_MODE kAddressModeZero
-#else
-#define ADDR_MODE 4
+// Compiler flags determine addressing mode and storage strategy.
+#ifndef ADDRESS_MODE
+#error Address mode undefined
+#endif
+
+#ifndef STORAGE_STRATEGY
+#error Storage strategy undefined
 #endif
 
 static const uint32_t kClassMaxInst = 0x1234;
 
-class TestClass : public SoaLayout<TestClass, kClassMaxInst, ADDR_MODE> {
+class TestClass : public SoaLayout<TestClass, kClassMaxInst,
+                                   ADDRESS_MODE, STORAGE_STRATEGY> {
  public:
   #include IKRA_INITIALIZE_CLASS
 
