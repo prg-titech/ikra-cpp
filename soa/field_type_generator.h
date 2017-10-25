@@ -22,6 +22,15 @@
   }; \
   array::layout<type, size, OffsetCounter<field_id>::value>
 
+#define IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type, field_id) \
+  template<typename DummyT> \
+  struct OffsetCounter<field_id + 1, DummyT> { \
+    static const uint32_t value = OffsetCounter<field_id>::value + \
+                                  sizeof(type); \
+    static const bool kIsSpecialization = true; \
+  }; \
+  Field<type, OffsetCounter<field_id>::value>
+
 // Generate types that keep track of offsets by themselves. Add more types
 // as needed.
 #define bool__(field_id) IKRA_FIELD_TYPE_GENERATOR(bool, field_id)
@@ -39,6 +48,11 @@
 #define ARRAY__1(arg1) ARRAY_2(0, 0)
 #define ARRAY__0() ARRAY_2(0, 0)
 
+#define field__(type, field_id) \
+    IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type, field_id)
+#define ref__(type, field_id) \
+    IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type*, field_id)
+
 // Generate types that keep track of offsets and field indices by themselves.
 // Add more types are needed.
 #define IKRA_NEXT_FIELD_ID __COUNTER__ - kCounterFirstIndex - 1
@@ -55,3 +69,6 @@
 #define ARRAY_1(arg) \
     static_assert(false, "At least two arguments required for array_.")
 #define ARRAY_0() ARRAY_1(0)
+
+#define field_(type) IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type, IKRA_NEXT_FIELD_ID)
+#define ref_(type) IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type*, IKRA_NEXT_FIELD_ID)
