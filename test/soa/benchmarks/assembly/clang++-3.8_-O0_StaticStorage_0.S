@@ -321,12 +321,12 @@ Disassembly of section .text:
   400934:	48 83 ec 10          	sub    $0x10,%rsp
   400938:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   40093c:	e8 ef 02 00 00       	callq  400c30 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
-  400941:	8b 04 25 50 20 60 00 	mov    0x602050,%eax
-  400948:	89 c1                	mov    %eax,%ecx
-  40094a:	83 c1 01             	add    $0x1,%ecx
-  40094d:	89 0c 25 50 20 60 00 	mov    %ecx,0x602050
-  400954:	89 c0                	mov    %eax,%eax
-  400956:	89 c7                	mov    %eax,%edi
+  400941:	48 8b 3c 25 50 20 60 	mov    0x602050,%rdi
+  400948:	00 
+  400949:	48 89 f8             	mov    %rdi,%rax
+  40094c:	48 83 c0 01          	add    $0x1,%rax
+  400950:	48 89 04 25 50 20 60 	mov    %rax,0x602050
+  400957:	00 
   400958:	e8 e3 02 00 00       	callq  400c40 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE3getEm>
   40095d:	48 83 c4 10          	add    $0x10,%rsp
   400961:	5d                   	pop    %rbp
@@ -515,7 +515,7 @@ Disassembly of section .text:
   400b61:	48 89 e5             	mov    %rsp,%rbp
   400b64:	48 b8 50 20 60 00 00 	movabs $0x602050,%rax
   400b6b:	00 00 00 
-  400b6e:	48 83 c0 04          	add    $0x4,%rax
+  400b6e:	48 83 c0 08          	add    $0x8,%rax
   400b72:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400b76:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
   400b7a:	48 c1 e7 02          	shl    $0x2,%rdi
@@ -567,7 +567,7 @@ Disassembly of section .text:
   400bf1:	48 89 e5             	mov    %rsp,%rbp
   400bf4:	48 b8 50 20 60 00 00 	movabs $0x602050,%rax
   400bfb:	00 00 00 
-  400bfe:	48 83 c0 04          	add    $0x4,%rax
+  400bfe:	48 83 c0 08          	add    $0x8,%rax
   400c02:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400c06:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
   400c0a:	48 c1 e7 02          	shl    $0x2,%rdi

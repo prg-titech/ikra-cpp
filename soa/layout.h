@@ -27,22 +27,22 @@ struct SizeNDummy {
 // of this class will be 0. In valid addressing mode, the size of this class
 // will be the size of first field.
 // Self is the type of the subclass being defined (see also F-bound
-// polymorphism or "Curiously Recurring Template Pattern"). ContainerSize is
+// polymorphism or "Curiously Recurring Template Pattern"). Capacity is
 // the maximum number of instances this class can have. It is a compile-time
 // constant to allow for efficient field address computation. AddressMode can
 // be either "Zero Addressing Mode" or "Valid Addressing Mode".
 template<class Self,
-         uintptr_t ContainerSize,
+         IndexType Capacity,
          int AddressMode = kAddressModeZero,
          template<class Owner> class StorageStrategy = DynamicStorage>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = StorageStrategy<Self>;
-  const static uintptr_t kContainerSize = ContainerSize;
+  const static IndexType kCapacity = Capacity;
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
-  using Field = Field_<T, ContainerSize, Offset, AddressMode, Self>;
+  using Field = Field_<T, Capacity, Offset, AddressMode, Self>;
 
   // Generate field types. Implement more types as necessary.
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool);
@@ -54,11 +54,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // This struct serves as a namespace and contains array field types.
   struct array {
     template<typename T, size_t N, int Offset>
-    using aos = ikra::soa::AosArrayField_<std::array<T, N>, ContainerSize,
+    using aos = ikra::soa::AosArrayField_<std::array<T, N>, Capacity,
                                           Offset, AddressMode, Self>;
 
     template<typename T, size_t N, int Offset>
-    using soa = ikra::soa::SoaArrayField_<T, N, ContainerSize,
+    using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
                                           Offset, AddressMode, Self>;
   };
 
@@ -70,7 +70,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
     check_sizeof_class();
     assert(count == sizeof(Self));
     // Check if out of memory.
-    assert(Self::storage.size <= ContainerSize);
+    assert(Self::storage.size <= Capacity);
 
     return get(Self::storage.size++);
   }
@@ -91,12 +91,12 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Return the number of instances of this class.
-  static uintptr_t size() {
+  static IndexType size() {
     return Self::storage.size;
   }
 
   // Return a pointer to an object with a given ID.
-  static Self* get(uintptr_t id) {
+  static Self* get(IndexType id) {
     assert(id <= Self::storage.size);
     return get_(id);
   }
@@ -113,7 +113,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Calculate the ID of this object (assuming valid addressing mode).
   template<int A = AddressMode>
-  typename std::enable_if<A != kAddressModeZero, uintptr_t>::type 
+  typename std::enable_if<A != kAddressModeZero, IndexType>::type 
   id() const {
     return (reinterpret_cast<uintptr_t>(this) - 
            reinterpret_cast<uintptr_t>(Self::storage.data)) / AddressMode;
@@ -121,7 +121,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Calculate the ID of this object (assuming zero addressing mode).
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeZero, uintptr_t>::type 
+  typename std::enable_if<A == kAddressModeZero, IndexType>::type 
   id() const {
     return reinterpret_cast<uintptr_t>(this);
   }
@@ -130,7 +130,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // Return a pointer to an object by ID (assuming valid addressing mode).
   template<int A = AddressMode>
   static typename std::enable_if<A != kAddressModeZero, Self*>::type
-  get_(uintptr_t id) {
+  get_(IndexType id) {
     uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) +
                         id*AddressMode;
     return reinterpret_cast<Self*>(address);
@@ -139,7 +139,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // Return a pointer to an object by ID (assuming zero addressing mode).
   template<int A = AddressMode>
   static typename std::enable_if<A == kAddressModeZero, Self*>::type
-  get_(uintptr_t id) {
+  get_(IndexType id) {
     return reinterpret_cast<Self*>(id);
   }
 

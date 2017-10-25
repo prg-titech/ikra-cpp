@@ -1,6 +1,8 @@
 #ifndef SOA_STORAGE_H
 #define SOA_STORAGE_H
 
+#include "soa/constants.h"
+
 namespace ikra {
 namespace soa {
 
@@ -13,7 +15,7 @@ class DynamicStorage {
   DynamicStorage() {
     // Note: ObjectSize is accessed within a function here.
     data = reinterpret_cast<char*>(
-        malloc(Owner::ObjectSize::value * Owner::kContainerSize));
+        malloc(Owner::ObjectSize::value * Owner::kCapacity));
   }
 
   // Use existing data allocation.
@@ -21,7 +23,7 @@ class DynamicStorage {
     data = reinterpret_cast<char*>(ptr);
   }
 
-  uint32_t size;
+  IndexType size;
   char* data;
 };
 
@@ -30,8 +32,8 @@ class DynamicStorage {
 template<class Owner>
 class StaticStorage {
  public:
-  uint32_t size;
-  char data[Owner::ObjectSize::value * Owner::kContainerSize];
+  IndexType size;
+  char data[Owner::ObjectSize::value * Owner::kCapacity];
 };
 
 }  // namespace soa

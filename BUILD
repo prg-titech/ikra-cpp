@@ -74,12 +74,6 @@ cc_test(
 )
 
 cc_binary(
-  name = "codegen_test",
-  srcs = ["test/soa/benchmarks/codegen_test.cc"],
-  deps = [":soa"],
-)
-
-cc_binary(
   name = "particle_simulation",
   srcs = ["example/particle_simulation.cc"],
   deps = [

@@ -390,12 +390,12 @@ Disassembly of section .text:
   400a74:	48 83 ec 10          	sub    $0x10,%rsp
   400a78:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400a7c:	e8 5f 03 00 00       	callq  400de0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
-  400a81:	8b 04 25 58 20 60 00 	mov    0x602058,%eax
-  400a88:	89 c1                	mov    %eax,%ecx
-  400a8a:	83 c1 01             	add    $0x1,%ecx
-  400a8d:	89 0c 25 58 20 60 00 	mov    %ecx,0x602058
-  400a94:	89 c0                	mov    %eax,%eax
-  400a96:	89 c7                	mov    %eax,%edi
+  400a81:	48 8b 3c 25 58 20 60 	mov    0x602058,%rdi
+  400a88:	00 
+  400a89:	48 89 f8             	mov    %rdi,%rax
+  400a8c:	48 83 c0 01          	add    $0x1,%rax
+  400a90:	48 89 04 25 58 20 60 	mov    %rax,0x602058
+  400a97:	00 
   400a98:	e8 53 03 00 00       	callq  400df0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE3getEm>
   400a9d:	48 83 c4 10          	add    $0x10,%rsp
   400aa1:	5d                   	pop    %rbp

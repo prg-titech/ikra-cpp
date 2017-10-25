@@ -1,11 +1,15 @@
-#include <cstdint>
-#include <type_traits>
-
 #ifndef EXECUTOR_ARRAY_H
 #define EXECUTOR_ARRAY_H
 
+#include <cstdint>
+#include <type_traits>
+
+#include "soa/constants.h"
+
 namespace ikra {
 namespace executor {
+
+using ikra::soa::IndexType;
 
 // A convenience class storing two iterators, i.e., a range of SOA objects.
 template<typename T>
@@ -51,7 +55,7 @@ void execute(IteratorRange<T> range, F function, Args... args) {
 // iterator (length many elements). This is currently a fully sequential
 // operation.
 template<typename T, typename F, typename... Args>
-void execute(T begin, uintptr_t length, F function, Args... args) {
+void execute(T begin, IndexType length, F function, Args... args) {
   T iter = begin;
   for (uint32_t i = 0; i < length; ++i, ++iter) {
     ((**iter).*function)(args...);

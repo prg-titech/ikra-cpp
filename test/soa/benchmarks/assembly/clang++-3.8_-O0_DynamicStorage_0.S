@@ -365,12 +365,12 @@ Disassembly of section .text:
   4009f4:	48 83 ec 10          	sub    $0x10,%rsp
   4009f8:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   4009fc:	e8 df 02 00 00       	callq  400ce0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
-  400a01:	8b 04 25 58 20 60 00 	mov    0x602058,%eax
-  400a08:	89 c1                	mov    %eax,%ecx
-  400a0a:	83 c1 01             	add    $0x1,%ecx
-  400a0d:	89 0c 25 58 20 60 00 	mov    %ecx,0x602058
-  400a14:	89 c0                	mov    %eax,%eax
-  400a16:	89 c7                	mov    %eax,%edi
+  400a01:	48 8b 3c 25 58 20 60 	mov    0x602058,%rdi
+  400a08:	00 
+  400a09:	48 89 f8             	mov    %rdi,%rax
+  400a0c:	48 83 c0 01          	add    $0x1,%rax
+  400a10:	48 89 04 25 58 20 60 	mov    %rax,0x602058
+  400a17:	00 
   400a18:	e8 d3 02 00 00       	callq  400cf0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE3getEm>
   400a1d:	48 83 c4 10          	add    $0x10,%rsp
   400a21:	5d                   	pop    %rbp

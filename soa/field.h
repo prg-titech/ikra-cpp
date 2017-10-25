@@ -16,13 +16,13 @@ namespace ikra {
 namespace soa {
 
 template<typename T,
-         uintptr_t ContainerSize,
+         IndexType Capacity,
          uint32_t Offset,
          int AddressMode,
          class Owner>
 class Field_ {
  private:
-  using Self = Field_<T, ContainerSize, Offset, AddressMode, Owner>;
+  using Self = Field_<T, Capacity, Offset, AddressMode, Owner>;
 
  public:
   Field_(Field_&& other) = delete;
@@ -89,17 +89,15 @@ class Field_ {
   Field_(const Field_& other) {}
 
   template<int A = AddressMode>
-  typename std::enable_if<A != kAddressModeZero, uintptr_t>::type 
+  typename std::enable_if<A != kAddressModeZero, IndexType>::type
   id() const {
-    static_assert(AddressMode != kAddressModeZero, "Internal error.");
     return (reinterpret_cast<uintptr_t>(this) - 
            reinterpret_cast<uintptr_t>(Owner::storage.data)) / A - 1;
   }
 
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeZero, uintptr_t>::type 
+  typename std::enable_if<A == kAddressModeZero, IndexType>::type
   id() const {
-    static_assert(AddressMode == kAddressModeZero, "Internal error.");
     return reinterpret_cast<uintptr_t>(this);
   }
 
@@ -108,7 +106,6 @@ class Field_ {
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, T*>::type
   data_ptr() const {
-    static_assert(AddressMode != kAddressModeZero, "Internal error.");
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(id() < Owner::storage.size);
@@ -116,17 +113,16 @@ class Field_ {
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
     uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                         ContainerSize*Offset;
+                         Capacity*Offset;
     return reinterpret_cast<T*>(p_result);
   }
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   data_ptr() const {
-    static_assert(AddressMode == kAddressModeZero, "Internal error.");
     assert(id() < Owner::storage.size);
     return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                Owner::storage.data + ContainerSize*Offset);
+                                Owner::storage.data + Capacity*Offset);
   }
 
   // Force size of this class to be 0.

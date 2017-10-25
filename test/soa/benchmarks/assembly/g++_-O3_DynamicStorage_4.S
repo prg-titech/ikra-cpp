@@ -44,43 +44,43 @@ Disassembly of section .plt.got:
 Disassembly of section .text:
 
 00000000004004a0 <main>:
-  4004a0:	8b 15 ba 0b 20 00    	mov    0x200bba(%rip),%edx        # 601060 <_ZN9TestClass7storageE>
-  4004a6:	53                   	push   %rbx
-  4004a7:	b9 20 64 68 24       	mov    $0x24686420,%ecx
-  4004ac:	be b4 07 40 00       	mov    $0x4007b4,%esi
-  4004b1:	bf 01 00 00 00       	mov    $0x1,%edi
-  4004b6:	8d 42 01             	lea    0x1(%rdx),%eax
-  4004b9:	89 05 a1 0b 20 00    	mov    %eax,0x200ba1(%rip)        # 601060 <_ZN9TestClass7storageE>
-  4004bf:	48 8b 05 a2 0b 20 00 	mov    0x200ba2(%rip),%rax        # 601068 <_ZN9TestClass7storageE+0x8>
-  4004c6:	48 8d 1c 90          	lea    (%rax,%rdx,4),%rbx
-  4004ca:	48 89 da             	mov    %rbx,%rdx
-  4004cd:	c6 03 00             	movb   $0x0,(%rbx)
-  4004d0:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
-  4004d4:	48 29 c2             	sub    %rax,%rdx
-  4004d7:	c6 43 02 00          	movb   $0x0,0x2(%rbx)
-  4004db:	c6 43 03 00          	movb   $0x0,0x3(%rbx)
-  4004df:	48 83 e2 fc          	and    $0xfffffffffffffffc,%rdx
-  4004e3:	48 01 d0             	add    %rdx,%rax
-  4004e6:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
-  4004eb:	c7 00 83 2d d2 27    	movl   $0x27d22d83,(%rax)
-  4004f1:	c7 80 d0 48 00 00 20 	movl   $0x24686420,0x48d0(%rax)
-  4004f8:	64 68 24 
-  4004fb:	31 c0                	xor    %eax,%eax
-  4004fd:	e8 7e ff ff ff       	callq  400480 <__printf_chk@plt>
-  400502:	48 8b 05 5f 0b 20 00 	mov    0x200b5f(%rip),%rax        # 601068 <_ZN9TestClass7storageE+0x8>
-  400509:	48 29 c3             	sub    %rax,%rbx
-  40050c:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
-  400510:	48 01 c3             	add    %rax,%rbx
-  400513:	b8 01 00 00 00       	mov    $0x1,%eax
-  400518:	81 3b 83 2d d2 27    	cmpl   $0x27d22d83,(%rbx)
-  40051e:	75 0d                	jne    40052d <main+0x8d>
-  400520:	81 bb d0 48 00 00 20 	cmpl   $0x24686420,0x48d0(%rbx)
-  400527:	64 68 24 
-  40052a:	0f 95 c0             	setne  %al
-  40052d:	0f b6 c0             	movzbl %al,%eax
-  400530:	5b                   	pop    %rbx
-  400531:	c3                   	retq   
-  400532:	0f 1f 40 00          	nopl   0x0(%rax)
+  4004a0:	48 8b 15 b9 0b 20 00 	mov    0x200bb9(%rip),%rdx        # 601060 <_ZN9TestClass7storageE>
+  4004a7:	53                   	push   %rbx
+  4004a8:	b9 20 64 68 24       	mov    $0x24686420,%ecx
+  4004ad:	be b4 07 40 00       	mov    $0x4007b4,%esi
+  4004b2:	bf 01 00 00 00       	mov    $0x1,%edi
+  4004b7:	48 8d 42 01          	lea    0x1(%rdx),%rax
+  4004bb:	48 89 05 9e 0b 20 00 	mov    %rax,0x200b9e(%rip)        # 601060 <_ZN9TestClass7storageE>
+  4004c2:	48 8b 05 9f 0b 20 00 	mov    0x200b9f(%rip),%rax        # 601068 <_ZN9TestClass7storageE+0x8>
+  4004c9:	48 8d 1c 90          	lea    (%rax,%rdx,4),%rbx
+  4004cd:	48 89 da             	mov    %rbx,%rdx
+  4004d0:	c6 03 00             	movb   $0x0,(%rbx)
+  4004d3:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
+  4004d7:	48 29 c2             	sub    %rax,%rdx
+  4004da:	c6 43 02 00          	movb   $0x0,0x2(%rbx)
+  4004de:	c6 43 03 00          	movb   $0x0,0x3(%rbx)
+  4004e2:	48 83 e2 fc          	and    $0xfffffffffffffffc,%rdx
+  4004e6:	48 01 d0             	add    %rdx,%rax
+  4004e9:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
+  4004ee:	c7 00 83 2d d2 27    	movl   $0x27d22d83,(%rax)
+  4004f4:	c7 80 d0 48 00 00 20 	movl   $0x24686420,0x48d0(%rax)
+  4004fb:	64 68 24 
+  4004fe:	31 c0                	xor    %eax,%eax
+  400500:	e8 7b ff ff ff       	callq  400480 <__printf_chk@plt>
+  400505:	48 8b 05 5c 0b 20 00 	mov    0x200b5c(%rip),%rax        # 601068 <_ZN9TestClass7storageE+0x8>
+  40050c:	48 29 c3             	sub    %rax,%rbx
+  40050f:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
+  400513:	48 01 c3             	add    %rax,%rbx
+  400516:	b8 01 00 00 00       	mov    $0x1,%eax
+  40051b:	81 3b 83 2d d2 27    	cmpl   $0x27d22d83,(%rbx)
+  400521:	75 0d                	jne    400530 <main+0x90>
+  400523:	81 bb d0 48 00 00 20 	cmpl   $0x24686420,0x48d0(%rbx)
+  40052a:	64 68 24 
+  40052d:	0f 95 c0             	setne  %al
+  400530:	0f b6 c0             	movzbl %al,%eax
+  400533:	5b                   	pop    %rbx
+  400534:	c3                   	retq   
+  400535:	90                   	nop
   400536:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   40053d:	00 00 00 
 
@@ -180,17 +180,17 @@ Disassembly of section .text:
   40065d:	00 00 00 
 
 0000000000400660 <_Z12new_instancev>:
-  400660:	8b 05 fa 09 20 00    	mov    0x2009fa(%rip),%eax        # 601060 <_ZN9TestClass7storageE>
-  400666:	8d 50 01             	lea    0x1(%rax),%edx
-  400669:	89 15 f1 09 20 00    	mov    %edx,0x2009f1(%rip)        # 601060 <_ZN9TestClass7storageE>
-  40066f:	48 8b 15 f2 09 20 00 	mov    0x2009f2(%rip),%rdx        # 601068 <_ZN9TestClass7storageE+0x8>
-  400676:	48 8d 04 82          	lea    (%rdx,%rax,4),%rax
-  40067a:	c6 00 00             	movb   $0x0,(%rax)
-  40067d:	c6 40 01 00          	movb   $0x0,0x1(%rax)
-  400681:	c6 40 02 00          	movb   $0x0,0x2(%rax)
-  400685:	c6 40 03 00          	movb   $0x0,0x3(%rax)
-  400689:	c3                   	retq   
-  40068a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+  400660:	48 8b 05 f9 09 20 00 	mov    0x2009f9(%rip),%rax        # 601060 <_ZN9TestClass7storageE>
+  400667:	48 8d 50 01          	lea    0x1(%rax),%rdx
+  40066b:	48 89 15 ee 09 20 00 	mov    %rdx,0x2009ee(%rip)        # 601060 <_ZN9TestClass7storageE>
+  400672:	48 8b 15 ef 09 20 00 	mov    0x2009ef(%rip),%rdx        # 601068 <_ZN9TestClass7storageE+0x8>
+  400679:	48 8d 04 82          	lea    (%rdx,%rax,4),%rax
+  40067d:	c6 00 00             	movb   $0x0,(%rax)
+  400680:	c6 40 01 00          	movb   $0x0,0x1(%rax)
+  400684:	c6 40 02 00          	movb   $0x0,0x2(%rax)
+  400688:	c6 40 03 00          	movb   $0x0,0x3(%rax)
+  40068c:	c3                   	retq   
+  40068d:	0f 1f 00             	nopl   (%rax)
 
 0000000000400690 <_Z12write_field0P9TestClass>:
   400690:	48 8b 05 d1 09 20 00 	mov    0x2009d1(%rip),%rax        # 601068 <_ZN9TestClass7storageE+0x8>

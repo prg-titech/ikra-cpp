@@ -11,7 +11,7 @@ namespace soa {
 // instance create will attempt to zero-initialize data at an invalid address.
 // Zero Addressing Mode results in efficient assembly code for field reads/
 // writes. The address of a field `i` in object with ID t is defined as:
-// this*sizeof(type(i)) + ContainerSize*Offset(i) + ClassStorageBase.
+// this*sizeof(type(i)) + Capacity*Offset(i) + ClassStorageBase.
 // Notice that the second operand is a compile-time constant if the container
 // size (max. number of elements of a class) is a compile-time constant.
 // See test/soa/benchmarks/codegen_test.cc for inspection of assembly code.
@@ -25,8 +25,12 @@ static const int kAddressModeZero = 0;
 // of a field is now complex:
 // (this - ClassStorageBase - sizeof(first field type))
 //         / sizeof(first field type) * sizeof(type(i)) + 
-//     ContainerSize*Offset(i) + ClassStorageBase
+//     Capacity*Offset(i) + ClassStorageBase
 // See test/soa/pointer_arithmetics_test.cc for pointer arithmetics examples.
+static const int kAddressModeValid = 1;
+
+// The type that is used to represent indices.
+using IndexType = uintptr_t;
 
 }  // namespace soa
 }  // namespace ikra

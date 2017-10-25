@@ -346,12 +346,12 @@ Disassembly of section .text:
   4009b4:	48 83 ec 10          	sub    $0x10,%rsp
   4009b8:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   4009bc:	e8 5f 03 00 00       	callq  400d20 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE18check_sizeof_classILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
-  4009c1:	8b 04 25 50 20 60 00 	mov    0x602050,%eax
-  4009c8:	89 c1                	mov    %eax,%ecx
-  4009ca:	83 c1 01             	add    $0x1,%ecx
-  4009cd:	89 0c 25 50 20 60 00 	mov    %ecx,0x602050
-  4009d4:	89 c0                	mov    %eax,%eax
-  4009d6:	89 c7                	mov    %eax,%edi
+  4009c1:	48 8b 3c 25 50 20 60 	mov    0x602050,%rdi
+  4009c8:	00 
+  4009c9:	48 89 f8             	mov    %rdi,%rax
+  4009cc:	48 83 c0 01          	add    $0x1,%rax
+  4009d0:	48 89 04 25 50 20 60 	mov    %rax,0x602050
+  4009d7:	00 
   4009d8:	e8 53 03 00 00       	callq  400d30 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE3getEm>
   4009dd:	48 83 c4 10          	add    $0x10,%rsp
   4009e1:	5d                   	pop    %rbp
@@ -552,7 +552,7 @@ Disassembly of section .text:
   400c11:	48 89 e5             	mov    %rsp,%rbp
   400c14:	48 b8 50 20 60 00 00 	movabs $0x602050,%rax
   400c1b:	00 00 00 
-  400c1e:	48 83 c0 04          	add    $0x4,%rax
+  400c1e:	48 83 c0 08          	add    $0x8,%rax
   400c22:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400c26:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
   400c2a:	48 89 7d f0          	mov    %rdi,-0x10(%rbp)
@@ -612,7 +612,7 @@ Disassembly of section .text:
   400cc1:	48 89 e5             	mov    %rsp,%rbp
   400cc4:	48 b8 50 20 60 00 00 	movabs $0x602050,%rax
   400ccb:	00 00 00 
-  400cce:	48 83 c0 04          	add    $0x4,%rax
+  400cce:	48 83 c0 08          	add    $0x8,%rax
   400cd2:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400cd6:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
   400cda:	48 89 7d f0          	mov    %rdi,-0x10(%rbp)
@@ -664,7 +664,7 @@ Disassembly of section .text:
   400d51:	48 89 e5             	mov    %rsp,%rbp
   400d54:	48 b8 50 20 60 00 00 	movabs $0x602050,%rax
   400d5b:	00 00 00 
-  400d5e:	48 83 c0 04          	add    $0x4,%rax
+  400d5e:	48 83 c0 08          	add    $0x8,%rax
   400d62:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400d66:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
   400d6a:	48 c1 e7 02          	shl    $0x2,%rdi
