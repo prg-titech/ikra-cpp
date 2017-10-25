@@ -12,7 +12,7 @@ class TestClass : public SoaLayout<TestClass, kClassMaxInst, sizeof(int)> {
  public:
   #include IKRA_INITIALIZE_CLASS
 
-  int___ field0;
+  int_ field0;
 };
 
 TestClass::Storage TestClass::storage;

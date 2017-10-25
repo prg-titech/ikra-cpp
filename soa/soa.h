@@ -15,6 +15,7 @@
 #include "soa/field.h"
 #include "soa/field_type_generator.h"
 #include "soa/layout.h"
+#include "soa/preprocessor.h"
 
 #define IKRA_INITIALIZE_CLASS "soa/class_initialization.inc"
 

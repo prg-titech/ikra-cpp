@@ -15,6 +15,7 @@ cc_library(
     "soa/field.h",
     "soa/field_type_generator.h",
     "soa/layout.h",
+    "soa/preprocessor.h",
     "soa/soa.h",
     "soa/storage.h",
   ],

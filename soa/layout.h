@@ -14,7 +14,7 @@ namespace soa {
 // int_<Offset> --> Field<int, Offset>
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
   template<int Offset> \
-  using type ## _ = Field<type, Offset>; \
+  using soa_ ## type = Field<type, Offset>; \
 
 // sizeof(SizeNDummy) = N;
 template<size_t N>

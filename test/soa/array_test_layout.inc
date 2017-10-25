@@ -4,15 +4,15 @@ class IKRA_TEST_CLASSNAME
  public:
   #include IKRA_INITIALIZE_CLASS
 
-  int___ field0;
+  int_ field0;
 
   // Array has size 12 bytes.
-  array_aos___(int, 3) field1;
-  int___ field2;
+  array_(int, 3, aos) field1;
+  int_ field2;
 
   // Array has size 12 bytes.
-  array_soa___(int, 3) field3;
-  int___ field4;
+  array_(int, 3) field3;
+  int_ field4;
 
   int field1_sum() {
     int result = 0;

@@ -29,8 +29,8 @@ class TestClass : public SoaLayout<TestClass, kClassMaxInst,
  public:
   #include IKRA_INITIALIZE_CLASS
 
-  int___ field0;
-  int___ field1;
+  int_ field0;
+  int_ field1;
 
   void increase_field0() {
     field0 *= 0x5555;

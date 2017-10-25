@@ -4,10 +4,10 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
  public:
   #include IKRA_INITIALIZE_CLASS
 
-  int___ field0;
-  double___ field1;
-  bool___ field2;
-  int___ field4;
+  int_ field0;
+  double_ field1;
+  bool_ field2;
+  int_ field4;
 
   IKRA_TEST_CLASSNAME() {}
 

@@ -55,8 +55,8 @@ class Well : public SoaLayout<Well, kNumWells> {
     render_rect(renderer, position_[0], position_[1], 60);
   }
 
-  double___ mass_;
-  array_soa___(double, 2) position_;
+  double_ mass_;
+  array_(double, 2) position_;
 };
 
 Well::Storage Well::storage;
@@ -75,10 +75,10 @@ class Particle : public SoaLayout<Particle, kNumParticles> {
     this->reset_force();
   }
 
-  double___ mass_;
-  array_soa___(double, 2) position_;
-  array_soa___(double, 2) velocity_;
-  array_soa___(double, 2) force_;
+  double_ mass_;
+  array_(double, 2) position_;
+  array_(double, 2) velocity_;
+  array_(double, 2) force_;
 
   double distance_to(Well* well) {
     double dx = position_[0] - well->position_[0];
