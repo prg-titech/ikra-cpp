@@ -101,6 +101,22 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return get_(id);
   }
 
+  // Return a pointer to an object by ID (assuming valid addressing mode).
+  template<int A = AddressMode>
+  static typename std::enable_if<A != kAddressModeZero, Self*>::type
+  get_(IndexType id) {
+    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) +
+                        id*AddressMode;
+    return reinterpret_cast<Self*>(address);
+  }
+
+  // Return a pointer to an object by ID (assuming zero addressing mode).
+  template<int A = AddressMode>
+  static typename std::enable_if<A == kAddressModeZero, Self*>::type
+  get_(IndexType id) {
+    return reinterpret_cast<Self*>(id);
+  }
+
   // Return an iterator pointing to the first instance of this class.
   static executor::Iterator<Self*> begin() {
     return executor::Iterator<Self*>(Self::get(0));
@@ -127,22 +143,6 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
  private:
-  // Return a pointer to an object by ID (assuming valid addressing mode).
-  template<int A = AddressMode>
-  static typename std::enable_if<A != kAddressModeZero, Self*>::type
-  get_(IndexType id) {
-    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage.data) +
-                        id*AddressMode;
-    return reinterpret_cast<Self*>(address);
-  }
-
-  // Return a pointer to an object by ID (assuming zero addressing mode).
-  template<int A = AddressMode>
-  static typename std::enable_if<A == kAddressModeZero, Self*>::type
-  get_(IndexType id) {
-    return reinterpret_cast<Self*>(id);
-  }
-
   // Compile-time check for the size of this class. This check should fail
   // if this class contains fields that are not declared with the SOA DSL.
   // Assuming valid addressing mode.

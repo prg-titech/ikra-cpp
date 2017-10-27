@@ -119,7 +119,7 @@ Particle::Storage Particle::storage;
 // Defined here because definition depends on Particle.
 void Well::add_force() {
   // Add force induced by this well to all particles.
-  execute<Particle>(&Particle::add_force, this);
+  execute(&Particle::add_force, this);
 }
 
 
@@ -150,20 +150,20 @@ int main() {
   SDL_bool done = SDL_FALSE;
   while (!done) {
     // Reset forces.
-    execute<Particle>(&Particle::reset_force);
+    execute(&Particle::reset_force);
 
     // Update forces.
-    execute<Well>(&Well::add_force);
+    execute(&Well::add_force);
 
     // Update velocities and positions.
-    execute<Particle>(&Particle::update, kTimeInterval);
+    execute(&Particle::update, kTimeInterval);
 
     // Draw scene.
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    execute<Well>(&Well::draw, renderer);
-    execute<Particle>(&Particle::draw, renderer);
+    execute(&Well::draw, renderer);
+    execute(&Particle::draw, renderer);
     SDL_RenderPresent(renderer);
 
     // Wait for user to close the window.

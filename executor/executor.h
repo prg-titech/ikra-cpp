@@ -11,6 +11,15 @@ namespace executor {
 
 using ikra::soa::IndexType;
 
+template<class F>
+struct FunctionTypeHelper;
+
+template<typename R, typename C, typename... Args>
+struct FunctionTypeHelper<R (C::*)(Args...)> {
+  using return_type = R;
+  using class_type = C;
+};
+
 // A convenience class storing two iterators, i.e., a range of SOA objects.
 template<typename T>
 class IteratorRange {
@@ -64,8 +73,8 @@ void execute(T begin, IndexType length, F function, Args... args) {
 
 // This function executes a method on all SOA objects of a given class.
 // This is currently a fully sequential operation.
-// TODO: Is is possible to infer T?
-template<typename T, typename F, typename... Args>
+template<typename F, typename... Args,
+         class T = typename FunctionTypeHelper<F>::class_type>
 void execute(F function, Args... args) {
   execute(T::begin(), T::end(), function, args...);
 }
