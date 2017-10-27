@@ -66,9 +66,26 @@ TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
   }
 }
 
+TYPED_TEST_P(ExecutorTest, ExecuteAndReduce) {
+  std::array<TypeParam*, kTestSize> arr;
+
+  for (int i = 0; i < kTestSize; ++i) {
+    arr[i] = new TypeParam(i, 100*i);
+  }
+
+  int expected = ((kTestSize - 1)*kTestSize)/2*101 + kTestSize;
+  int actual = execute_and_reduce(make_iterator(arr[0]),
+                                  ++make_iterator(arr[kTestSize - 1]),
+                                  &TypeParam::sum_plus_delta,
+                                  [](int a, int b) { return a + b; }, 0, 1);
+
+  EXPECT_EQ(actual, expected);
+}
+
 REGISTER_TYPED_TEST_CASE_P(ExecutorTest,
                            StdArray,
-                           IteratorFromPointers);
+                           IteratorFromPointers,
+                           ExecuteAndReduce);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, ExecutorTest, TestClassV);
 INSTANTIATE_TYPED_TEST_CASE_P(Zero, ExecutorTest, TestClassZ);

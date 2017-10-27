@@ -12,6 +12,10 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
   void add_field1_and_a_to_field0(int a) {
     field0 += field1 + a;
   }
+
+  int sum_plus_delta(int delta) {
+    return field0 + field1 + delta;
+  }
 };
 
 IKRA_TEST_CLASSNAME::Storage IKRA_TEST_CLASSNAME::storage;

@@ -70,6 +70,10 @@ class Iterator {
     return position_ != other.position_;
   }
 
+  bool operator==(Iterator<T> other) const {
+    return position_ == other.position_;
+  }
+
   Iterator(T position) : position_(position) {}
 
  private:

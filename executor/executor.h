@@ -51,6 +51,24 @@ void execute(T begin, T end, F function, Args... args) {
 }
 
 // This function executes a method on all SOA objects that are enumerated by an
+// iterator (between begin and end). It also reduces all return values.
+template<typename T, typename F, typename... Args, typename G, typename D>
+D execute_and_reduce(T begin, T end, F function, G reduce_function,
+                     D default_value, Args... args) {
+  if (begin == end) {
+    return default_value;
+  }
+
+  D reduced_value = ((**begin).*function)(args...);
+  for (auto iter = ++begin; iter != end; ++iter) {
+    // TODO: Should we override and use operator->* here?
+    reduced_value = reduce_function(reduced_value,
+                                    ((**iter).*function)(args...));
+  }
+  return reduced_value;
+}
+
+// This function executes a method on all SOA objects that are enumerated by an
 // iterator (between begin and end). This is currently a fully sequential
 // operation.
 template<typename T, typename F, typename... Args>
@@ -77,6 +95,16 @@ template<typename F, typename... Args,
          class T = typename FunctionTypeHelper<F>::class_type>
 void execute(F function, Args... args) {
   execute(T::begin(), T::end(), function, args...);
+}
+
+// This function executes a method on all SOA objects of a given class and
+// reduces the return values.
+template<typename F, typename... Args, typename G, typename D,
+         class T = typename FunctionTypeHelper<F>::class_type>
+D execute_and_reduce(F function, G reduce_function, D default_value,
+                     Args... args) {
+  return execute_and_reduce(T::begin(), T::end(),
+                            function, reduce_function, default_value, args...);
 }
 
 }  // namespace executor
