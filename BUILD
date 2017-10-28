@@ -99,3 +99,13 @@ cc_binary(
     ":executor",
   ]
 )
+
+cc_binary(
+  name = "bfs_std_vector",
+  srcs = ["example/bfs/bfs_std_vector.cc"],
+  deps = [
+    ":bfs_util",
+    ":soa",
+    ":executor",
+  ]
+)

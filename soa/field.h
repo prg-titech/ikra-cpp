@@ -28,10 +28,11 @@ class Field_ {
   // This class may only be used to declare fields of classes.
   void* operator new(size_t count) = delete;
 
-  // TODO: What should we do with the dereference operator?
-  //T& operator*() const {
-  //  return *data_ptr();
-  //}
+  // TODO: Disable operator if T is a SOA class. SOA object pointer cannot be
+  // dereferenced.
+  T& operator*() const {
+    return *data_ptr();
+  }
 
   T* operator->() const {
     return data_ptr();
