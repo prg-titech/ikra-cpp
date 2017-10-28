@@ -25,8 +25,6 @@ class Field_ {
   using Self = Field_<T, Capacity, Offset, AddressMode, Owner>;
 
  public:
-  Field_(Field_&& other) = delete;
-
   // This class may only be used to declare fields of classes.
   void* operator new(size_t count) = delete;
 
@@ -87,6 +85,10 @@ class Field_ {
   // Initialize the field with the value of another field. Used in class
   // constructor. TODO: Unclear why exactly we need this one...
   Field_(const Field_& other) {}
+
+  // Not sure why we need this. Required to make field inplace initialization
+  // work.
+  Field_(Field_&& other) {}
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, IndexType>::type

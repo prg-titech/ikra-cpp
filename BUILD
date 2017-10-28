@@ -83,3 +83,19 @@ cc_binary(
     ":executor",
   ],
 )
+
+cc_library(
+  name = "bfs_util",
+  hdrs = ["example/bfs/bfs_loader.h"],
+  deps = [":soa"],
+)
+
+cc_binary(
+  name = "bfs_const_size_array",
+  srcs = ["example/bfs/bfs_const_size_array.cc"],
+  deps = [
+    ":bfs_util",
+    ":soa",
+    ":executor",
+  ]
+)
