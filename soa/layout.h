@@ -4,6 +4,7 @@
 #include "soa/array_field.h"
 #include "soa/constants.h"
 #include "soa/field.h"
+#include "soa/inlined_dynamic_array_field.h"
 #include "soa/storage.h"
 
 namespace ikra {
@@ -60,6 +61,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
     template<typename T, size_t N, int Offset>
     using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
                                           Offset, AddressMode, Self>;
+
+    template<typename T, size_t InlineSize, int Offset>
+    using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
+        T, InlineSize, Capacity, Offset, AddressMode, Self>;
   };
 
   static const int kAddressMode = AddressMode;

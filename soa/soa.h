@@ -14,6 +14,7 @@
 #include "soa/constants.h"
 #include "soa/field.h"
 #include "soa/field_type_generator.h"
+#include "soa/inlined_dynamic_array_field.h"
 #include "soa/layout.h"
 #include "soa/preprocessor.h"
 

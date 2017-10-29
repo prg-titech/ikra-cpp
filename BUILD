@@ -14,6 +14,7 @@ cc_library(
     "soa/constants.h",
     "soa/field.h",
     "soa/field_type_generator.h",
+    "soa/inlined_dynamic_array_field.h",
     "soa/layout.h",
     "soa/preprocessor.h",
     "soa/soa.h",
@@ -103,6 +104,16 @@ cc_binary(
 cc_binary(
   name = "bfs_std_vector",
   srcs = ["example/bfs/bfs_std_vector.cc"],
+  deps = [
+    ":bfs_util",
+    ":soa",
+    ":executor",
+  ]
+)
+
+cc_binary(
+  name = "bfs_inlined_dynamic_array",
+  srcs = ["example/bfs/bfs_inlined_dynamic_array.cc"],
   deps = [
     ":bfs_util",
     ":soa",

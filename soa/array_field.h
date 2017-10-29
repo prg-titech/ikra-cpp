@@ -18,6 +18,8 @@ template<typename T,
 class AosArrayField_ : public Field_<T, Capacity, Offset,
                                      AddressMode, Owner> {
  public:
+  static const int kSize = sizeof(T);
+
   // This operator is just for convenience reasons. The correct way to use it
   // would be "this->operator[](pos)".
   typename T::reference operator[](typename T::size_type pos) {
@@ -41,6 +43,8 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
                               AddressMode, Owner>;
 
  public:
+  static const int kSize = sizeof(std::array<T, ArraySize>);
+
   // Support calling methods using -> syntax.
   const Self* operator->() const {
     return this;

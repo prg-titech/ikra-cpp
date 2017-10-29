@@ -17,7 +17,7 @@
   template<typename DummyT> \
   struct OffsetCounter<field_id + 1, DummyT> { \
     static const uint32_t value = OffsetCounter<field_id>::value + \
-                                  sizeof(std::array<type, size>); \
+        array::layout<type, size, OffsetCounter<field_id>::value>::kSize; \
     static const bool kIsSpecialization = true; \
   }; \
   array::layout<type, size, OffsetCounter<field_id>::value>
