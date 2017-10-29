@@ -15,6 +15,7 @@ namespace soa {
 // * T: Base type of the array.
 // * InlinedSize: Number of elements that should be stored in SOA format.
 // * Remaining fields: See array_field.h
+// Note, for SOA class references, T must be a pointer type!
 template<typename T,
          size_t InlinedSize,
          IndexType Capacity,
@@ -38,7 +39,8 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   SoaInlinedDynamicArrayField_(size_t num_elements) {
     // Allocate memory in arena if necessary.
     if (num_elements > InlinedSize) {
-      void* mem = Owner::storage.allocate_in_arena(num_elements - InlinedSize);
+      void* mem = Owner::storage.allocate_in_arena(
+          (num_elements - InlinedSize)*sizeof(T));
       this->set_external_pointer(reinterpret_cast<T*>(mem));
     }
   }
@@ -78,8 +80,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, void>::type
   set_external_pointer(T* ptr) {
-    assert(this->id() < Owner::storage.size);
-
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
     uintptr_t p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
@@ -90,8 +90,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, void>::type
   set_external_pointer(T* ptr) {
-    assert(this->id() < Owner::storage.size);
-
     uintptr_t p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
                            reinterpret_cast<uintptr_t>(Owner::storage.data) +
                            Capacity*(Offset + InlinedSize*sizeof(T));

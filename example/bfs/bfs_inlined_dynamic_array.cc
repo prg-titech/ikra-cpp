@@ -6,7 +6,7 @@
 #include "executor/executor.h"
 #include "soa/soa.h"
 
-static const int kInlineSize = 20;
+static const int kInlineSize = 2;
 static const int kMaxVertices = 20000;
 static const int kMaxEdges = 100000;
 
