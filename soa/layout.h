@@ -35,10 +35,10 @@ struct SizeNDummy {
 template<class Self,
          IndexType Capacity,
          int AddressMode = kAddressModeZero,
-         template<class Owner> class StorageStrategy = DynamicStorage>
+         class StorageStrategy = DynamicStorage>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
-  using Storage = StorageStrategy<Self>;
+  using Storage = typename StorageStrategy::template type<Self>;
   const static IndexType kCapacity = Capacity;
 
   // Define a Field_ alias as a shortcut.

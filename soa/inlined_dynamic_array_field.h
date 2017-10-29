@@ -35,6 +35,14 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     this->set_external_pointer(external_storage);
   }
 
+  SoaInlinedDynamicArrayField_(size_t num_elements) {
+    // Allocate memory in arena if necessary.
+    if (num_elements > InlinedSize) {
+      void* mem = Owner::storage.allocate_in_arena(num_elements - InlinedSize);
+      this->set_external_pointer(reinterpret_cast<T*>(mem));
+    }
+  }
+
   // Support calling methods using -> syntax.
   const Self* operator->() const {
     return this;
@@ -128,7 +136,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(this->id() < Owner::storage.size);
-    assert(this->get_external_pointer() != nullptr);
 
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
@@ -140,9 +147,9 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
       return reinterpret_cast<T*>(p_result);
     } else {
       // Within external storage. Pointer at position InlinedSize + 1.
-      uintptr_t p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                             Capacity*(Offset + InlinedSize*sizeof(T));
-      return *reinterpret_cast<T**>(p_external) + (Pos - InlinedSize);
+      T* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (Pos - InlinedSize);
     }
   }
 
@@ -150,7 +157,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr() const {
     assert(this->id() < Owner::storage.size);
-    assert(this->get_external_pointer() != nullptr);
 
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
@@ -161,9 +167,9 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
                                   Capacity*(Offset + Pos*sizeof(T)));
     } else {
       // Within external storage.
-      uintptr_t p_external = p_this*sizeof(T) + p_base +
-                             Capacity*(Offset + InlinedSize*sizeof(T));
-      return *reinterpret_cast<T**>(p_external) + (Pos - InlinedSize);
+      T* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (Pos - InlinedSize);
     }
   }
 
@@ -173,7 +179,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(this->id() < Owner::storage.size);
-    assert(this->get_external_pointer() != nullptr);
 
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
@@ -185,9 +190,9 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
       return reinterpret_cast<T*>(p_result);
     } else {
       // Within external storage. Pointer at position InlinedSize + 1.
-      uintptr_t p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                             Capacity*(Offset + InlinedSize*sizeof(T));
-      return *reinterpret_cast<T**>(p_external) + (pos - InlinedSize);
+      T* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (pos - InlinedSize);
     }
   }
 
@@ -195,7 +200,6 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr(size_t pos) const {
     assert(this->id() < Owner::storage.size);
-    assert(this->get_external_pointer() != nullptr);
 
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage.data);
@@ -206,9 +210,9 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
                                   Capacity*(Offset + pos*sizeof(T)));
     } else {
       // Within external storage.
-      uintptr_t p_external = p_this*sizeof(T) + p_base +
-                             Capacity*(Offset + InlinedSize*sizeof(T));
-      return *reinterpret_cast<T**>(p_external) + (pos - InlinedSize);
+      T* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (pos - InlinedSize);
     }
   }
 };

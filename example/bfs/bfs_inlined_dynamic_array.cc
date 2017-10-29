@@ -6,30 +6,27 @@
 #include "executor/executor.h"
 #include "soa/soa.h"
 
-static const int kInlineSize = 2;
+static const int kInlineSize = 20;
 static const int kMaxVertices = 20000;
 static const int kMaxEdges = 100000;
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
+using ikra::soa::StaticStorageWithArena;
+using ikra::soa::kAddressModeZero;
 using ikra::executor::execute;
 using ikra::executor::execute_and_reduce;
 
-class Vertex;
 
-// TODO: This should be hidden in the storage class implementation.
-Vertex** request_external_storage(size_t num_elements);
-
-class Vertex : public SoaLayout<Vertex, kMaxVertices> {
+class Vertex : public SoaLayout<
+    Vertex, kMaxVertices, kAddressModeZero,
+    StaticStorageWithArena<kMaxEdges*sizeof(Vertex*)>> {
  public:
   #include IKRA_INITIALIZE_CLASS
 
   Vertex(const std::vector<IndexType>& neighbors)
-      : adj_list_(request_external_storage(neighbors.size() - kInlineSize)) {
-    // If this check fails, we the dataset cannot be run with this
-    // implementation.
+      : adj_list_(neighbors.size()) {
     adj_list_size_ = neighbors.size();
-
     for (int i = 0; i < num_neighbors(); ++i) {
       adj_list_[i] = Vertex::get_(neighbors[i]);
     }
@@ -55,7 +52,7 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
     bool updated = false;
 
     if (distance_ == iteration) {
-      for (int i = 0; i < adj_list_size_; ++i) {
+      for (int i = 0; i < num_neighbors(); ++i) {
         Vertex* neighbor = adj_list_[i];
         updated |= neighbor->update_distance(distance_ + 1);
       }
@@ -76,16 +73,6 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
 };
 
 Vertex::Storage Vertex::storage;
-
-
-Vertex** external_storage_base;
-Vertex** external_storage_head;
-
-Vertex** request_external_storage(size_t num_elements) {
-  Vertex** return_value = external_storage_head;
-  external_storage_head += num_elements;
-  return return_value;
-}
 
 
 int run() {
@@ -109,10 +96,6 @@ int main(int argc, char* argv[]) {
     printf("Usage: %s filename num_vertices start_vertex\n", argv[0]);
     exit(1);
   }
-
-  // Initialize external memory.
-  external_storage_base = external_storage_head = new Vertex*[kMaxEdges];
-  
   load_file<Vertex>(argv[1], atoi(argv[2]));
 
   // Set start vertex.
