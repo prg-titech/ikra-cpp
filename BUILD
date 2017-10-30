@@ -85,6 +85,16 @@ cc_binary(
   ],
 )
 
+cc_binary(
+  name = "n_body",
+  srcs = ["example/n_body.cc"],
+  deps = [
+    ":sdl2",
+    ":soa",
+    ":executor",
+  ],
+)
+
 cc_library(
   name = "bfs_util",
   hdrs = ["example/bfs/bfs_loader.h"],
