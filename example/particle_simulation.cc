@@ -1,18 +1,20 @@
 // Particle-Well Simulation
 // Code adapted from: http://physics.princeton.edu/~fpretori/Nbody/code.htm
 
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 #include "SDL2/SDL.h"
 
 #include "executor/executor.h"
 #include "soa/soa.h"
 
+using namespace std;
 using ikra::executor::execute;
 using ikra::executor::Iterator;
 using ikra::soa::SoaLayout;
 
-static const int kIterations = 10000;
 static const int kNumWells = 1;
 static const int kNumParticles = 20;
 static const double kTimeInterval = 1500;
@@ -80,12 +82,6 @@ class Particle : public SoaLayout<Particle, kNumParticles> {
   array_(double, 2) velocity_;
   array_(double, 2) force_;
 
-  double distance_to(Well* well) {
-    double dx = position_[0] - well->position_[0];
-    double dy = position_[1] - well->position_[1];
-    return sqrt(dx*dx + dy*dy);
-  }
-
   void add_force(Well* well) {
     double EPS = 3e4;    // Softening parameter (just to avoid infinities).
     double dx = well->position_[0] - position_[0];
@@ -132,7 +128,7 @@ int main() {
   SDL_Window* window = nullptr;
   SDL_Renderer* renderer = nullptr;
 
-  if (SDL_CreateWindowAndRenderer(kWindowWidth, kWindowWidth, 0,
+  if (SDL_CreateWindowAndRenderer(kWindowWidth, kWindowlHeight, 0,
         &window, &renderer) != 0) {
     printf("Could not create window/render!\n");
     exit(1);
