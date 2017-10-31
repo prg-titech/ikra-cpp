@@ -23,7 +23,7 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
     adj_list_size_ = neighbors.size();
 
     for (int i = 0; i < num_neighbors(); ++i) {
-      adj_list_->push_back(Vertex::get_(neighbors[i]));
+      adj_list_->push_back(Vertex::get_uninitialized(neighbors[i]));
     }
   }
 

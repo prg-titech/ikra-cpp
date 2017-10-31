@@ -700,29 +700,29 @@ Disassembly of section .text:
   400bc0:	48 83 ec 10          	sub    $0x10,%rsp
   400bc4:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400bc8:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400bcc:	48 89 c7             	mov    %rax,%rdi
-  400bcf:	e8 02 00 00 00       	callq  400bd6 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
-  400bd4:	c9                   	leaveq 
-  400bd5:	c3                   	retq   
+  400bcc:	48 83 c0 01          	add    $0x1,%rax
+  400bd0:	48 89 c7             	mov    %rax,%rdi
+  400bd3:	e8 02 00 00 00       	callq  400bda <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400bd8:	c9                   	leaveq 
+  400bd9:	c3                   	retq   
 
-0000000000400bd6 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
-  400bd6:	55                   	push   %rbp
-  400bd7:	48 89 e5             	mov    %rsp,%rbp
-  400bda:	48 83 ec 20          	sub    $0x20,%rsp
-  400bde:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-  400be2:	e8 49 fc ff ff       	callq  400830 <_ZN9TestClass7storageEv>
-  400be7:	48 83 c0 08          	add    $0x8,%rax
-  400beb:	48 89 c2             	mov    %rax,%rdx
-  400bee:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
-  400bf2:	48 c1 e0 02          	shl    $0x2,%rax
-  400bf6:	48 01 d0             	add    %rdx,%rax
-  400bf9:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
-  400bfd:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400c01:	c9                   	leaveq 
-  400c02:	c3                   	retq   
-  400c03:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400c0a:	00 00 00 
-  400c0d:	0f 1f 00             	nopl   (%rax)
+0000000000400bda <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_13StaticStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
+  400bda:	55                   	push   %rbp
+  400bdb:	48 89 e5             	mov    %rsp,%rbp
+  400bde:	48 83 ec 20          	sub    $0x20,%rsp
+  400be2:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+  400be6:	e8 45 fc ff ff       	callq  400830 <_ZN9TestClass7storageEv>
+  400beb:	48 83 c0 08          	add    $0x8,%rax
+  400bef:	48 89 c2             	mov    %rax,%rdx
+  400bf2:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
+  400bf6:	48 c1 e0 02          	shl    $0x2,%rax
+  400bfa:	48 01 d0             	add    %rdx,%rax
+  400bfd:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+  400c01:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+  400c05:	c9                   	leaveq 
+  400c06:	c3                   	retq   
+  400c07:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  400c0e:	00 00 
 
 0000000000400c10 <__libc_csu_init>:
   400c10:	41 57                	push   %r15

@@ -74,20 +74,32 @@ class SoaLayout : SizeNDummy<AddressMode> {
 #ifdef __CUDA_ARCH__
   // TODO: Not sure why the CUDA version does not take the overload without
   // the "self" argument. Is this a compiler bug?
-  __device__ void* operator new(size_t count, Self* self) {
-    printf("!!!!!!!!! %i\n", sizeof(Self));
-    return get_(0);
+  __device__ void* operator new(size_t count, void* self) {
+    printf("IN NEW!!\n");
+    check_sizeof_class();
+    // Check if out of memory.
+    assert(Self::storage().size <= Capacity);
+
+    return get_(1);
+  }
+
+  __device__ void operator delete(void* /*ptr*/, void* self) {
+    assert(false);
   }
 #else
   // Create a new instance of this class. Data will be allocated inside
   // storage.data.
-  __ikra_device__ void* operator new(size_t count) {
+  void* operator new(size_t count) {
     check_sizeof_class();
     assert(count == sizeof(Self));
     // Check if out of memory.
     assert(Self::storage().size <= Capacity);
-
     return get(Self::storage().size++);
+  }
+
+  // TODO: Implement delete operator.
+  void operator delete(void* /*ptr*/) {
+    assert(false);
   }
 #endif  // __CUDA_ARCH__
 
@@ -96,14 +108,9 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__ void* operator new[](size_t count) {
     check_sizeof_class();
     // Size of this class is 1. "count" is the number of new instances.
-    Self* first_ptr = get(Self::storage().size);
+    Self* first_ptr = get_uninitialized(Self::storage().size);
     Self::storage().size += count/AddressMode;
     return first_ptr;
-  }
-
-  // TODO: Implement delete operator.
-  __ikra_device__ void operator delete(void* /*ptr*/) {
-    assert(false);
   }
 
   // Return the number of instances of this class.
@@ -111,27 +118,48 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return Self::storage().size;
   }
 
+  // Return a pointer to an object with a given ID. Do not check if the
+  // object was previously initialized.
+  __ikra_device__ static Self* get_uninitialized(IndexType id) {
+    assert(id >= 0);
+    assert(id <= Capacity);
+
+    // First object has actually ID 1. This is because a nullptr allows the
+    // compiler to do special optimizations.
+    return get_(id + 1);
+  }
+
   // Return a pointer to an object with a given ID.
   __ikra_device__ static Self* get(IndexType id) {
-    assert(id <= Self::storage().size);
-    return get_(id);
+    assert(id >= 0);
+    assert(id < Self::storage().size);
+
+    // First object has actually ID 1. This is because a nullptr allows the
+    // compiler to do special optimizations.
+    return get_(id + 1);
   }
 
   // Return a pointer to an object by ID (assuming valid addressing mode).
+  // TODO: This method should be private!
   template<int A = AddressMode>
   __ikra_device__
   static typename std::enable_if<A != kAddressModeZero, Self*>::type
   get_(IndexType id) {
+    // Start counting from 1 internally.
+    assert(id > 0);
     uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage().data) +
                         id*AddressMode;
     return reinterpret_cast<Self*>(address);
   }
 
   // Return a pointer to an object by ID (assuming zero addressing mode).
+  // TODO: This method should be private!
   template<int A = AddressMode>
   __ikra_device__
   static typename std::enable_if<A == kAddressModeZero, Self*>::type
   get_(IndexType id) {
+    // Start counting from 1 internally.
+    assert(id > 0);
     return reinterpret_cast<Self*>(id);
   }
 
@@ -151,7 +179,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   typename std::enable_if<A != kAddressModeZero, IndexType>::type 
   id() const {
     return (reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Self::storage().data)) / AddressMode;
+           reinterpret_cast<uintptr_t>(Self::storage().data)) / A - 1;
   }
 
   // Calculate the ID of this object (assuming zero addressing mode).
@@ -159,7 +187,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   typename std::enable_if<A == kAddressModeZero, IndexType>::type 
   id() const {
-    return reinterpret_cast<uintptr_t>(this);
+    return reinterpret_cast<uintptr_t>(this) - 1;
   }
 
  private:
@@ -170,8 +198,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A != kAddressModeZero, void>::type
   check_sizeof_class() {
+#ifndef __CUDA_ARCH__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == AddressMode,
                   "SOA class must have only SOA fields.");
+#endif
   }
 
   // Compile-time check for the size of this class. This check should fail
@@ -181,8 +211,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A == kAddressModeZero, void>::type
   check_sizeof_class() {
+#ifndef __CUDA_ARCH__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == 0,
                   "SOA class must have only SOA fields.");
+#endif
   }
 };
 

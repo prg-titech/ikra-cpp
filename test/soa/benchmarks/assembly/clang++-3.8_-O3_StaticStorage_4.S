@@ -131,42 +131,43 @@ Disassembly of section .text:
   4005fc:	48 8b 1d 4d 0a 20 00 	mov    0x200a4d(%rip),%rbx        # 601050 <storage_buffer>
   400603:	48 8d 43 01          	lea    0x1(%rbx),%rax
   400607:	48 89 05 42 0a 20 00 	mov    %rax,0x200a42(%rip)        # 601050 <storage_buffer>
-  40060e:	c7 04 9d 58 10 60 00 	movl   $0x0,0x601058(,%rbx,4)
+  40060e:	c7 04 9d 5c 10 60 00 	movl   $0x0,0x60105c(,%rbx,4)
   400615:	00 00 00 00 
-  400619:	c7 04 9d 58 10 60 00 	movl   $0x7777,0x601058(,%rbx,4)
+  400619:	c7 04 9d 5c 10 60 00 	movl   $0x7777,0x60105c(,%rbx,4)
   400620:	77 77 00 00 
-  400624:	c7 04 9d 28 59 60 00 	movl   $0x8888,0x605928(,%rbx,4)
+  400624:	c7 04 9d 2c 59 60 00 	movl   $0x8888,0x60592c(,%rbx,4)
   40062b:	88 88 00 00 
-  40062f:	69 04 9d 58 10 60 00 	imul   $0x5555,0x601058(,%rbx,4),%eax
+  40062f:	69 04 9d 5c 10 60 00 	imul   $0x5555,0x60105c(,%rbx,4),%eax
   400636:	55 55 00 00 
-  40063a:	89 04 9d 58 10 60 00 	mov    %eax,0x601058(,%rbx,4)
-  400641:	69 14 9d 28 59 60 00 	imul   $0x4444,0x605928(,%rbx,4),%edx
+  40063a:	89 04 9d 5c 10 60 00 	mov    %eax,0x60105c(,%rbx,4)
+  400641:	69 14 9d 2c 59 60 00 	imul   $0x4444,0x60592c(,%rbx,4),%edx
   400648:	44 44 00 00 
-  40064c:	89 14 9d 28 59 60 00 	mov    %edx,0x605928(,%rbx,4)
-  400653:	8b 34 9d 58 10 60 00 	mov    0x601058(,%rbx,4),%esi
+  40064c:	89 14 9d 2c 59 60 00 	mov    %edx,0x60592c(,%rbx,4)
+  400653:	8b 34 9d 5c 10 60 00 	mov    0x60105c(,%rbx,4),%esi
   40065a:	bf e4 07 40 00       	mov    $0x4007e4,%edi
   40065f:	31 c0                	xor    %eax,%eax
   400661:	e8 5a fe ff ff       	callq  4004c0 <printf@plt>
   400666:	b0 01                	mov    $0x1,%al
-  400668:	81 3c 9d 58 10 60 00 	cmpl   $0x27d22d83,0x601058(,%rbx,4)
+  400668:	81 3c 9d 5c 10 60 00 	cmpl   $0x27d22d83,0x60105c(,%rbx,4)
   40066f:	83 2d d2 27 
-  400673:	75 11                	jne    400686 <main+0x96>
-  400675:	48 c1 e3 02          	shl    $0x2,%rbx
-  400679:	81 bb 28 59 60 00 20 	cmpl   $0x24686420,0x605928(%rbx)
-  400680:	64 68 24 
-  400683:	0f 95 c0             	setne  %al
-  400686:	0f b6 c0             	movzbl %al,%eax
-  400689:	5b                   	pop    %rbx
-  40068a:	c3                   	retq   
-  40068b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  400673:	75 15                	jne    40068a <main+0x9a>
+  400675:	48 8d 04 9d 04 00 00 	lea    0x4(,%rbx,4),%rax
+  40067c:	00 
+  40067d:	81 b8 28 59 60 00 20 	cmpl   $0x24686420,0x605928(%rax)
+  400684:	64 68 24 
+  400687:	0f 95 c0             	setne  %al
+  40068a:	0f b6 c0             	movzbl %al,%eax
+  40068d:	5b                   	pop    %rbx
+  40068e:	c3                   	retq   
+  40068f:	90                   	nop
 
 0000000000400690 <_Z12new_instancev>:
   400690:	48 8b 0d b9 09 20 00 	mov    0x2009b9(%rip),%rcx        # 601050 <storage_buffer>
   400697:	48 8d 41 01          	lea    0x1(%rcx),%rax
   40069b:	48 89 05 ae 09 20 00 	mov    %rax,0x2009ae(%rip)        # 601050 <storage_buffer>
-  4006a2:	48 8d 04 8d 58 10 60 	lea    0x601058(,%rcx,4),%rax
+  4006a2:	48 8d 04 8d 5c 10 60 	lea    0x60105c(,%rcx,4),%rax
   4006a9:	00 
-  4006aa:	c7 04 8d 58 10 60 00 	movl   $0x0,0x601058(,%rcx,4)
+  4006aa:	c7 04 8d 5c 10 60 00 	movl   $0x0,0x60105c(,%rcx,4)
   4006b1:	00 00 00 00 
   4006b5:	c3                   	retq   
   4006b6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)

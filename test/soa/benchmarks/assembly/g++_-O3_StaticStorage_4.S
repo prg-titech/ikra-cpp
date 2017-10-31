@@ -47,10 +47,10 @@ Disassembly of section .text:
   400460:	48 8b 05 19 0c 20 00 	mov    0x200c19(%rip),%rax        # 601080 <storage_buffer>
   400467:	48 c7 05 b6 9d 20 00 	movq   $0x0,0x209db6(%rip)        # 60a228 <storage_buffer+0x91a8>
   40046e:	00 00 00 00 
-  400472:	48 8d 1c 85 88 10 60 	lea    0x601088(,%rax,4),%rbx
-  400479:	00 
-  40047a:	48 8d 50 01          	lea    0x1(%rax),%rdx
-  40047e:	48 89 15 fb 0b 20 00 	mov    %rdx,0x200bfb(%rip)        # 601080 <storage_buffer>
+  400472:	48 83 c0 01          	add    $0x1,%rax
+  400476:	48 8d 1c 85 88 10 60 	lea    0x601088(,%rax,4),%rbx
+  40047d:	00 
+  40047e:	48 89 05 fb 0b 20 00 	mov    %rax,0x200bfb(%rip)        # 601080 <storage_buffer>
   400485:	c6 04 85 88 10 60 00 	movb   $0x0,0x601088(,%rax,4)
   40048c:	00 
   40048d:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
@@ -174,11 +174,11 @@ Disassembly of section .text:
   40061d:	00 00 00 
 
 0000000000400620 <_Z12new_instancev>:
-  400620:	48 8b 15 59 0a 20 00 	mov    0x200a59(%rip),%rdx        # 601080 <storage_buffer>
-  400627:	48 8d 42 01          	lea    0x1(%rdx),%rax
-  40062b:	48 89 05 4e 0a 20 00 	mov    %rax,0x200a4e(%rip)        # 601080 <storage_buffer>
-  400632:	48 8d 04 95 88 10 60 	lea    0x601088(,%rdx,4),%rax
-  400639:	00 
+  400620:	48 8b 05 59 0a 20 00 	mov    0x200a59(%rip),%rax        # 601080 <storage_buffer>
+  400627:	48 8d 50 01          	lea    0x1(%rax),%rdx
+  40062b:	48 8d 04 95 88 10 60 	lea    0x601088(,%rdx,4),%rax
+  400632:	00 
+  400633:	48 89 15 46 0a 20 00 	mov    %rdx,0x200a46(%rip)        # 601080 <storage_buffer>
   40063a:	c6 04 95 88 10 60 00 	movb   $0x0,0x601088(,%rdx,4)
   400641:	00 
   400642:	c6 40 01 00          	movb   $0x0,0x1(%rax)

@@ -74,9 +74,12 @@ class Field_ {
   // TODO: Implement special operators:
   // http://en.cppreference.com/w/cpp/language/operator_logical
 
+// TODO: Implement visibility. This is an nvcc bug.
 // protected:
-  // Only Owner can create new fields for itself.
+//  Only Owner can create new fields for itself.
 //  friend Owner;
+
+
   __ikra_device__ Field_() {}
 
   // Initialize the field with a given value. Used in class constructor.
@@ -92,19 +95,20 @@ class Field_ {
   // work.
   __ikra_device__ Field_(Field_&& /*other*/) {}
 
+ protected:
   template<int A = AddressMode>
   __ikra_device__
   typename std::enable_if<A != kAddressModeZero, IndexType>::type
   id() const {
     return (reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Owner::storage().data)) / A - 1;
+           reinterpret_cast<uintptr_t>(Owner::storage().data)) / A - 1 - 1;
   }
 
   template<int A = AddressMode>
   __ikra_device__
   typename std::enable_if<A == kAddressModeZero, IndexType>::type
   id() const {
-    return reinterpret_cast<uintptr_t>(this);
+    return reinterpret_cast<uintptr_t>(this) - 1;
   }
 
   // Calculate the address of this field based on the "this" pointer of this

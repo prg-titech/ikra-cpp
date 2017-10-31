@@ -139,49 +139,51 @@ Disassembly of section .text:
   40064c:	48 8b 0d fd 09 20 00 	mov    0x2009fd(%rip),%rcx        # 601050 <storage_buffer>
   400653:	48 8d 51 01          	lea    0x1(%rcx),%rdx
   400657:	48 89 15 f2 09 20 00 	mov    %rdx,0x2009f2(%rip)        # 601050 <storage_buffer>
-  40065e:	48 8d 1c 88          	lea    (%rax,%rcx,4),%rbx
-  400662:	c7 04 88 00 00 00 00 	movl   $0x0,(%rax,%rcx,4)
-  400669:	48 8b 05 e8 09 20 00 	mov    0x2009e8(%rip),%rax        # 601058 <storage_buffer+0x8>
-  400670:	48 89 d9             	mov    %rbx,%rcx
-  400673:	48 29 c1             	sub    %rax,%rcx
-  400676:	48 83 e1 fc          	and    $0xfffffffffffffffc,%rcx
-  40067a:	c7 04 01 77 77 00 00 	movl   $0x7777,(%rcx,%rax,1)
-  400681:	c7 84 01 d0 48 00 00 	movl   $0x8888,0x48d0(%rcx,%rax,1)
-  400688:	88 88 00 00 
-  40068c:	69 14 01 55 55 00 00 	imul   $0x5555,(%rcx,%rax,1),%edx
-  400693:	89 14 01             	mov    %edx,(%rcx,%rax,1)
-  400696:	69 94 01 d0 48 00 00 	imul   $0x4444,0x48d0(%rcx,%rax,1),%edx
-  40069d:	44 44 00 00 
-  4006a1:	89 94 01 d0 48 00 00 	mov    %edx,0x48d0(%rcx,%rax,1)
-  4006a8:	8b 34 01             	mov    (%rcx,%rax,1),%esi
-  4006ab:	bf 44 08 40 00       	mov    $0x400844,%edi
-  4006b0:	31 c0                	xor    %eax,%eax
-  4006b2:	e8 39 fe ff ff       	callq  4004f0 <printf@plt>
-  4006b7:	48 8b 05 9a 09 20 00 	mov    0x20099a(%rip),%rax        # 601058 <storage_buffer+0x8>
-  4006be:	48 29 c3             	sub    %rax,%rbx
-  4006c1:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
-  4006c5:	b1 01                	mov    $0x1,%cl
-  4006c7:	81 3c 03 83 2d d2 27 	cmpl   $0x27d22d83,(%rbx,%rax,1)
-  4006ce:	75 0e                	jne    4006de <main+0xae>
-  4006d0:	81 bc 18 d0 48 00 00 	cmpl   $0x24686420,0x48d0(%rax,%rbx,1)
-  4006d7:	20 64 68 24 
-  4006db:	0f 95 c1             	setne  %cl
-  4006de:	0f b6 c1             	movzbl %cl,%eax
-  4006e1:	5b                   	pop    %rbx
-  4006e2:	c3                   	retq   
-  4006e3:	66 66 66 66 2e 0f 1f 	data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
-  4006ea:	84 00 00 00 00 00 
+  40065e:	48 8d 5c 88 04       	lea    0x4(%rax,%rcx,4),%rbx
+  400663:	c7 44 88 04 00 00 00 	movl   $0x0,0x4(%rax,%rcx,4)
+  40066a:	00 
+  40066b:	48 8b 05 e6 09 20 00 	mov    0x2009e6(%rip),%rax        # 601058 <storage_buffer+0x8>
+  400672:	48 89 d9             	mov    %rbx,%rcx
+  400675:	48 29 c1             	sub    %rax,%rcx
+  400678:	48 83 e1 fc          	and    $0xfffffffffffffffc,%rcx
+  40067c:	c7 04 01 77 77 00 00 	movl   $0x7777,(%rcx,%rax,1)
+  400683:	c7 84 01 d0 48 00 00 	movl   $0x8888,0x48d0(%rcx,%rax,1)
+  40068a:	88 88 00 00 
+  40068e:	69 14 01 55 55 00 00 	imul   $0x5555,(%rcx,%rax,1),%edx
+  400695:	89 14 01             	mov    %edx,(%rcx,%rax,1)
+  400698:	69 94 01 d0 48 00 00 	imul   $0x4444,0x48d0(%rcx,%rax,1),%edx
+  40069f:	44 44 00 00 
+  4006a3:	89 94 01 d0 48 00 00 	mov    %edx,0x48d0(%rcx,%rax,1)
+  4006aa:	8b 34 01             	mov    (%rcx,%rax,1),%esi
+  4006ad:	bf 44 08 40 00       	mov    $0x400844,%edi
+  4006b2:	31 c0                	xor    %eax,%eax
+  4006b4:	e8 37 fe ff ff       	callq  4004f0 <printf@plt>
+  4006b9:	48 8b 05 98 09 20 00 	mov    0x200998(%rip),%rax        # 601058 <storage_buffer+0x8>
+  4006c0:	48 29 c3             	sub    %rax,%rbx
+  4006c3:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
+  4006c7:	b1 01                	mov    $0x1,%cl
+  4006c9:	81 3c 03 83 2d d2 27 	cmpl   $0x27d22d83,(%rbx,%rax,1)
+  4006d0:	75 0e                	jne    4006e0 <main+0xb0>
+  4006d2:	81 bc 18 d0 48 00 00 	cmpl   $0x24686420,0x48d0(%rax,%rbx,1)
+  4006d9:	20 64 68 24 
+  4006dd:	0f 95 c1             	setne  %cl
+  4006e0:	0f b6 c1             	movzbl %cl,%eax
+  4006e3:	5b                   	pop    %rbx
+  4006e4:	c3                   	retq   
+  4006e5:	66 66 2e 0f 1f 84 00 	data16 nopw %cs:0x0(%rax,%rax,1)
+  4006ec:	00 00 00 00 
 
 00000000004006f0 <_Z12new_instancev>:
   4006f0:	48 8b 0d 59 09 20 00 	mov    0x200959(%rip),%rcx        # 601050 <storage_buffer>
   4006f7:	48 8d 41 01          	lea    0x1(%rcx),%rax
   4006fb:	48 89 05 4e 09 20 00 	mov    %rax,0x20094e(%rip)        # 601050 <storage_buffer>
   400702:	48 8b 15 4f 09 20 00 	mov    0x20094f(%rip),%rdx        # 601058 <storage_buffer+0x8>
-  400709:	48 8d 04 8a          	lea    (%rdx,%rcx,4),%rax
-  40070d:	c7 04 8a 00 00 00 00 	movl   $0x0,(%rdx,%rcx,4)
-  400714:	c3                   	retq   
-  400715:	66 66 2e 0f 1f 84 00 	data16 nopw %cs:0x0(%rax,%rax,1)
-  40071c:	00 00 00 00 
+  400709:	48 8d 44 8a 04       	lea    0x4(%rdx,%rcx,4),%rax
+  40070e:	c7 44 8a 04 00 00 00 	movl   $0x0,0x4(%rdx,%rcx,4)
+  400715:	00 
+  400716:	c3                   	retq   
+  400717:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  40071e:	00 00 
 
 0000000000400720 <_Z12write_field0P9TestClass>:
   400720:	48 8b 05 31 09 20 00 	mov    0x200931(%rip),%rax        # 601058 <storage_buffer+0x8>

@@ -4,7 +4,7 @@
 // By Ingemar Ragnemalm 2010
  
 #include <stdio.h>
-#include "executor/cuda_executor.h"
+//#include "executor/cuda_executor.h"
 #include "soa/soa.h"
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
@@ -21,26 +21,39 @@ using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
 using ikra::soa::DynamicStorage;
-using ikra::executor::cuda::construct;
 
 __device__ char data_buffer[10000];
+
+
 
 class Vertex : public SoaLayout<Vertex, 1000> {
  public:
   IKRA_INITIALIZE_CLASS(data_buffer)
 
-  __ikra_device__ Vertex() {
-
+  __device__ Vertex(int a) {
+    printf("IN CONSTRUCTOR!!\n");
   }
 
+
+/*
   int_ field0;
   int_ field1;
 
   __ikra_device__ void add_fields() {
     field0 = field0 + field1;
   }
+*/
+
 };
- 
+
+
+template<typename T>
+__global__ void myKernel() {
+  new (Vertex::get_(0)) Vertex(123);
+}
+
+
+
 int main()
 {
   void* bla;
@@ -48,7 +61,12 @@ int main()
   gpuErrchk( cudaPeekAtLastError() );
   gpuErrchk( cudaDeviceSynchronize() );
   
-  construct<Vertex>(10);
+  myKernel<int><<<1,2>>>();
   gpuErrchk( cudaPeekAtLastError() );
   gpuErrchk( cudaDeviceSynchronize() );
+
+  printf("!!!!!\n");
 }
+
+
+// Keep nullptr as special "not an object"

@@ -701,11 +701,12 @@ Disassembly of section .text:
   400df4:	48 83 ec 10          	sub    $0x10,%rsp
   400df8:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400dfc:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
-  400e00:	e8 0b 00 00 00       	callq  400e10 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
-  400e05:	48 83 c4 10          	add    $0x10,%rsp
-  400e09:	5d                   	pop    %rbp
-  400e0a:	c3                   	retq   
-  400e0b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  400e00:	48 83 c7 01          	add    $0x1,%rdi
+  400e04:	e8 07 00 00 00       	callq  400e10 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400e09:	48 83 c4 10          	add    $0x10,%rsp
+  400e0d:	5d                   	pop    %rbp
+  400e0e:	c3                   	retq   
+  400e0f:	90                   	nop
 
 0000000000400e10 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi4ENS0_14DynamicStorageEE4get_ILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
   400e10:	55                   	push   %rbp

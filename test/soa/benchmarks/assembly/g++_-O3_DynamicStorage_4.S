@@ -47,7 +47,7 @@ Disassembly of section .text:
   4004a0:	53                   	push   %rbx
   4004a1:	bf a0 91 00 00       	mov    $0x91a0,%edi
   4004a6:	e8 c5 ff ff ff       	callq  400470 <malloc@plt>
-  4004ab:	48 8b 15 ce 0b 20 00 	mov    0x200bce(%rip),%rdx        # 601080 <storage_buffer>
+  4004ab:	48 8b 0d ce 0b 20 00 	mov    0x200bce(%rip),%rcx        # 601080 <storage_buffer>
   4004b2:	48 89 05 cf 0b 20 00 	mov    %rax,0x200bcf(%rip)        # 601088 <storage_buffer+0x8>
   4004b9:	be b4 07 40 00       	mov    $0x4007b4,%esi
   4004be:	48 c7 05 cf 0b 20 00 	movq   $0x0,0x200bcf(%rip)        # 601098 <storage_buffer+0x18>
@@ -55,17 +55,17 @@ Disassembly of section .text:
   4004c9:	48 c7 05 bc 0b 20 00 	movq   $0x0,0x200bbc(%rip)        # 601090 <storage_buffer+0x10>
   4004d0:	00 00 00 00 
   4004d4:	bf 01 00 00 00       	mov    $0x1,%edi
-  4004d9:	48 8d 1c 90          	lea    (%rax,%rdx,4),%rbx
-  4004dd:	48 8d 4a 01          	lea    0x1(%rdx),%rcx
-  4004e1:	48 89 da             	mov    %rbx,%rdx
-  4004e4:	48 89 0d 95 0b 20 00 	mov    %rcx,0x200b95(%rip)        # 601080 <storage_buffer>
-  4004eb:	c6 03 00             	movb   $0x0,(%rbx)
-  4004ee:	48 29 c2             	sub    %rax,%rdx
-  4004f1:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
-  4004f5:	c6 43 02 00          	movb   $0x0,0x2(%rbx)
-  4004f9:	48 83 e2 fc          	and    $0xfffffffffffffffc,%rdx
-  4004fd:	c6 43 03 00          	movb   $0x0,0x3(%rbx)
-  400501:	b9 20 64 68 24       	mov    $0x24686420,%ecx
+  4004d9:	48 8d 51 01          	lea    0x1(%rcx),%rdx
+  4004dd:	b9 20 64 68 24       	mov    $0x24686420,%ecx
+  4004e2:	48 8d 1c 90          	lea    (%rax,%rdx,4),%rbx
+  4004e6:	48 89 15 93 0b 20 00 	mov    %rdx,0x200b93(%rip)        # 601080 <storage_buffer>
+  4004ed:	48 89 da             	mov    %rbx,%rdx
+  4004f0:	c6 03 00             	movb   $0x0,(%rbx)
+  4004f3:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
+  4004f7:	48 29 c2             	sub    %rax,%rdx
+  4004fa:	c6 43 02 00          	movb   $0x0,0x2(%rbx)
+  4004fe:	c6 43 03 00          	movb   $0x0,0x3(%rbx)
+  400502:	48 83 e2 fc          	and    $0xfffffffffffffffc,%rdx
   400506:	48 01 d0             	add    %rdx,%rax
   400509:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
   40050e:	c7 00 83 2d d2 27    	movl   $0x27d22d83,(%rax)
@@ -178,9 +178,9 @@ Disassembly of section .text:
 
 0000000000400660 <_Z12new_instancev>:
   400660:	48 8b 05 19 0a 20 00 	mov    0x200a19(%rip),%rax        # 601080 <storage_buffer>
-  400667:	48 8d 50 01          	lea    0x1(%rax),%rdx
-  40066b:	48 89 15 0e 0a 20 00 	mov    %rdx,0x200a0e(%rip)        # 601080 <storage_buffer>
-  400672:	48 8b 15 0f 0a 20 00 	mov    0x200a0f(%rip),%rdx        # 601088 <storage_buffer+0x8>
+  400667:	48 8b 15 1a 0a 20 00 	mov    0x200a1a(%rip),%rdx        # 601088 <storage_buffer+0x8>
+  40066e:	48 83 c0 01          	add    $0x1,%rax
+  400672:	48 89 05 07 0a 20 00 	mov    %rax,0x200a07(%rip)        # 601080 <storage_buffer>
   400679:	48 8d 04 82          	lea    (%rdx,%rax,4),%rax
   40067d:	c6 00 00             	movb   $0x0,(%rax)
   400680:	c6 40 01 00          	movb   $0x0,0x1(%rax)

@@ -16,7 +16,7 @@ using ikra::soa::IndexType;
 template<typename T, typename... Args>
 __global__ void construct_kernel(IndexType base_id, Args... args) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  new (T::get_(base_id + tid)) T(args...);
+  new (T::get_(base_id + tid)) T(/*args...*/);
 }
 
 template<typename T, typename... Args>

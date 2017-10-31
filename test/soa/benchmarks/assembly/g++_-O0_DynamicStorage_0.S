@@ -670,19 +670,20 @@ Disassembly of section .text:
   400b76:	48 83 ec 10          	sub    $0x10,%rsp
   400b7a:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400b7e:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400b82:	48 89 c7             	mov    %rax,%rdi
-  400b85:	e8 02 00 00 00       	callq  400b8c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
-  400b8a:	c9                   	leaveq 
-  400b8b:	c3                   	retq   
+  400b82:	48 83 c0 01          	add    $0x1,%rax
+  400b86:	48 89 c7             	mov    %rax,%rdi
+  400b89:	e8 02 00 00 00       	callq  400b90 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400b8e:	c9                   	leaveq 
+  400b8f:	c3                   	retq   
 
-0000000000400b8c <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
-  400b8c:	55                   	push   %rbp
-  400b8d:	48 89 e5             	mov    %rsp,%rbp
-  400b90:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
-  400b94:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400b98:	5d                   	pop    %rbp
-  400b99:	c3                   	retq   
-  400b9a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+0000000000400b90 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_14DynamicStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
+  400b90:	55                   	push   %rbp
+  400b91:	48 89 e5             	mov    %rsp,%rbp
+  400b94:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
+  400b98:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+  400b9c:	5d                   	pop    %rbp
+  400b9d:	c3                   	retq   
+  400b9e:	66 90                	xchg   %ax,%ax
 
 0000000000400ba0 <__libc_csu_init>:
   400ba0:	41 57                	push   %r15

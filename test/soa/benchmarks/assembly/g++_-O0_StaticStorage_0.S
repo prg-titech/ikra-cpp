@@ -654,21 +654,21 @@ Disassembly of section .text:
   400b0e:	48 83 ec 10          	sub    $0x10,%rsp
   400b12:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400b16:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400b1a:	48 89 c7             	mov    %rax,%rdi
-  400b1d:	e8 02 00 00 00       	callq  400b24 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
-  400b22:	c9                   	leaveq 
-  400b23:	c3                   	retq   
+  400b1a:	48 83 c0 01          	add    $0x1,%rax
+  400b1e:	48 89 c7             	mov    %rax,%rdi
+  400b21:	e8 02 00 00 00       	callq  400b28 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400b26:	c9                   	leaveq 
+  400b27:	c3                   	retq   
 
-0000000000400b24 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
-  400b24:	55                   	push   %rbp
-  400b25:	48 89 e5             	mov    %rsp,%rbp
-  400b28:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
-  400b2c:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-  400b30:	5d                   	pop    %rbp
-  400b31:	c3                   	retq   
-  400b32:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400b39:	00 00 00 
-  400b3c:	0f 1f 40 00          	nopl   0x0(%rax)
+0000000000400b28 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
+  400b28:	55                   	push   %rbp
+  400b29:	48 89 e5             	mov    %rsp,%rbp
+  400b2c:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
+  400b30:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+  400b34:	5d                   	pop    %rbp
+  400b35:	c3                   	retq   
+  400b36:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400b3d:	00 00 00 
 
 0000000000400b40 <__libc_csu_init>:
   400b40:	41 57                	push   %r15

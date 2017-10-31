@@ -131,22 +131,22 @@ Disassembly of section .text:
   4005fc:	48 8b 1d 4d 0a 20 00 	mov    0x200a4d(%rip),%rbx        # 601050 <storage_buffer>
   400603:	48 8d 43 01          	lea    0x1(%rbx),%rax
   400607:	48 89 05 42 0a 20 00 	mov    %rax,0x200a42(%rip)        # 601050 <storage_buffer>
-  40060e:	c7 04 9d 28 59 60 00 	movl   $0x8888,0x605928(,%rbx,4)
+  40060e:	c7 04 9d 2c 59 60 00 	movl   $0x8888,0x60592c(,%rbx,4)
   400615:	88 88 00 00 
-  400619:	c7 04 9d 58 10 60 00 	movl   $0x27d22d83,0x601058(,%rbx,4)
+  400619:	c7 04 9d 5c 10 60 00 	movl   $0x27d22d83,0x60105c(,%rbx,4)
   400620:	83 2d d2 27 
-  400624:	69 14 9d 28 59 60 00 	imul   $0x4444,0x605928(,%rbx,4),%edx
+  400624:	69 14 9d 2c 59 60 00 	imul   $0x4444,0x60592c(,%rbx,4),%edx
   40062b:	44 44 00 00 
-  40062f:	89 14 9d 28 59 60 00 	mov    %edx,0x605928(,%rbx,4)
-  400636:	8b 34 9d 58 10 60 00 	mov    0x601058(,%rbx,4),%esi
+  40062f:	89 14 9d 2c 59 60 00 	mov    %edx,0x60592c(,%rbx,4)
+  400636:	8b 34 9d 5c 10 60 00 	mov    0x60105c(,%rbx,4),%esi
   40063d:	bf 74 07 40 00       	mov    $0x400774,%edi
   400642:	31 c0                	xor    %eax,%eax
   400644:	e8 77 fe ff ff       	callq  4004c0 <printf@plt>
   400649:	b0 01                	mov    $0x1,%al
-  40064b:	81 3c 9d 58 10 60 00 	cmpl   $0x27d22d83,0x601058(,%rbx,4)
+  40064b:	81 3c 9d 5c 10 60 00 	cmpl   $0x27d22d83,0x60105c(,%rbx,4)
   400652:	83 2d d2 27 
   400656:	75 0e                	jne    400666 <main+0x76>
-  400658:	81 3c 9d 28 59 60 00 	cmpl   $0x24686420,0x605928(,%rbx,4)
+  400658:	81 3c 9d 2c 59 60 00 	cmpl   $0x24686420,0x60592c(,%rbx,4)
   40065f:	20 64 68 24 
   400663:	0f 95 c0             	setne  %al
   400666:	0f b6 c0             	movzbl %al,%eax
@@ -156,11 +156,11 @@ Disassembly of section .text:
 
 0000000000400670 <_Z12new_instancev>:
   400670:	48 8b 05 d9 09 20 00 	mov    0x2009d9(%rip),%rax        # 601050 <storage_buffer>
-  400677:	48 8d 48 01          	lea    0x1(%rax),%rcx
-  40067b:	48 89 0d ce 09 20 00 	mov    %rcx,0x2009ce(%rip)        # 601050 <storage_buffer>
-  400682:	c3                   	retq   
-  400683:	66 66 66 66 2e 0f 1f 	data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
-  40068a:	84 00 00 00 00 00 
+  400677:	48 ff c0             	inc    %rax
+  40067a:	48 89 05 cf 09 20 00 	mov    %rax,0x2009cf(%rip)        # 601050 <storage_buffer>
+  400681:	c3                   	retq   
+  400682:	66 66 66 66 66 2e 0f 	data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
+  400689:	1f 84 00 00 00 00 00 
 
 0000000000400690 <_Z12write_field0P9TestClass>:
   400690:	c7 04 bd 58 10 60 00 	movl   $0x7777,0x601058(,%rdi,4)
