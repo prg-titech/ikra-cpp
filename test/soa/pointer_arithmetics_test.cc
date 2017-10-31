@@ -5,7 +5,7 @@ namespace {
 using ikra::soa::SoaLayout;
 
 static const int kClassMaxInst = 1024;
-static const int kTestSize = 40;
+static const uint32_t kTestSize = 40;
 
 // Pointer arithmetics works only in valid addressing mode.
 class TestClass : public SoaLayout<TestClass, kClassMaxInst, sizeof(int)> {
@@ -26,7 +26,7 @@ TEST(PointerArithmeticsTest, IncrementDecrement) {
     it->field0 = counter;
   }
 
-  for (int i = 0; i < kTestSize; ++i) {
+  for (int i = 0; i < static_cast<int>(kTestSize); ++i) {
     EXPECT_EQ(TestClass::get(i)->field0, 2*i);
   }
 }

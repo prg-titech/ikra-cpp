@@ -1,0 +1,8 @@
+add_executable(bfs_const_size_array bfs_const_size_array.cc)
+target_link_libraries(bfs_const_size_array ikra)
+
+add_executable(bfs_inlined_dynamic_array bfs_inlined_dynamic_array.cc)
+target_link_libraries(bfs_inlined_dynamic_array ikra)
+
+add_executable(bfs_std_vector bfs_std_vector.cc)
+target_link_libraries(bfs_std_vector ikra)

@@ -91,7 +91,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // TODO: Implement delete operator.
-  void operator delete(void* ptr) {
+  void operator delete(void* /*ptr*/) {
     assert(false);
   }
 

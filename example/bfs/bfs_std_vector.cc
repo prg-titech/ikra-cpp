@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <vector>
 
-#include "example/bfs/bfs_loader.h"
+#include "bfs_loader.h"
 #include "executor/executor.h"
 #include "soa/soa.h"
 

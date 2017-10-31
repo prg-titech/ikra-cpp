@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "example/bfs/bfs_loader.h"
+#include "bfs_loader.h"
 #include "executor/executor.h"
 #include "soa/soa.h"
 

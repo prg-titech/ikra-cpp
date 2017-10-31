@@ -85,11 +85,11 @@ class Field_ {
 
   // Initialize the field with the value of another field. Used in class
   // constructor. TODO: Unclear why exactly we need this one...
-  Field_(const Field_& other) {}
+  Field_(const Field_& /*other*/) {}
 
   // Not sure why we need this. Required to make field inplace initialization
   // work.
-  Field_(Field_&& other) {}
+  Field_(Field_&& /*other*/) {}
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, IndexType>::type
