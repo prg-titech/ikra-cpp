@@ -25,6 +25,8 @@ static const int kWindowWidth = 1000;
 static const int kWindowHeight = 1000;
 static const int kMaxRect = 20;
 
+char storage_buffer[100000];
+
 #define RAND (1.0 * rand() / RAND_MAX)
 
 static void render_rect(SDL_Renderer* renderer, double x, double y, double mass) {
@@ -37,7 +39,7 @@ static void render_rect(SDL_Renderer* renderer, double x, double y, double mass)
 
 class Body : public SoaLayout<Body, kNumBodies> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   Body(double mass, double pos_x, double pos_y, double vel_x, double vel_y)
       : mass_(mass) {
@@ -93,8 +95,6 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 };
 
-Body::Storage Body::storage;
-
 
 int main() {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -110,6 +110,9 @@ int main() {
     printf("Could not create window/render!\n");
     exit(1);
   }
+
+  // Initialize object storage.
+  Body::initialize_storage();
 
   // Create objects.
   for (int i = 0; i < kNumBodies; ++i) {

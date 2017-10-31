@@ -10,6 +10,8 @@ static const int kInlineSize = 2;
 static const int kMaxVertices = 20000;
 static const int kMaxEdges = 100000;
 
+char storage_buffer[10000000];
+
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::soa::StaticStorageWithArena;
@@ -22,7 +24,7 @@ class Vertex : public SoaLayout<
     Vertex, kMaxVertices, kAddressModeZero,
     StaticStorageWithArena<kMaxEdges*sizeof(Vertex*)>> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   Vertex(const std::vector<IndexType>& neighbors)
       : adj_list_(neighbors.size()) {
@@ -72,8 +74,6 @@ class Vertex : public SoaLayout<
   array_(Vertex*, kInlineSize, inline_soa) adj_list_;
 };
 
-Vertex::Storage Vertex::storage;
-
 
 int run() {
   int counter = 0;
@@ -96,6 +96,8 @@ int main(int argc, char* argv[]) {
     printf("Usage: %s filename num_vertices start_vertex\n", argv[0]);
     exit(1);
   }
+
+  Vertex::initialize_storage();
   load_file<Vertex>(argv[1], atoi(argv[2]));
 
   // Set start vertex.

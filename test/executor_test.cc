@@ -12,6 +12,8 @@ using ikra::executor::make_iterator;
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
+char storage_buffer[100000];
+
 // Zero addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassZ
 #define IKRA_TEST_ADDRESS_MODE kAddressModeZero
@@ -32,6 +34,7 @@ class ExecutorTest : public testing::Test {};
 TYPED_TEST_CASE_P(ExecutorTest);
 
 TYPED_TEST_P(ExecutorTest, StdArray) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {
@@ -48,6 +51,7 @@ TYPED_TEST_P(ExecutorTest, StdArray) {
 }
 
 TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {
@@ -67,6 +71,7 @@ TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
 }
 
 TYPED_TEST_P(ExecutorTest, ExecuteAndReduce) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {

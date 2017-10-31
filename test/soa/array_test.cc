@@ -8,6 +8,8 @@ using ikra::soa::kAddressModeZero;
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 9;
 
+char storage_buffer[100000];
+
 // Zero addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassZ
 #define IKRA_TEST_ADDRESS_MODE kAddressModeZero
@@ -28,6 +30,7 @@ class ArrayTest : public testing::Test {};
 TYPED_TEST_CASE_P(ArrayTest);
 
 TYPED_TEST_P(ArrayTest, AosArray) {
+  TypeParam::initialize_storage();
   TypeParam** instances = new TypeParam*[kTestSize];
 
   // Create a few instances
@@ -58,6 +61,7 @@ TYPED_TEST_P(ArrayTest, AosArray) {
 }
 
 TYPED_TEST_P(ArrayTest, SoaArray) {
+  TypeParam::initialize_storage();
   TypeParam** instances = new TypeParam*[kTestSize];
 
   // Create a few instances
@@ -80,6 +84,7 @@ TYPED_TEST_P(ArrayTest, SoaArray) {
 }
 
 TYPED_TEST_P(ArrayTest, SoaArrayStaticGet) {
+  TypeParam::initialize_storage();
   TypeParam** instances = new TypeParam*[kTestSize];
 
   // Create a few instances

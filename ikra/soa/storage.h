@@ -2,6 +2,7 @@
 #define SOA_STORAGE_H
 
 #include "soa/constants.h"
+#include "soa/cuda.h"
 
 namespace ikra {
 namespace soa {
@@ -12,7 +13,7 @@ template<class Owner, size_t ArenaSize>
 class DynamicStorage_ {
  public:
   // Allocate data on the heap.
-  DynamicStorage_() {
+  __ikra_device__ DynamicStorage_() {
     // Note: ObjectSize is accessed within a function here.
     data = reinterpret_cast<char*>(
         malloc(Owner::ObjectSize::value * Owner::kCapacity));
@@ -25,6 +26,7 @@ class DynamicStorage_ {
   }
 
   // Use existing data allocation.
+  __ikra_device__
   explicit DynamicStorage_(void* ptr, void* arena_ptr = nullptr) : size(0) {
     data = reinterpret_cast<char*>(ptr);
 
@@ -38,7 +40,7 @@ class DynamicStorage_ {
   // Allocate arena storage, i.e., storage that is not used for a SOA column.
   // For example, inlined dynamic arrays require arena storage for all elements
   // beyond InlineSize.
-  void* allocate_in_arena(size_t bytes) {
+  __ikra_device__ void* allocate_in_arena(size_t bytes) {
     assert(arena_head_ != nullptr);
     void* result = reinterpret_cast<void*>(arena_head_);
     arena_head_ += bytes;
@@ -59,7 +61,7 @@ class DynamicStorage_ {
 template<class Owner, size_t ArenaSize>
 class StaticStorage_ {
  public:
-  StaticStorage_() {
+  __ikra_device__ StaticStorage_() {
     if (ArenaSize == 0) {
       arena_head_ = nullptr;
     } else {
@@ -71,7 +73,7 @@ class StaticStorage_ {
   IndexType size;
   char data[Owner::ObjectSize::value * Owner::kCapacity];
 
-  void* allocate_in_arena(size_t bytes) {
+  __ikra_device__ void* allocate_in_arena(size_t bytes) {
     assert(arena_head_ != nullptr);
     // Assert that arena is not full.
     assert(arena_head_ + bytes < arena_base_ + ArenaSize);
