@@ -4,60 +4,51 @@
 // By Ingemar Ragnemalm 2010
  
 #include <stdio.h>
-#include "executor/executor.h"
+#include "executor/cuda_executor.h"
 #include "soa/soa.h"
 
-const int N = 16; 
-const int blocksize = 16; 
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
 using ikra::soa::DynamicStorage;
-using ikra::executor::execute;
-using ikra::executor::execute_and_reduce;
+using ikra::executor::cuda::construct;
 
-char data_buffer[10000];
+__device__ char data_buffer[10000];
 
 class Vertex : public SoaLayout<Vertex, 1000> {
  public:
   IKRA_INITIALIZE_CLASS(data_buffer)
 
+  __ikra_device__ Vertex() {
+
+  }
+
   int_ field0;
   int_ field1;
-};
 
-__global__ 
-void hello(char *a, int *b) 
-{
-  int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  Vertex::get(tid)->field0 += Vertex::get(tid)->field1;
-}
+  __ikra_device__ void add_fields() {
+    field0 = field0 + field1;
+  }
+};
  
 int main()
 {
-  char a[N] = "Hello \0\0\0\0\0\0";
-  int b[N] = {15, 10, 6, 0, -11, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
- 
-  char *ad;
-  int *bd;
-  const int csize = N*sizeof(char);
-  const int isize = N*sizeof(int);
- 
-  printf("%s", a);
- 
-  cudaMalloc( (void**)&ad, csize ); 
-  cudaMalloc( (void**)&bd, isize ); 
-  cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice ); 
-  cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice ); 
+  void* bla;
+  cudaMalloc( (void**)&bla, 100 );
+  gpuErrchk( cudaPeekAtLastError() );
+  gpuErrchk( cudaDeviceSynchronize() );
   
-  dim3 dimBlock( blocksize, 1 );
-  dim3 dimGrid( 1, 1 );
-  hello<<<dimGrid, dimBlock>>>(ad, bd);
-  cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost ); 
-  cudaFree( ad );
-  cudaFree( bd );
-  
-  printf("%s\n", a);
-  return EXIT_SUCCESS;
+  construct<Vertex>(10);
+  gpuErrchk( cudaPeekAtLastError() );
+  gpuErrchk( cudaDeviceSynchronize() );
 }

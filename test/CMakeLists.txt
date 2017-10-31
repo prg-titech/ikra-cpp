@@ -17,6 +17,6 @@ add_test(executor_test ${CMAKE_BINARY_DIR}/bin/executor_test)
 
 # CUDA Tests
 # TODO: cuda_add_library does not support INTERFACE libraries
-#include_directories(${CMAKE_SOURCE_DIR}/ikra)
-#cuda_add_executable(minimum_cuda_test minimum_cuda_test.cu)
-#target_link_libraries(minimum_cuda_test ikra)
+include_directories(${CMAKE_SOURCE_DIR}/ikra)
+cuda_add_executable(minimum_cuda_test minimum_cuda_test.cu)
+target_link_libraries(minimum_cuda_test ikra)

@@ -54,7 +54,7 @@ using ObjectSize = ObjectSize_<0>; \
 \
 /* Function that returns a reference to the storage buffer.
  * Will be inlined. Pointer dereference will be optimized out. */ \
-static Storage& storage() { \
+__ikra_device__ static Storage& storage() { \
   return *reinterpret_cast<Storage*>(storage_buffer); \
 } \
 \

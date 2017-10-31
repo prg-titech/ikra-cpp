@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(ikra-cpp)
 
 # Set up CUDA
+# TODO: -gencode arch=compute_52,code=sm_52
 find_package(CUDA 8.0 REQUIRED)
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -gencode arch=compute_52,code=sm_52 -std=c++11)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -std=c++11)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

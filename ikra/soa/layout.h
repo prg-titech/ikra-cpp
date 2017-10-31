@@ -71,6 +71,14 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   static const int kAddressMode = AddressMode;
 
+#ifdef __CUDA_ARCH__
+  // TODO: Not sure why the CUDA version does not take the overload without
+  // the "self" argument. Is this a compiler bug?
+  __device__ void* operator new(size_t count, Self* self) {
+    printf("!!!!!!!!! %i\n", sizeof(Self));
+    return get_(0);
+  }
+#else
   // Create a new instance of this class. Data will be allocated inside
   // storage.data.
   __ikra_device__ void* operator new(size_t count) {
@@ -81,6 +89,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
     return get(Self::storage().size++);
   }
+#endif  // __CUDA_ARCH__
 
   // Create multiple new instances of this class. Data will be allocated inside
   // storage.data.

@@ -58,6 +58,24 @@ class Iterator {
     return *this;
   }
 
+  template<int A = InnerT::kAddressMode>
+  typename std::enable_if<A == soa::kAddressModeZero, Iterator<T>>::type
+  operator+(IndexType delta) const {
+    Iterator<T> copy = *this;
+    auto new_pos = reinterpret_cast<uintptr_t>(copy.position_) + delta;
+    copy.position_ = reinterpret_cast<T>(new_pos);
+    return copy;
+  }
+
+  template<int A = InnerT::kAddressMode>
+  typename std::enable_if<A != soa::kAddressModeZero, Iterator<T>>::type
+  operator+(IndexType delta) const {
+    Iterator<T> copy = *this;
+    auto new_pos = reinterpret_cast<uintptr_t>(copy.position_) + A*delta;
+    copy.position_ = reinterpret_cast<T>(new_pos);
+    return copy;
+  }
+
   Iterator<T>& operator++() {
     return this->operator+=(1);
   }
