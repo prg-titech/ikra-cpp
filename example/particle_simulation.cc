@@ -1,18 +1,20 @@
 // Particle-Well Simulation
 // Code adapted from: http://physics.princeton.edu/~fpretori/Nbody/code.htm
 
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 #include "SDL2/SDL.h"
 
 #include "executor/executor.h"
 #include "soa/soa.h"
 
+using namespace std;
 using ikra::executor::execute;
 using ikra::executor::Iterator;
 using ikra::soa::SoaLayout;
 
-static const int kIterations = 10000;
 static const int kNumWells = 1;
 static const int kNumParticles = 20;
 static const double kTimeInterval = 1500;
@@ -24,14 +26,14 @@ static const double kEarthSunDistance = 149600000000;
 static const double kEarthVelocity = 30000;
 
 static const int kWindowWidth = 1000;
-static const int kWindowlHeight = 1000;
+static const int kWindowHeight = 1000;
 static const double kScalingFactor = 2.5e-9;
 
 // Draw a rectangle with equal height/width at a given position.
 static void render_rect(SDL_Renderer* renderer, double x, double y, int side) {
   SDL_Rect rect;
   rect.x = x*kScalingFactor + kWindowWidth/2 - side/2;
-  rect.y = y*kScalingFactor + kWindowlHeight/2 - side/2;
+  rect.y = y*kScalingFactor + kWindowHeight/2 - side/2;
   rect.w = side;
   rect.h = side;
   SDL_RenderDrawRect(renderer, &rect);
@@ -80,12 +82,6 @@ class Particle : public SoaLayout<Particle, kNumParticles> {
   array_(double, 2) velocity_;
   array_(double, 2) force_;
 
-  double distance_to(Well* well) {
-    double dx = position_[0] - well->position_[0];
-    double dy = position_[1] - well->position_[1];
-    return sqrt(dx*dx + dy*dy);
-  }
-
   void add_force(Well* well) {
     double EPS = 3e4;    // Softening parameter (just to avoid infinities).
     double dx = well->position_[0] - position_[0];
@@ -132,7 +128,7 @@ int main() {
   SDL_Window* window = nullptr;
   SDL_Renderer* renderer = nullptr;
 
-  if (SDL_CreateWindowAndRenderer(kWindowWidth, kWindowWidth, 0,
+  if (SDL_CreateWindowAndRenderer(kWindowWidth, kWindowHeight, 0,
         &window, &renderer) != 0) {
     printf("Could not create window/render!\n");
     exit(1);
