@@ -71,6 +71,8 @@ class Field_ {
 
   // Operator for implicit conversion to type T. Running in CUDA mode on the
   // host. Data must be copied.
+  // TODO: This method is broken when compiling in CUDA mode but host execution
+  // is intended.
   __ikra_device__ operator T() const {
     return copy_from_device();
   }
@@ -96,11 +98,12 @@ class Field_ {
   // TODO: Implement special operators:
   // http://en.cppreference.com/w/cpp/language/operator_logical
 
-// TODO: Implement visibility. This is an nvcc bug.
-// protected:
-//  Only Owner can create new fields for itself.
-//  friend Owner;
-
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+// Friend template is broken. This is an nvcc bug.
+ protected:
+  // Only Owner can create new fields for itself.
+  friend Owner;
+#endif
 
   __ikra_device__ Field_() {}
 
