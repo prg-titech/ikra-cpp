@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(ikra-cpp)
 
+# Set up CUDA
+# TODO: -gencode arch=compute_52,code=sm_52
+# TODO: This should be CUDA 9.0 but the version check is broken on my machine.
+find_package(CUDA 8.0 REQUIRED)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -std=c++14 --expt-extended-lambda)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -13,7 +19,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -Wno-unused-parameter")
 
 add_subdirectory(lib/googletest)
 enable_testing()

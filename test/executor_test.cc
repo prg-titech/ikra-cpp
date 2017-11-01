@@ -6,11 +6,14 @@
 namespace {
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
+using ikra::executor::construct;
 using ikra::executor::execute;
 using ikra::executor::make_iterator;
 
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
+
+char storage_buffer[100000];
 
 // Zero addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassZ
@@ -32,6 +35,7 @@ class ExecutorTest : public testing::Test {};
 TYPED_TEST_CASE_P(ExecutorTest);
 
 TYPED_TEST_P(ExecutorTest, StdArray) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {
@@ -48,6 +52,7 @@ TYPED_TEST_P(ExecutorTest, StdArray) {
 }
 
 TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {
@@ -67,6 +72,7 @@ TYPED_TEST_P(ExecutorTest, IteratorFromPointers) {
 }
 
 TYPED_TEST_P(ExecutorTest, ExecuteAndReduce) {
+  TypeParam::initialize_storage();
   std::array<TypeParam*, kTestSize> arr;
 
   for (int i = 0; i < kTestSize; ++i) {
@@ -82,10 +88,23 @@ TYPED_TEST_P(ExecutorTest, ExecuteAndReduce) {
   EXPECT_EQ(actual, expected);
 }
 
+TYPED_TEST_P(ExecutorTest, Construct) {
+  TypeParam::initialize_storage();
+  TypeParam* first = construct<TypeParam>(kTestSize, 1, 2);
+
+  int expected = (20 + 1 + 2)*kTestSize;
+  int actual = execute_and_reduce(make_iterator(first),
+                                  make_iterator(first) + kTestSize,
+                                  &TypeParam::sum_plus_delta,
+                                  [](int a, int b) { return a + b; }, 0, 20);
+  EXPECT_EQ(actual, expected);
+}
+
 REGISTER_TYPED_TEST_CASE_P(ExecutorTest,
                            StdArray,
                            IteratorFromPointers,
-                           ExecuteAndReduce);
+                           ExecuteAndReduce,
+                           Construct);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, ExecutorTest, TestClassV);
 INSTANTIATE_TYPED_TEST_CASE_P(Zero, ExecutorTest, TestClassZ);

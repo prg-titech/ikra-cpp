@@ -13,3 +13,11 @@ add_test(pointer_arithmetics_test ${CMAKE_BINARY_DIR}/bin/pointer_arithmetics_te
 add_executable(executor_test executor_test.cc)
 target_link_libraries(executor_test gtest gtest_main ikra)
 add_test(executor_test ${CMAKE_BINARY_DIR}/bin/executor_test)
+
+
+# CUDA Tests
+# TODO: cuda_add_library does not support INTERFACE libraries
+include_directories(${CMAKE_SOURCE_DIR}/ikra ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+cuda_add_executable(minimum_cuda_test minimum_cuda_test.cu)
+target_link_libraries(minimum_cuda_test gtest gtest_main ikra)
+add_test(minimum_cuda_test ${CMAKE_BINARY_DIR}/bin/minimum_cuda_test)

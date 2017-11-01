@@ -7,19 +7,21 @@ using ikra::soa::SoaLayout;
 static const int kClassMaxInst = 1024;
 static const uint32_t kTestSize = 40;
 
+char storage_buffer[100000];
+
 // Pointer arithmetics works only in valid addressing mode.
 class TestClass : public SoaLayout<TestClass, kClassMaxInst, sizeof(int)> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   int_ field0;
 };
 
-TestClass::Storage TestClass::storage;
-
 TEST(PointerArithmeticsTest, IncrementDecrement) {
+  TestClass::initialize_storage();
+
   auto first = new TestClass[kTestSize];
-  EXPECT_EQ(TestClass::storage.size, kTestSize);
+  EXPECT_EQ(TestClass::storage().size, kTestSize);
 
   int counter = 0;
   for (auto it = first; it < first + kTestSize; ++it, counter += 2) {

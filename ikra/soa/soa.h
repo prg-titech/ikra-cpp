@@ -18,6 +18,4 @@
 #include "soa/layout.h"
 #include "soa/preprocessor.h"
 
-#define IKRA_INITIALIZE_CLASS "soa/class_initialization.inc"
-
 #endif  // SOA_SOA_H

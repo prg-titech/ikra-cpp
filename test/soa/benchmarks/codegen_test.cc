@@ -24,10 +24,12 @@ using ikra::soa::StaticStorage;
 
 static const uint32_t kClassMaxInst = 0x1234;
 
+char storage_buffer[100000];
+
 class TestClass : public SoaLayout<TestClass, kClassMaxInst,
                                    ADDRESS_MODE, STORAGE_STRATEGY> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   int_ field0;
   int_ field1;
@@ -41,9 +43,10 @@ class TestClass : public SoaLayout<TestClass, kClassMaxInst,
   }
 };
 
-TestClass::Storage TestClass::storage;
 
 int main() {
+  TestClass::initialize_storage();
+
   TestClass* instance = new TestClass();
   instance->field0 = 0x7777;
   instance->field1 = 0x8888;

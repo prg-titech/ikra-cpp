@@ -18,7 +18,7 @@ do
             -DSTORAGE_STRATEGY=${v_storage} \
             -DADDRESS_MODE=${v_addr_mode} \
             codegen_test.cc \
-            -I../../.. \
+            -I../../../ikra \
             -o bin/${out_name}
         bin/${out_name}
         objdump -S bin/${out_name} > assembly/${out_name}.S

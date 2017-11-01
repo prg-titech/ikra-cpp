@@ -1,5 +1,8 @@
-#ifndef EXECUTOR_ARRAY_H
-#define EXECUTOR_ARRAY_H
+#ifndef EXECUTOR_EXECUTOR_H
+#define EXECUTOR_EXECUTOR_H
+
+// Asserts active only in debug mode (NDEBUG).
+#include <cassert>
 
 #include <cstdint>
 #include <type_traits>
@@ -38,6 +41,16 @@ class IteratorRange {
   T begin_;
   T end_;
 };
+
+template<typename T, typename... Args>
+T* construct(size_t count, Args... args) {
+  assert(count > 0);
+  T* first = new T(args...);
+  for (size_t i = 1; i < count; ++i) {
+    new T(args...);
+  }
+  return first;
+}
 
 // This function executes a method on all SOA objects that are enumerated by an
 // iterator (between begin and end). This is currently a fully sequential
@@ -110,4 +123,4 @@ D execute_and_reduce(F function, G reduce_function, D default_value,
 }  // namespace executor
 }  // namespace ikra
 
-#endif  // EXECUTOR_ARRAY_H
+#endif  // EXECUTOR_EXECUTOR_H

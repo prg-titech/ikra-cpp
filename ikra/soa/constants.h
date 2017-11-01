@@ -1,6 +1,8 @@
 #ifndef SOA_CONSTANTS_H
 #define SOA_CONSTANTS_H
 
+#include <cstdint>
+
 namespace ikra {
 namespace soa {
 

@@ -2,7 +2,7 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
                                              kClassMaxInst,
                                              IKRA_TEST_ADDRESS_MODE> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   int_ field0;
   int_ field1;
@@ -17,5 +17,3 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
     return field0 + field1 + delta;
   }
 };
-
-IKRA_TEST_CLASSNAME::Storage IKRA_TEST_CLASSNAME::storage;

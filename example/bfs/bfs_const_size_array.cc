@@ -9,6 +9,8 @@
 static const int kMaxDegree = 10;
 static const int kMaxVertices = 20000;
 
+char storage_buffer[2000000];
+
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::executor::execute;
@@ -16,7 +18,7 @@ using ikra::executor::execute_and_reduce;
 
 class Vertex : public SoaLayout<Vertex, kMaxVertices> {
  public:
-  #include IKRA_INITIALIZE_CLASS
+  IKRA_INITIALIZE_CLASS(storage_buffer)
 
   Vertex(const std::vector<IndexType>& neighbors) {
     // If this check fails, we the dataset cannot be run with this
@@ -25,7 +27,7 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
     adj_list_size_ = neighbors.size();
 
     for (int i = 0; i < num_neighbors(); ++i) {
-      adj_list_[i] = Vertex::get_(neighbors[i]);
+      adj_list_[i] = Vertex::get_uninitialized(neighbors[i]);
     }
   }
 
@@ -69,8 +71,6 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
   array_(Vertex*, kMaxDegree) adj_list_;
 };
 
-Vertex::Storage Vertex::storage;
-
 
 int run() {
   int counter = 0;
@@ -93,6 +93,8 @@ int main(int argc, char* argv[]) {
     printf("Usage: %s filename num_vertices start_vertex\n", argv[0]);
     exit(1);
   }
+
+  Vertex::initialize_storage();
   load_file<Vertex>(argv[1], atoi(argv[2]));
 
   // Set start vertex.
