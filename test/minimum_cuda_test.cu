@@ -1,11 +1,12 @@
-#include <stdio.h>
+#include "gtest/gtest.h"
+
 #include "executor/cuda_executor.h"
 #include "soa/soa.h"
 
 using ikra::soa::SoaLayout;
 using ikra::executor::cuda::construct;
 
-const static int kTestSize = 500;
+const static int kTestSize = 12;
 
 __device__ char data_buffer[10000];
 
@@ -21,21 +22,29 @@ class Vertex : public SoaLayout<Vertex, 1000> {
 
   __device__ void add_fields(int increment) {
     field0 = field0 + field1 + increment + this->id();
-  }
 
-  __device__ void foo() {
-    printf("CALLING FOO on %i!\n", (int) field0);
+    Vertex::get(0)->field0.get();
   }
 };
 
-
-int main()
-{
+// Cannot run "cuda_execute" inside gtest case.
+void run_test() {
   Vertex::cuda_initialize_storage();
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
   cuda_execute(Vertex, add_fields, kTestSize, first, 10)
 
-  // Should print: 10+5+6+i = 21+
-  cuda_execute(Vertex, foo, kTestSize, first)
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    int actual = Vertex::get_uninitialized(i)->field0;
+    int expected = 10 + 5 + 6 + i;
+    EXPECT_EQ(actual, expected);
+  }
+
+  // Make sure that we had no CUDA failures.
+  gpuErrchk(cudaPeekAtLastError());
+}
+
+TEST(MinimumCudaTest, ConstructAndExecute) {
+  run_test();
 }

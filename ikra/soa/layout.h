@@ -188,6 +188,20 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return reinterpret_cast<uintptr_t>(this) - 1;
   }
 
+#ifdef __CUDACC__
+  static Storage* device_storage_pointer() {
+    // Get device address of storage.
+    Storage* d_storage;
+    cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage),
+                         Self::storage());
+    return d_storage;
+  }
+
+  static void cuda_initialize_storage() {
+    storage_cuda_initialize(device_storage_pointer());
+  }
+#endif  // __CUDACC__
+
  private:
   // Compile-time check for the size of this class. This check should fail
   // if this class contains fields that are not declared with the SOA DSL.

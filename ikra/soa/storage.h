@@ -126,20 +126,14 @@ __global__ void storage_cuda_initialize_kernel(Storage* self) {
   self->cuda_initialize();
 }
 
+// Initializes a storage container located in "h_storage" with a storage
+// strategy "Storage". "h_storage" is the host representation of the
+// (statically-allocated) device storage. This function sets the instance
+// counter of the class to zero.
 template<typename Storage>
-void storage_cuda_initialize(const Storage& h_storage) {
-  // Get device address of storage.
-  Storage* d_storage;
-  cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), h_storage);
-  // Initialize storage.
+void storage_cuda_initialize(Storage* d_storage) {
   storage_cuda_initialize_kernel<<<1, 1>>>(d_storage);
   cudaThreadSynchronize();
-}
-#else
-// CUDA initialization only available in CUDA mode.
-template<typename Storage>
-void storage_cuda_initialize(const Storage& /*h_storage*/) {
-  assert(false);
 }
 #endif  // __CUDACC__
 

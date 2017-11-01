@@ -28,7 +28,7 @@ __global__ void kernel_call_lambda(F func, Args... args) {
       [] __device__ (auto* base, auto... args) { \
           /* TODO: Assuming zero addressing mode. */ \
           int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-          class_name::get(base->id() + tid)->method_node(args...); \
+          return class_name::get(base->id() + tid)->method_node(args...); \
       }, __VA_ARGS__); cudaDeviceSynchronize();
 
 }  // soa

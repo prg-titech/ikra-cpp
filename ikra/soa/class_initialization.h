@@ -65,10 +65,6 @@ static void initialize_storage() { \
       "Storage buffer too small. Must be at least sizeof(Storage)"); \
   new (storage_buffer) Storage(); \
 } \
-\
-static void cuda_initialize_storage() { \
-  storage_cuda_initialize(storage()); \
-} \
 static const uint32_t kCounterFirstIndex = __COUNTER__;
 
 #endif  // SOA_CLASS_INITIALIZATION_H

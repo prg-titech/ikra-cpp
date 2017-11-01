@@ -49,10 +49,32 @@ class Field_ {
     return *data_ptr();
   }
 
-  // Operator for implicit conversion to type T.
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+  // Operator for implicit conversion to type T. Either running device code or
+  // not running in CUDA mode at all.
   __ikra_device__ operator T&() const {
     return *data_ptr();
   }
+#else
+  T copy_from_device() const {
+    auto h_data_ptr = reinterpret_cast<uintptr_t>(data_ptr_uninitialized());
+    auto h_storage_data = reinterpret_cast<uintptr_t>(&Owner::storage());
+    auto data_offset = h_data_ptr - h_storage_data;
+    auto d_storage_ptr = reinterpret_cast<uintptr_t>(
+        Owner::device_storage_pointer());
+    T* d_data_ptr = reinterpret_cast<T*>(d_storage_ptr + data_offset);
+
+    T host_data;
+    cudaMemcpy(&host_data, d_data_ptr, sizeof(T), cudaMemcpyDeviceToHost);
+    return host_data;
+  }
+
+  // Operator for implicit conversion to type T. Running in CUDA mode on the
+  // host. Data must be copied.
+  __ikra_device__ operator T() const {
+    return copy_from_device();
+  }
+#endif  // __CUDA_ARCH__
 
   __ikra_device__ Self operator=(T value) {
     *data_ptr() = value;
@@ -115,11 +137,7 @@ class Field_ {
   // Field instance.
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
-  data_ptr() const {
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size);
-
+  data_ptr_uninitialized() const {
     uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
     uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
     uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
@@ -128,11 +146,28 @@ class Field_ {
   }
 
   template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
+  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
   data_ptr() const {
+    // Ensure that this is a valid pointer: Only those objects may be accessed
+    // which were created with the "new" keyword and are thus initialized.
     assert(id() < Owner::storage().size);
+    return data_ptr_uninitialized();
+  }
+
+  template<int A = AddressMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
+  data_ptr_uninitialized() const {
     return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
                                 Owner::storage().data + Capacity*Offset);
+  }
+
+  template<int A = AddressMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
+  data_ptr() const {
+    // Ensure that this is a valid pointer: Only those objects may be accessed
+    // which were created with the "new" keyword and are thus initialized.
+    assert(id() < Owner::storage().size);
+    return data_ptr_uninitialized();
   }
 
   // Force size of this class to be 0.
