@@ -60,6 +60,9 @@ class DynamicStorage_ {
 // It also keeps track of the number of created instances ("size").
 template<class Owner, size_t ArenaSize>
 class StaticStorage_ {
+ private:
+  using Self = StaticStorage_<Owner, ArenaSize>;
+
  public:
   __ikra_device__ StaticStorage_() {
     if (ArenaSize == 0) {
@@ -81,6 +84,13 @@ class StaticStorage_ {
     arena_head_ += bytes;
     return result;
   }
+
+#ifdef __CUDACC__
+  // TODO: Consider going through the regular constructor here.
+  __device__ void cuda_initialize() {
+    size = 0;
+  }
+#endif  // __CUDACC__
 
  private:
   char* arena_head_;
@@ -108,6 +118,30 @@ struct StaticStorageWithArena {
   template<class Owner>
   using type = StaticStorage_<Owner, ArenaSize>;
 };
+
+#ifdef __CUDACC__
+template<typename Storage>
+__global__ void storage_cuda_initialize_kernel(Storage* self) {
+  // Delegate initialization to storage strategy.
+  self->cuda_initialize();
+}
+
+template<typename Storage>
+void storage_cuda_initialize(const Storage& h_storage) {
+  // Get device address of storage.
+  Storage* d_storage;
+  cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), h_storage);
+  // Initialize storage.
+  storage_cuda_initialize_kernel<<<1, 1>>>(d_storage);
+  cudaThreadSynchronize();
+}
+#else
+// CUDA initialization only available in CUDA mode.
+template<typename Storage>
+void storage_cuda_initialize(const Storage& /*h_storage*/) {
+  assert(false);
+}
+#endif  // __CUDACC__
 
 }  // namespace soa
 }  // namespace ikra

@@ -9,7 +9,7 @@
 static const int kMaxDegree = 10;
 static const int kMaxVertices = 20000;
 
-char storage_buffer[10000];
+char storage_buffer[2000000];
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;

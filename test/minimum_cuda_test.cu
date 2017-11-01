@@ -1,72 +1,40 @@
-// This is the REAL "hello world" for CUDA!
-// It takes the string "Hello ", prints it, then passes it to CUDA with an array
-// of offsets. Then the offsets are added in parallel to produce the string "World!"
-// By Ingemar Ragnemalm 2010
- 
 #include <stdio.h>
-//#include "executor/cuda_executor.h"
+#include "executor/cuda_executor.h"
 #include "soa/soa.h"
-
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess) 
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
+#include "soa/cuda.h"
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
-using ikra::soa::kAddressModeZero;
-using ikra::soa::DynamicStorage;
+using ikra::executor::cuda::construct;
+using ikra::executor::cuda::execute;
 
 __device__ char data_buffer[10000];
-
 
 
 class Vertex : public SoaLayout<Vertex, 1000> {
  public:
   IKRA_INITIALIZE_CLASS(data_buffer)
 
-  __device__ Vertex(int a) {
-    printf("IN CONSTRUCTOR!!\n");
-  }
+  __ikra_device__ Vertex(int f0, int f1) : field0(f0), field1(f1) {}
 
-
-/*
   int_ field0;
   int_ field1;
 
-  __ikra_device__ void add_fields() {
-    field0 = field0 + field1;
+  __ikra_device__ void add_fields(int increment) {
+    field0 = field0 + field1 + increment + this->id();
   }
-*/
 
+  __ikra_device__ void foo() {
+    printf("CALLING FOO on %i!\n", (int) field0);
+  }
 };
-
-
-template<typename T>
-__global__ void myKernel() {
-  new (Vertex::get_(0)) Vertex(123);
-}
-
 
 
 int main()
 {
-  void* bla;
-  cudaMalloc( (void**)&bla, 100 );
-  gpuErrchk( cudaPeekAtLastError() );
-  gpuErrchk( cudaDeviceSynchronize() );
-  
-  myKernel<int><<<1,2>>>();
-  gpuErrchk( cudaPeekAtLastError() );
-  gpuErrchk( cudaDeviceSynchronize() );
+  Vertex::cuda_initialize_storage();
 
-  printf("!!!!!\n");
+  Vertex* first = construct<Vertex>(8, 5, 6);
+  // cuda_execute(Vertex, add_fields, first, 8, 10)
+  cuda_execute(Vertex, foo, first, 8)
 }
-
-
-// Keep nullptr as special "not an object"

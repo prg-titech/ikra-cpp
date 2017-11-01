@@ -8,7 +8,7 @@
 #include "soa/soa.h"
 
 static const int kMaxVertices = 20000;
-char storage_buffer[50000];
+char storage_buffer[1000000];
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;

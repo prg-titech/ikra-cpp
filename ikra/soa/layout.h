@@ -37,7 +37,7 @@ struct SizeNDummy {
 template<class Self,
          IndexType Capacity,
          int AddressMode = kAddressModeZero,
-         class StorageStrategy = DynamicStorage>
+         class StorageStrategy = StaticStorage>
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = typename StorageStrategy::template type<Self>;
@@ -71,25 +71,9 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   static const int kAddressMode = AddressMode;
 
-#ifdef __CUDA_ARCH__
-  // TODO: Not sure why the CUDA version does not take the overload without
-  // the "self" argument. Is this a compiler bug?
-  __device__ void* operator new(size_t count, void* self) {
-    printf("IN NEW!!\n");
-    check_sizeof_class();
-    // Check if out of memory.
-    assert(Self::storage().size <= Capacity);
-
-    return get_(1);
-  }
-
-  __device__ void operator delete(void* /*ptr*/, void* self) {
-    assert(false);
-  }
-#else
   // Create a new instance of this class. Data will be allocated inside
   // storage.data.
-  void* operator new(size_t count) {
+  __ikra_device__ void* operator new(size_t count) {
     check_sizeof_class();
     assert(count == sizeof(Self));
     // Check if out of memory.
@@ -98,10 +82,26 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // TODO: Implement delete operator.
-  void operator delete(void* /*ptr*/) {
+  __ikra_device__ void operator delete(void* /*ptr*/) {
     assert(false);
   }
-#endif  // __CUDA_ARCH__
+
+#ifdef __CUDACC__
+  // Create a new instance of this class with placement new. This is only
+  // allowed in CUDA mode where we keep track of instance counters in a
+  // different way.
+  // TODO: Assuming zero addressing mode.
+  __device__ void* operator new(size_t count, void* ptr) {
+    check_sizeof_class();
+    assert(reinterpret_cast<uintptr_t>(ptr) > 0);
+    return ptr;
+  }
+
+  // TODO: Implement delete operator.
+  __device__ void operator delete(void* /*ptr*/, void* /*place*/) {
+    assert(false);
+  }
+#endif  // __CUDACC__
 
   // Create multiple new instances of this class. Data will be allocated inside
   // storage.data.
@@ -121,7 +121,6 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // Return a pointer to an object with a given ID. Do not check if the
   // object was previously initialized.
   __ikra_device__ static Self* get_uninitialized(IndexType id) {
-    assert(id >= 0);
     assert(id <= Capacity);
 
     // First object has actually ID 1. This is because a nullptr allows the
@@ -131,7 +130,6 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Return a pointer to an object with a given ID.
   __ikra_device__ static Self* get(IndexType id) {
-    assert(id >= 0);
     assert(id < Self::storage().size);
 
     // First object has actually ID 1. This is because a nullptr allows the
@@ -198,10 +196,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A != kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDA_ARCH__   // TODO: Fix on GPU.
+#ifndef __CUDACC__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == AddressMode,
                   "SOA class must have only SOA fields.");
-#endif
+#endif  // __CUDACC__
   }
 
   // Compile-time check for the size of this class. This check should fail
@@ -211,10 +209,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A == kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDA_ARCH__   // TODO: Fix on GPU.
+#ifndef __CUDACC__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == 0,
                   "SOA class must have only SOA fields.");
-#endif
+#endif  // __CUDACC__
   }
 };
 

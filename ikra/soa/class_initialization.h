@@ -66,6 +66,9 @@ static void initialize_storage() { \
   new (storage_buffer) Storage(); \
 } \
 \
+static void cuda_initialize_storage() { \
+  storage_cuda_initialize(storage()); \
+} \
 static const uint32_t kCounterFirstIndex = __COUNTER__;
 
 #endif  // SOA_CLASS_INITIALIZATION_H
