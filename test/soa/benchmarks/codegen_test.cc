@@ -83,7 +83,7 @@ int read_field1(TestClass* instance) {
 }
 
 // Compare with explicit, hand-written SOA code.
-int* explicit_field0;
+int explicit_field0[100];
 
 void explicit_write_field0(uintptr_t id) {
   explicit_field0[id] = 0x7777;

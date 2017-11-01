@@ -303,24 +303,23 @@ Disassembly of section .text:
   400951:	48 89 e5             	mov    %rsp,%rbp
   400954:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400958:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
-  40095c:	48 8b 04 25 00 a7 61 	mov    0x61a700,%rax
-  400963:	00 
-  400964:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
-  40096b:	5d                   	pop    %rbp
-  40096c:	c3                   	retq   
-  40096d:	0f 1f 00             	nopl   (%rax)
+  40095c:	c7 04 bd 00 a7 61 00 	movl   $0x7777,0x61a700(,%rdi,4)
+  400963:	77 77 00 00 
+  400967:	5d                   	pop    %rbp
+  400968:	c3                   	retq   
+  400969:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
 
 0000000000400970 <_Z20explicit_read_field0m>:
   400970:	55                   	push   %rbp
   400971:	48 89 e5             	mov    %rsp,%rbp
   400974:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400978:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
-  40097c:	48 8b 04 25 00 a7 61 	mov    0x61a700,%rax
-  400983:	00 
-  400984:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
-  400987:	5d                   	pop    %rbp
-  400988:	c3                   	retq   
-  400989:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  40097c:	8b 04 bd 00 a7 61 00 	mov    0x61a700(,%rdi,4),%eax
+  400983:	5d                   	pop    %rbp
+  400984:	c3                   	retq   
+  400985:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  40098c:	00 00 00 
+  40098f:	90                   	nop
 
 0000000000400990 <_ZN9TestClass18initialize_storageEv>:
   400990:	55                   	push   %rbp

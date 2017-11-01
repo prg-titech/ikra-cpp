@@ -198,16 +198,16 @@ Disassembly of section .text:
   40072f:	90                   	nop
 
 0000000000400730 <_Z21explicit_write_field0m>:
-  400730:	48 8b 05 b9 8f 21 00 	mov    0x218fb9(%rip),%rax        # 6196f0 <explicit_field0>
-  400737:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
-  40073e:	c3                   	retq   
-  40073f:	90                   	nop
+  400730:	c7 04 bd f0 96 61 00 	movl   $0x7777,0x6196f0(,%rdi,4)
+  400737:	77 77 00 00 
+  40073b:	c3                   	retq   
+  40073c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400740 <_Z20explicit_read_field0m>:
-  400740:	48 8b 05 a9 8f 21 00 	mov    0x218fa9(%rip),%rax        # 6196f0 <explicit_field0>
-  400747:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
-  40074a:	c3                   	retq   
-  40074b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  400740:	8b 04 bd f0 96 61 00 	mov    0x6196f0(,%rdi,4),%eax
+  400747:	c3                   	retq   
+  400748:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  40074f:	00 
 
 0000000000400750 <__libc_csu_init>:
   400750:	41 57                	push   %r15

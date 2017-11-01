@@ -47,18 +47,18 @@ Disassembly of section .text:
   4004a0:	53                   	push   %rbx
   4004a1:	bf a0 91 00 00       	mov    $0x91a0,%edi
   4004a6:	e8 c5 ff ff ff       	callq  400470 <malloc@plt>
-  4004ab:	48 8b 0d ce 0b 20 00 	mov    0x200bce(%rip),%rcx        # 601080 <storage_buffer>
-  4004b2:	48 89 05 cf 0b 20 00 	mov    %rax,0x200bcf(%rip)        # 601088 <storage_buffer+0x8>
+  4004ab:	48 8b 0d 4e 0d 20 00 	mov    0x200d4e(%rip),%rcx        # 601200 <storage_buffer>
+  4004b2:	48 89 05 4f 0d 20 00 	mov    %rax,0x200d4f(%rip)        # 601208 <storage_buffer+0x8>
   4004b9:	be b4 07 40 00       	mov    $0x4007b4,%esi
-  4004be:	48 c7 05 cf 0b 20 00 	movq   $0x0,0x200bcf(%rip)        # 601098 <storage_buffer+0x18>
+  4004be:	48 c7 05 4f 0d 20 00 	movq   $0x0,0x200d4f(%rip)        # 601218 <storage_buffer+0x18>
   4004c5:	00 00 00 00 
-  4004c9:	48 c7 05 bc 0b 20 00 	movq   $0x0,0x200bbc(%rip)        # 601090 <storage_buffer+0x10>
+  4004c9:	48 c7 05 3c 0d 20 00 	movq   $0x0,0x200d3c(%rip)        # 601210 <storage_buffer+0x10>
   4004d0:	00 00 00 00 
   4004d4:	bf 01 00 00 00       	mov    $0x1,%edi
   4004d9:	48 8d 51 01          	lea    0x1(%rcx),%rdx
   4004dd:	b9 20 64 68 24       	mov    $0x24686420,%ecx
   4004e2:	48 8d 1c 90          	lea    (%rax,%rdx,4),%rbx
-  4004e6:	48 89 15 93 0b 20 00 	mov    %rdx,0x200b93(%rip)        # 601080 <storage_buffer>
+  4004e6:	48 89 15 13 0d 20 00 	mov    %rdx,0x200d13(%rip)        # 601200 <storage_buffer>
   4004ed:	48 89 da             	mov    %rbx,%rdx
   4004f0:	c6 03 00             	movb   $0x0,(%rbx)
   4004f3:	c6 43 01 00          	movb   $0x0,0x1(%rbx)
@@ -73,7 +73,7 @@ Disassembly of section .text:
   40051b:	64 68 24 
   40051e:	31 c0                	xor    %eax,%eax
   400520:	e8 5b ff ff ff       	callq  400480 <__printf_chk@plt>
-  400525:	48 8b 05 5c 0b 20 00 	mov    0x200b5c(%rip),%rax        # 601088 <storage_buffer+0x8>
+  400525:	48 8b 05 dc 0c 20 00 	mov    0x200cdc(%rip),%rax        # 601208 <storage_buffer+0x8>
   40052c:	48 29 c3             	sub    %rax,%rbx
   40052f:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
   400533:	48 01 c3             	add    %rax,%rbx
@@ -177,10 +177,10 @@ Disassembly of section .text:
   40065d:	00 00 00 
 
 0000000000400660 <_Z12new_instancev>:
-  400660:	48 8b 05 19 0a 20 00 	mov    0x200a19(%rip),%rax        # 601080 <storage_buffer>
-  400667:	48 8b 15 1a 0a 20 00 	mov    0x200a1a(%rip),%rdx        # 601088 <storage_buffer+0x8>
+  400660:	48 8b 05 99 0b 20 00 	mov    0x200b99(%rip),%rax        # 601200 <storage_buffer>
+  400667:	48 8b 15 9a 0b 20 00 	mov    0x200b9a(%rip),%rdx        # 601208 <storage_buffer+0x8>
   40066e:	48 83 c0 01          	add    $0x1,%rax
-  400672:	48 89 05 07 0a 20 00 	mov    %rax,0x200a07(%rip)        # 601080 <storage_buffer>
+  400672:	48 89 05 87 0b 20 00 	mov    %rax,0x200b87(%rip)        # 601200 <storage_buffer>
   400679:	48 8d 04 82          	lea    (%rdx,%rax,4),%rax
   40067d:	c6 00 00             	movb   $0x0,(%rax)
   400680:	c6 40 01 00          	movb   $0x0,0x1(%rax)
@@ -190,7 +190,7 @@ Disassembly of section .text:
   40068d:	0f 1f 00             	nopl   (%rax)
 
 0000000000400690 <_Z12write_field0P9TestClass>:
-  400690:	48 8b 05 f1 09 20 00 	mov    0x2009f1(%rip),%rax        # 601088 <storage_buffer+0x8>
+  400690:	48 8b 05 71 0b 20 00 	mov    0x200b71(%rip),%rax        # 601208 <storage_buffer+0x8>
   400697:	48 29 c7             	sub    %rax,%rdi
   40069a:	48 c1 ef 02          	shr    $0x2,%rdi
   40069e:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
@@ -199,7 +199,7 @@ Disassembly of section .text:
   4006ad:	00 00 00 
 
 00000000004006b0 <_Z11read_field0P9TestClass>:
-  4006b0:	48 8b 05 d1 09 20 00 	mov    0x2009d1(%rip),%rax        # 601088 <storage_buffer+0x8>
+  4006b0:	48 8b 05 51 0b 20 00 	mov    0x200b51(%rip),%rax        # 601208 <storage_buffer+0x8>
   4006b7:	48 29 c7             	sub    %rax,%rdi
   4006ba:	48 c1 ef 02          	shr    $0x2,%rdi
   4006be:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
@@ -209,7 +209,7 @@ Disassembly of section .text:
   4006cd:	00 00 00 
 
 00000000004006d0 <_Z12write_field1P9TestClass>:
-  4006d0:	48 8b 05 b1 09 20 00 	mov    0x2009b1(%rip),%rax        # 601088 <storage_buffer+0x8>
+  4006d0:	48 8b 05 31 0b 20 00 	mov    0x200b31(%rip),%rax        # 601208 <storage_buffer+0x8>
   4006d7:	48 29 c7             	sub    %rax,%rdi
   4006da:	48 c1 ef 02          	shr    $0x2,%rdi
   4006de:	c7 84 b8 d0 48 00 00 	movl   $0x7777,0x48d0(%rax,%rdi,4)
@@ -218,7 +218,7 @@ Disassembly of section .text:
   4006ea:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
 
 00000000004006f0 <_Z11read_field1P9TestClass>:
-  4006f0:	48 8b 05 91 09 20 00 	mov    0x200991(%rip),%rax        # 601088 <storage_buffer+0x8>
+  4006f0:	48 8b 05 11 0b 20 00 	mov    0x200b11(%rip),%rax        # 601208 <storage_buffer+0x8>
   4006f7:	48 29 c7             	sub    %rax,%rdi
   4006fa:	48 c1 ef 02          	shr    $0x2,%rdi
   4006fe:	8b 84 b8 d0 48 00 00 	mov    0x48d0(%rax,%rdi,4),%eax
@@ -227,16 +227,16 @@ Disassembly of section .text:
   40070d:	00 00 00 
 
 0000000000400710 <_Z21explicit_write_field0m>:
-  400710:	48 8b 05 49 09 20 00 	mov    0x200949(%rip),%rax        # 601060 <explicit_field0>
-  400717:	c7 04 b8 77 77 00 00 	movl   $0x7777,(%rax,%rdi,4)
-  40071e:	c3                   	retq   
-  40071f:	90                   	nop
+  400710:	c7 04 bd 60 10 60 00 	movl   $0x7777,0x601060(,%rdi,4)
+  400717:	77 77 00 00 
+  40071b:	c3                   	retq   
+  40071c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400720 <_Z20explicit_read_field0m>:
-  400720:	48 8b 05 39 09 20 00 	mov    0x200939(%rip),%rax        # 601060 <explicit_field0>
-  400727:	8b 04 b8             	mov    (%rax,%rdi,4),%eax
-  40072a:	c3                   	retq   
-  40072b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  400720:	8b 04 bd 60 10 60 00 	mov    0x601060(,%rdi,4),%eax
+  400727:	c3                   	retq   
+  400728:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  40072f:	00 
 
 0000000000400730 <__libc_csu_init>:
   400730:	41 57                	push   %r15
