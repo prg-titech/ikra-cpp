@@ -59,15 +59,6 @@ T* construct(size_t count, Args... args) {
   return h_storage_data_head;
 }
 
-// This function executes a method on all SOA objects that are enumerated by an
-// iterator (length many elements). This is currently a fully sequential
-// operation.
-template<typename T, typename F, typename... Args>
-void execute(T* base_ptr, IndexType length, F function, Args... args) {
-  assert(length > 0);
-  function<<<1, length>>>(base_ptr, args...);
-}
-
 }  // cuda
 }  // executor
 }  // ikra

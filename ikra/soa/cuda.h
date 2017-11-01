@@ -23,13 +23,13 @@ __global__ void kernel_call_lambda(F func, Args... args) {
   func(args...);
 }
 
-#define cuda_execute(class_name, method_node, base_ptr, length) \
+#define cuda_execute(class_name, method_node, length, ...) \
   kernel_call_lambda<<<1, length>>>( \
       [] __device__ (auto* base, auto... args) { \
           /* TODO: Assuming zero addressing mode. */ \
           int tid = threadIdx.x + blockIdx.x * blockDim.x; \
           class_name::get(base->id() + tid)->method_node(args...); \
-      }, base_ptr); cudaDeviceSynchronize();
+      }, __VA_ARGS__); cudaDeviceSynchronize();
 
 }  // soa
 }  // ikra
