@@ -26,3 +26,15 @@ do
     done
   done
 done
+
+# CUDA test
+/usr/local/cuda/bin/nvcc \
+    -std=c++14 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_codegen_test \
+    cuda_codegen_test.cu
+bin/cuda_codegen_test
+/usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
+    > assembly/cuda_codegen_test.S
