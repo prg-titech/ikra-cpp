@@ -19,8 +19,6 @@ class Vertex : public SoaLayout<Vertex, 1000> {
 
   __device__ void add_fields(int increment) {
     field0 = field0 + field1 + increment + this->id();
-
-    Vertex::get(0)->field0.get();
   }
 };
 
