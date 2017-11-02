@@ -92,6 +92,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // different way.
   // TODO: Assuming zero addressing mode.
   __device__ void* operator new(size_t count, void* ptr) {
+    static_assert(kAddressMode == ikra::soa::kAddressModeZero,
+        "Not implemented: Valid addressing mode.");
     check_sizeof_class();
     assert(reinterpret_cast<uintptr_t>(ptr) > 0);
     return ptr;
@@ -128,6 +130,9 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return get_(id + 1);
   }
 
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+  // Not running in CUDA mode or running on device.
+
   // Return a pointer to an object with a given ID.
   __ikra_device__ static Self* get(IndexType id) {
     assert(id < Self::storage().size);
@@ -136,6 +141,29 @@ class SoaLayout : SizeNDummy<AddressMode> {
     // compiler to do special optimizations.
     return get_(id + 1);
   }
+#else
+  // Running in CUDA mode and accessing object from host code.
+
+  static Self* get(IndexType id) {
+    assert(id <= Capacity);
+
+#ifndef NDEBUG
+    // Check if ID is valid on device.
+    auto h_size_ptr = reinterpret_cast<uintptr_t>(&Self::storage().size);
+    auto h_storage_data = reinterpret_cast<uintptr_t>(&Self::storage());
+    auto size_offset = h_size_ptr - h_storage_data;
+    auto d_storage_ptr = reinterpret_cast<uintptr_t>(device_storage_pointer());
+    IndexType* d_size_ptr = reinterpret_cast<IndexType*>(
+        d_storage_ptr + size_offset);
+
+    IndexType host_size;
+    cudaMemcpy(&host_size, d_size_ptr, sizeof(IndexType),
+               cudaMemcpyDeviceToHost);
+    assert(id < host_size);
+#endif  // NDEBUG
+    return get_uninitialized(id);
+  }
+#endif
 
   // Return a pointer to an object by ID (assuming valid addressing mode).
   // TODO: This method should be private!

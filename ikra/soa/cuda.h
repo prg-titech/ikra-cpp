@@ -45,6 +45,9 @@ __global__ void kernel_call_lambda(F func, Args... args) {
   kernel_call_lambda<<<1, length>>>( \
       [] __device__ (auto* base, auto... args) { \
           /* TODO: Assuming zero addressing mode. */ \
+          static_assert(class_name::kAddressMode \
+              == ikra::soa::kAddressModeZero, \
+              "Not implemented: Valid addressing mode."); \
           int tid = threadIdx.x + blockIdx.x * blockDim.x; \
           return class_name::get(base->id() + tid)->method_node(args...); \
       }, __VA_ARGS__); cudaDeviceSynchronize();

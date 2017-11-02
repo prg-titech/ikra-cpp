@@ -12,6 +12,7 @@ namespace executor {
 namespace cuda {
 
 using ikra::soa::IndexType;
+using ikra::soa::kAddressModeZero;
 
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
@@ -32,6 +33,8 @@ __global__ void increment_class_size_kernel(IndexType increment) {
 // TODO: Assuming zero addressing mode.
 template<typename T, typename... Args>
 __global__ void construct_kernel(IndexType base_id, Args... args) {
+  static_assert(T::kAddressMode == kAddressModeZero,
+      "Not implemented: Valid addressing mode.");
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // Use placement new to avoid atomic increment of ID.
   new (T::get_uninitialized(base_id + tid)) T(args...);

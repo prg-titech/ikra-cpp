@@ -34,7 +34,7 @@ void run_test() {
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
-    int actual = Vertex::get_uninitialized(i)->field0;
+    int actual = Vertex::get(i)->field0;
     int expected = 10 + 5 + 6 + i;
     EXPECT_EQ(actual, expected);
   }
