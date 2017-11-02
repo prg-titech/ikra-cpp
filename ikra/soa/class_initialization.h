@@ -52,19 +52,13 @@ struct ObjectSize_ { \
 /* Alias for simplier access of object size: MyClass::ObjectSize::value. */ \
 using ObjectSize = ObjectSize_<0>; \
 \
+using StorageBufferType = decltype(storage_buffer); \
 /* Function that returns a reference to the storage buffer.
  * Will be inlined. Pointer dereference will be optimized out. */ \
 __ikra_device__ static Storage& storage() { \
   return *reinterpret_cast<Storage*>(storage_buffer); \
 } \
 \
-/* Initializes the storage buffer with an actual storage object. */ \
-static void initialize_storage() { \
-  static_assert(sizeof(ikra::soa::char_array_size(storage_buffer)) \
-      >= sizeof(Storage), \
-      "Storage buffer too small. Must be at least sizeof(Storage)"); \
-  new (storage_buffer) Storage(); \
-} \
 static const uint32_t kCounterFirstIndex = __COUNTER__;
 
 #endif  // SOA_CLASS_INITIALIZATION_H

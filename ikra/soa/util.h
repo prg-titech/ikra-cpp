@@ -4,9 +4,15 @@
 namespace ikra {
 namespace soa {
 
-// Returns the size (number of elements) of a char array.
-template<size_t n>
-static char (&char_array_size(const char (&)[n]))[n];
+// Helper structure for checking if a storage buffer has a minimum required
+// size. The structure is designed in such a way that the compiler may display
+// the required size as part of the error message.
+template<size_t StorageBufferSize, size_t RequiredMinimumSize>
+struct StorageSizeCheck {
+  static_assert(StorageBufferSize >= RequiredMinimumSize,
+      "Storage buffer size too small. Must be at least sizeof(Storage)");
+  static constexpr bool value = StorageBufferSize >= RequiredMinimumSize;
+};
 
 }  // soa
 }  // ikra
