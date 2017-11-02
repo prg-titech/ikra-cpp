@@ -8,7 +8,6 @@
 #include "soa/soa.h"
 
 static const int kMaxVertices = 20000;
-char storage_buffer[1000000];
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
@@ -17,7 +16,7 @@ using ikra::executor::execute_and_reduce;
 
 class Vertex : public SoaLayout<Vertex, kMaxVertices> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer)
+  IKRA_INITIALIZE_CLASS
 
   Vertex(const std::vector<IndexType>& neighbors) {
     adj_list_size_ = neighbors.size();
@@ -64,6 +63,8 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
   int_ adj_list_size_;
   field_(std::vector<Vertex*>) adj_list_;
 };
+
+IKRA_HOST_STORAGE(Vertex)
 
 
 int run() {

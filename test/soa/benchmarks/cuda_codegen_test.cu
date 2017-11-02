@@ -10,12 +10,9 @@ using ikra::executor::cuda::construct;
 
 const static int kTestSize = 12;
 
-__device__ char data_buffer[10000];
-
-
 class TestClass : public SoaLayout<TestClass, 1000> {
  public:
-  IKRA_INITIALIZE_CLASS(data_buffer)
+  IKRA_INITIALIZE_CLASS
 
   __device__ TestClass(int f0, int f1) : field0(f0), field1(f1) {}
 
@@ -29,9 +26,11 @@ class TestClass : public SoaLayout<TestClass, 1000> {
   }
 };
 
+IKRA_DEVICE_STORAGE(TestClass)
+
 
 int main() {
-  TestClass::cuda_initialize_storage();
+  TestClass::initialize_storage();
 
   TestClass* first = construct<TestClass>(kTestSize, 0x6666, 0x5555);
   cuda_execute(TestClass, add_fields, kTestSize, first, 0x8888)

@@ -3,7 +3,7 @@
 
 #include "soa/util.h"
 
-#define IKRA_INITIALIZE_CLASS(storage_buffer) \
+#define IKRA_INITIALIZE_CLASS \
 /* This class is used to calculate field offsets inside a SOA class. For every
  * field declaration, a new class specialization will be generated using
  * macro expansion. "N" is index of the field and "value" is the offset of
@@ -51,13 +51,9 @@ struct ObjectSize_ { \
 \
 /* Alias for simplier access of object size: MyClass::ObjectSize::value. */ \
 using ObjectSize = ObjectSize_<0>; \
-\
-using StorageBufferType = decltype(storage_buffer); \
 /* Function that returns a reference to the storage buffer.
  * Will be inlined. Pointer dereference will be optimized out. */ \
-__ikra_device__ static Storage& storage() { \
-  return *reinterpret_cast<Storage*>(storage_buffer); \
-} \
+__ikra_host_device__ static Storage& storage(); \
 \
 static const uint32_t kCounterFirstIndex = __COUNTER__;
 

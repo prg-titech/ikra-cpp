@@ -188,13 +188,6 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return reinterpret_cast<uintptr_t>(this) - 1;
   }
 
-  __ikra_device__ static void check_storage_buffer_size() {
-    __attribute__((unused)) static constexpr bool storage_buffer_size_check =
-        ikra::soa::StorageSizeCheck<
-            sizeof(typename Self::StorageBufferType),
-            sizeof(Storage)>::value;
-  }
-
 #ifdef __CUDACC__
   static Storage* device_storage_pointer() {
     // Get device address of storage.
@@ -206,13 +199,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   static void initialize_storage() {
-    check_storage_buffer_size();
     storage_cuda_initialize(device_storage_pointer());
   }
 #else
   // Initializes the storage buffer with an actual storage object.
   static void initialize_storage() {
-    check_storage_buffer_size();
     new (reinterpret_cast<void*>(&Self::storage())) Storage();
   }
 #endif  // __CUDACC__

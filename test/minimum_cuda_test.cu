@@ -8,12 +8,9 @@ using ikra::executor::cuda::construct;
 
 const static int kTestSize = 12;
 
-__device__ char data_buffer[8016];
-
-
 class Vertex : public SoaLayout<Vertex, 1000> {
  public:
-  IKRA_INITIALIZE_CLASS(data_buffer)
+  IKRA_INITIALIZE_CLASS
 
   __device__ Vertex(int f0, int f1) : field0(f0), field1(f1) {}
 
@@ -26,6 +23,9 @@ class Vertex : public SoaLayout<Vertex, 1000> {
     Vertex::get(0)->field0.get();
   }
 };
+
+IKRA_DEVICE_STORAGE(Vertex);
+
 
 // Cannot run "cuda_execute" inside gtest case.
 void run_test() {

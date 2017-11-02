@@ -25,8 +25,6 @@ static const int kWindowWidth = 1000;
 static const int kWindowHeight = 1000;
 static const int kMaxRect = 20;
 
-char storage_buffer[100000];
-
 #define RAND (1.0 * rand() / RAND_MAX)
 
 static void render_rect(SDL_Renderer* renderer, double x, double y, double mass) {
@@ -39,7 +37,7 @@ static void render_rect(SDL_Renderer* renderer, double x, double y, double mass)
 
 class Body : public SoaLayout<Body, kNumBodies> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer)
+  IKRA_INITIALIZE_CLASS
 
   Body(double mass, double pos_x, double pos_y, double vel_x, double vel_y)
       : mass_(mass) {
@@ -94,6 +92,8 @@ class Body : public SoaLayout<Body, kNumBodies> {
     render_rect(renderer, position_[0], position_[1], mass_);
   }
 };
+
+IKRA_HOST_STORAGE(Body)
 
 
 int main() {

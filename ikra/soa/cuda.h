@@ -10,6 +10,8 @@
 #define __ikra_device__
 #endif  // __CUDA_ARCH__
 
+#define __ikra_host_device__ __host__ __device__
+
 // Error checking code taken from:
 // https://stackoverflow.com/questions/14038589/
 // what-is-the-canonical-way-to-check-for-errors-using-the-cuda-runtime-api
@@ -53,6 +55,7 @@ __global__ void kernel_call_lambda(F func, Args... args) {
 #else
 
 #define __ikra_device__
+#define __ikra_host_device__
 
 #endif  // __CUDACC__
 

@@ -2,7 +2,7 @@ class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
                                              kClassMaxInst,
                                              IKRA_TEST_ADDRESS_MODE> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer)
+  IKRA_INITIALIZE_CLASS
 
   int_ field0;
   int_ field1;

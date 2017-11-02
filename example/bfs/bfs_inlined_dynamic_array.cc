@@ -10,8 +10,6 @@ static const int kInlineSize = 2;
 static const int kMaxVertices = 20000;
 static const int kMaxEdges = 100000;
 
-char storage_buffer[10000000];
-
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::soa::StaticStorageWithArena;
@@ -24,7 +22,7 @@ class Vertex : public SoaLayout<
     Vertex, kMaxVertices, kAddressModeZero,
     StaticStorageWithArena<kMaxEdges*sizeof(Vertex*)>> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer)
+  IKRA_INITIALIZE_CLASS
 
   Vertex(const std::vector<IndexType>& neighbors)
       : adj_list_(neighbors.size()) {
@@ -73,6 +71,8 @@ class Vertex : public SoaLayout<
   // By default a SOA array.
   array_(Vertex*, kInlineSize, inline_soa) adj_list_;
 };
+
+IKRA_HOST_STORAGE(Vertex)
 
 
 int run() {

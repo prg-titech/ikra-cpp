@@ -4,6 +4,18 @@
 #include "soa/constants.h"
 #include "soa/cuda.h"
 
+#define IKRA_DEVICE_STORAGE(class_name) \
+__device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
+__host__ __device__ class_name::Storage& class_name::storage() { \
+  return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
+}
+
+#define IKRA_HOST_STORAGE(class_name) \
+char __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
+class_name::Storage& class_name::storage() { \
+  return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
+}
+
 namespace ikra {
 namespace soa {
 

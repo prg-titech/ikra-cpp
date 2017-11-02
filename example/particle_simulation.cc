@@ -29,9 +29,6 @@ static const int kWindowWidth = 1000;
 static const int kWindowHeight = 1000;
 static const double kScalingFactor = 2.5e-9;
 
-char storage_buffer_well[10000];
-char storage_buffer_particles[10000];
-
 // Draw a rectangle with equal height/width at a given position.
 static void render_rect(SDL_Renderer* renderer, double x, double y, int side) {
   SDL_Rect rect;
@@ -46,7 +43,7 @@ class Particle;
 
 class Well : public SoaLayout<Well, kNumWells> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer_well)
+  IKRA_INITIALIZE_CLASS
 
   Well(double mass, double pos_x, double pos_y) : mass_(mass) {
     position_[0] = pos_x;
@@ -64,10 +61,12 @@ class Well : public SoaLayout<Well, kNumWells> {
   array_(double, 2) position_;
 };
 
+IKRA_HOST_STORAGE(Well)
+
 
 class Particle : public SoaLayout<Particle, kNumParticles> {
  public:
-  IKRA_INITIALIZE_CLASS(storage_buffer_particles)
+  IKRA_INITIALIZE_CLASS
 
   Particle(double mass, double pos_x, double pos_y, double vel_x, double vel_y)
       : mass_(mass) {
@@ -109,6 +108,8 @@ class Particle : public SoaLayout<Particle, kNumParticles> {
     render_rect(renderer, position_[0], position_[1], 30);
   }
 };
+
+IKRA_HOST_STORAGE(Particle)
 
 
 // Defined here because definition depends on Particle.

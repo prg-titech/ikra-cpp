@@ -8,14 +8,13 @@ using ikra::soa::kAddressModeZero;
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
-char storage_buffer[100000];
-
 // Zero addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassZ
 #define IKRA_TEST_ADDRESS_MODE kAddressModeZero
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
+IKRA_HOST_STORAGE(TestClassZ)
 
 // Valid addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassV
@@ -23,6 +22,7 @@ char storage_buffer[100000];
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
+IKRA_HOST_STORAGE(TestClassV)
 
 
 template<typename T>

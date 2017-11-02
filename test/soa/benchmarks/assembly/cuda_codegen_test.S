@@ -23,7 +23,7 @@ compile_size = 64bit
 
 Resource usage:
  Common:
-  GLOBAL:10420
+  GLOBAL:8436
  Function _ZN4ikra8executor4cuda16construct_kernelI9TestClassJiiEEEvmDpT0_:
   REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda27increment_class_size_kernelI9TestClassEEvm:
@@ -366,7 +366,7 @@ compressed
 .address_size 64
 
 
-.global .align 16 .b8 data_buffer[10000];
+.global .align 16 .b8 __TestClassdata_buffer[8016];
 .global .align 4 .u32 int_result;
 .global .align 16 .b8 explicit_field0[400];
 .global .align 8 .u64 _ZN4ikra8executor4cuda14d_storage_sizeE;
@@ -382,8 +382,8 @@ compressed
 
 ld.param.u64 %rd1, [_Z12write_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
-mov.u64 %rd3, data_buffer;
-add.s64 %rd4, %rd2, %rd3;
+mov.u64 %rd3, __TestClassdata_buffer;
+add.s64 %rd4, %rd3, %rd2;
 mov.u32 %r1, 30583;
 st.global.u32 [%rd4+8], %r1;
 ret;
@@ -400,8 +400,8 @@ ret;
 
 ld.param.u64 %rd1, [_Z11read_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
-mov.u64 %rd3, data_buffer;
-add.s64 %rd4, %rd2, %rd3;
+mov.u64 %rd3, __TestClassdata_buffer;
+add.s64 %rd4, %rd3, %rd2;
 ld.global.u32 %r1, [%rd4+8];
 st.global.u32 [int_result], %r1;
 ret;
@@ -418,7 +418,7 @@ ret;
 
 ld.param.u64 %rd1, [_Z12write_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
-mov.u64 %rd3, data_buffer;
+mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd2, %rd3;
 mov.u32 %r1, 30583;
 st.global.u32 [%rd4+4008], %r1;
@@ -436,7 +436,7 @@ ret;
 
 ld.param.u64 %rd1, [_Z11read_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
-mov.u64 %rd3, data_buffer;
+mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd2, %rd3;
 ld.global.u32 %r1, [%rd4+4008];
 st.global.u32 [int_result], %r1;
@@ -499,8 +499,8 @@ mad.lo.s32 %r5, %r4, %r3, %r2;
 cvt.s64.s32	%rd2, %r5;
 add.s64 %rd3, %rd2, %rd1;
 shl.b64 %rd4, %rd3, 2;
-mov.u64 %rd5, data_buffer;
-add.s64 %rd6, %rd4, %rd5;
+mov.u64 %rd5, __TestClassdata_buffer;
+add.s64 %rd6, %rd5, %rd4;
 ld.global.u32 %r6, [%rd6+8];
 ld.global.u32 %r7, [%rd6+4008];
 add.s32 %r8, %r6, %r1;
@@ -536,12 +536,12 @@ ret;
 
 
 ld.param.u64 %rd1, [_ZN4ikra8executor4cuda27increment_class_size_kernelI9TestClassEEvm_param_0];
-ld.global.u64 %rd2, [data_buffer];
+ld.global.u64 %rd2, [__TestClassdata_buffer];
 add.s64 %rd3, %rd2, 1;
 st.global.u64 [_ZN4ikra8executor4cuda19d_storage_data_headE], %rd3;
 st.global.u64 [_ZN4ikra8executor4cuda14d_storage_sizeE], %rd2;
 add.s64 %rd4, %rd2, %rd1;
-st.global.u64 [data_buffer], %rd4;
+st.global.u64 [__TestClassdata_buffer], %rd4;
 ret;
 }
 
@@ -571,8 +571,8 @@ setp.eq.s64	%p1, %rd1, 0;
 @%p1 bra BB9_2;
 
 shl.b64 %rd5, %rd1, 2;
-mov.u64 %rd6, data_buffer;
-add.s64 %rd7, %rd5, %rd6;
+mov.u64 %rd6, __TestClassdata_buffer;
+add.s64 %rd7, %rd6, %rd5;
 st.global.u32 [%rd7+8], %r1;
 st.global.u32 [%rd7+4008], %r2;
 
