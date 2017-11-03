@@ -56,17 +56,29 @@ class Field_ {
   __ikra_device__ operator T&() const {
     return *data_ptr();
   }
+
+  // Assignment operator.
+  __ikra_device__ Self& operator=(T value) {
+    *data_ptr() = value;
+    return *this;
+  }
 #else
-  T copy_from_device() const {
+  T* device_data_ptr() const {
     auto h_data_ptr = reinterpret_cast<uintptr_t>(data_ptr_uninitialized());
     auto h_storage_data = reinterpret_cast<uintptr_t>(&Owner::storage());
     auto data_offset = h_data_ptr - h_storage_data;
     auto d_storage_ptr = reinterpret_cast<uintptr_t>(
         Owner::device_storage_pointer());
-    T* d_data_ptr = reinterpret_cast<T*>(d_storage_ptr + data_offset);
+    return reinterpret_cast<T*>(d_storage_ptr + data_offset);
+  }
 
+  void copy_from_device(T* target) const {
+    cudaMemcpy(target, device_data_ptr(), sizeof(T), cudaMemcpyDeviceToHost);
+  }
+
+  T copy_from_device() const {
     T host_data;
-    cudaMemcpy(&host_data, d_data_ptr, sizeof(T), cudaMemcpyDeviceToHost);
+    copy_from_device(&host_data);
     return host_data;
   }
 
@@ -74,15 +86,17 @@ class Field_ {
   // host. Data must be copied.
   // TODO: This method is broken when compiling in CUDA mode but host execution
   // is intended.
-  __ikra_device__ operator T() const {
+  operator T() const {
     return copy_from_device();
   }
-#endif  // __CUDA_ARCH__
 
-  __ikra_device__ Self operator=(T value) {
-    *data_ptr() = value;
+  // Assignment operator.
+  // TODO: Probably need to handle SOA pointer differently here.
+  Self& operator=(T value) {
+    cudaMemcpy(device_data_ptr(), &value, sizeof(T), cudaMemcpyHostToDevice);
     return *this;
   }
+#endif  // __CUDA_ARCH__
 
   // Define inplace assignment operators.
   IKRA_DEFINE_FIELD_ASSIGNMENT(+);

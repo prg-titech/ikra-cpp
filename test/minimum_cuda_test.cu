@@ -26,7 +26,7 @@ IKRA_DEVICE_STORAGE(Vertex);
 
 
 // Cannot run "cuda_execute" inside gtest case.
-void run_test() {
+void run_test_construct_and_execute() {
   Vertex::initialize_storage();
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
@@ -43,6 +43,31 @@ void run_test() {
   gpuErrchk(cudaPeekAtLastError());
 }
 
+void run_test_host_side_assignment() {
+  Vertex::initialize_storage();
+
+  Vertex* first = construct<Vertex>(kTestSize, 5, 6);
+  cuda_execute(Vertex, add_fields, kTestSize, first, 10)
+
+  for (int i = 0; i < kTestSize; ++i) {
+    Vertex::get(i)->field0 = Vertex::get(i)->field0*Vertex::get(i)->field0;
+  }
+
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    int actual = Vertex::get(i)->field0;
+    int expected = (10 + 5 + 6 + i)*(10 + 5 + 6 + i);
+    EXPECT_EQ(actual, expected);
+  }
+
+  // Make sure that we had no CUDA failures.
+  gpuErrchk(cudaPeekAtLastError());
+}
+
 TEST(MinimumCudaTest, ConstructAndExecute) {
-  run_test();
+  run_test_construct_and_execute();
+}
+
+TEST(MinimumCudaTest, HostSideAssignment) {
+  run_test_host_side_assignment();
 }
