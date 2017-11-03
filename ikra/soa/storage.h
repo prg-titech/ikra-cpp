@@ -1,8 +1,6 @@
 #ifndef SOA_STORAGE_H
 #define SOA_STORAGE_H
 
-#include <cstddef>
-
 #include "soa/constants.h"
 #include "soa/cuda.h"
 
