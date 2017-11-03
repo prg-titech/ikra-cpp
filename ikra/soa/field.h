@@ -3,6 +3,7 @@
 
 #include "soa/constants.h"
 #include "soa/cuda.h"
+#include "soa/util.h"
 
 // This marco is expanded for every inplace assignment operator and forwards
 // the operation to the wrapped data.
@@ -98,11 +99,14 @@ class Field_ {
   // TODO: Implement special operators:
   // http://en.cppreference.com/w/cpp/language/operator_logical
 
-#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
-// Friend template is broken. This is an nvcc bug.
  protected:
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
   // Only Owner can create new fields for itself.
   friend Owner;
+#else
+  // Only Owner can create new fields for itself.
+  // Friend template is broken. This is an nvcc bug.
+  friend typename NvccWorkaroundIdentityClassHolder<Owner>::type;
 #endif
 
   __ikra_device__ Field_() {}
@@ -120,7 +124,6 @@ class Field_ {
   // work.
   __ikra_device__ Field_(Field_&& /*other*/) {}
 
- protected:
   template<int A = AddressMode>
   __ikra_device__
   typename std::enable_if<A != kAddressModeZero, IndexType>::type
