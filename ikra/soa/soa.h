@@ -17,5 +17,6 @@
 #include "soa/inlined_dynamic_array_field.h"
 #include "soa/layout.h"
 #include "soa/preprocessor.h"
+#include "soa/storage.h"
 
 #endif  // SOA_SOA_H

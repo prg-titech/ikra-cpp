@@ -77,7 +77,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
     check_sizeof_class();
     assert(count == sizeof(Self));
     // Check if out of memory.
-    assert(Self::storage().size() <= Capacity);
+    assert(size() <= Capacity);
     return get(Self::storage().increase_size(1));
   }
 

@@ -1,3 +1,5 @@
+#include <array>
+
 #include "gtest/gtest.h"
 
 #include "executor/cuda_executor.h"
@@ -13,7 +15,7 @@ class Vertex : public SoaLayout<Vertex, 1000> {
  public:
   IKRA_INITIALIZE_CLASS
 
-  __device__ Vertex(int f0, int f1) : field0(f0), field1(f1) {}
+  __host__ __device__ Vertex(int f0, int f1) : field0(f0), field1(f1) {}
 
   int_ field0;
   int_ field1;
@@ -73,10 +75,44 @@ void run_test_host_side_assignment() {
   gpuErrchk(cudaPeekAtLastError());
 }
 
+void run_test_host_side_new() {
+  Vertex::initialize_storage();
+  EXPECT_EQ(Vertex::size(), 0UL);
+
+  std::array<Vertex*, kTestSize> vertices;
+
+  for (int i = 0; i < kTestSize; ++i) {
+    vertices[i] = new Vertex(i + 1, i * i);
+  }
+
+  cuda_execute(Vertex, add_fields, kTestSize, vertices[0], 10);
+
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    int actual = Vertex::get(i)->field0;
+    int expected = 10 + i + (i + 1) + (i*i);
+    EXPECT_EQ(actual, expected);
+
+    actual = vertices[i]->field1;
+    expected = i*i;
+    EXPECT_EQ(actual, expected);
+  }
+
+  // Copy size to host memory and compare.
+  EXPECT_EQ(Vertex::size(), static_cast<IndexType>(kTestSize));
+
+  // Make sure that we had no CUDA failures.
+  gpuErrchk(cudaPeekAtLastError());
+}
+
 TEST(MinimumCudaTest, ConstructAndExecute) {
   run_test_construct_and_execute();
 }
 
 TEST(MinimumCudaTest, HostSideAssignment) {
   run_test_host_side_assignment();
+}
+
+TEST(MinimumCudaTest, HostSideNew) {
+  run_test_host_side_new();
 }

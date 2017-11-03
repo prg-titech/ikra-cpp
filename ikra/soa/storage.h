@@ -18,23 +18,27 @@ class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
 }
 
+
 namespace ikra {
 namespace soa {
+
+#ifdef __CUDACC__
+__device__ IndexType d_previous_storage_size;
+#endif  // __CUDACC__
 
 // Storage classes maintain the data of all SOA columns, as well as some meta
 // data such as the number of instances of a SOA class. All storage classes are
 // singletons, i.e., instantiations of the following classes are tied to a
 // specific SOA class.
 
-template<typename Self>
 class StorageStrategyBase {
  public:
   __ikra_device__ StorageStrategyBase() : size_(0) {}
 
 #ifdef __CUDACC__
-  Self* device_ptr() const {
+  StorageStrategyBase* device_ptr() const {
     // Get device address of storage.
-    Self* d_storage;
+    StorageStrategyBase* d_storage;
     cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
     assert(cudaPeekAtLastError() == cudaSuccess);
     return d_storage;
@@ -46,16 +50,6 @@ class StorageStrategyBase {
   __ikra_device__ IndexType size() const {
     return size_;
   }
-#else
-  // Running in CUDA mode on host.
-  IndexType size() const {
-    // Copy size to host and return.
-    IndexType host_size;
-    cudaMemcpy(&host_size, &device_ptr()->size_, sizeof(IndexType),
-               cudaMemcpyDeviceToHost);
-    return host_size;
-  }
-#endif
 
   __ikra_device__ IndexType increase_size(IndexType increment) {
     // TODO: Make this operation atomic.
@@ -63,11 +57,65 @@ class StorageStrategyBase {
     size_ += increment;
     return result;
   }
+#else
+  // Running in CUDA mode on host.
+  IndexType size() const {
+    // Copy size to host and return.
+    IndexType host_size;
+    cudaMemcpy(&host_size, &device_ptr()->size_, sizeof(IndexType),
+               cudaMemcpyDeviceToHost);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+    return host_size;
+  }
+
+  // Increase the instance counter on the device.
+  // Note: This is a host function.
+  IndexType increase_size(IndexType increment);
+#endif
 
  private:
   // The number of instances of Owner.
   IndexType size_;
 };
+
+template<typename Self>
+class StorageStrategySelf : public StorageStrategyBase {
+ public:
+#ifdef __CUDACC__
+  Self* device_ptr() const {
+    // Get device address of storage.
+    Self* d_storage;
+    cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+    return d_storage;
+  }
+#endif  // __CUDACC__
+};
+
+#if defined(__CUDACC__)
+// Note: This kernel cannot be templatized because template expansion
+// for code generation purposes is broken when invoked only through an
+// overridden operator new. This is the reason why StorageStrategyBase exists
+// in addition to StorageStrategySelf.
+__global__ void storage_increase_size_kernel(StorageStrategyBase* storage,
+                                             IndexType increment) {
+  d_previous_storage_size = storage->increase_size(increment);
+}
+
+#ifndef __CUDA_ARCH__
+// Running in host mode. Provide definition of method here because it depends
+// on the kernel above.
+IndexType StorageStrategyBase::increase_size(IndexType increment) {
+  storage_increase_size_kernel<<<1, 1>>>(device_ptr(), increment);
+  IndexType h_result_value;
+  cudaMemcpyFromSymbol(&h_result_value, d_previous_storage_size,
+                       sizeof(h_result_value),
+                       0, cudaMemcpyDeviceToHost);
+  assert(cudaPeekAtLastError() == cudaSuccess);
+  return h_result_value;
+}
+#endif  // __CUDA_ARCH__
+#endif  // __CUDACC__
 
 // This class maintains the data (char array) for the Owner class. Memory is
 // allocated dynamically. This allows programmers to take control over the
@@ -76,7 +124,7 @@ class StorageStrategyBase {
 // TODO: Use cudaMalloc for device storage (?).
 template<class OwnerT, size_t ArenaSize>
 class DynamicStorage_
-    : public StorageStrategyBase<DynamicStorage_<OwnerT, ArenaSize>> {
+    : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  public:
   using Owner = OwnerT;
 
@@ -135,7 +183,7 @@ class DynamicStorage_
 // Memory is allocated statically, allowing for efficient code generation.
 template<class OwnerT, size_t ArenaSize>
 class StaticStorage_
-    : public StorageStrategyBase<StaticStorage_<OwnerT, ArenaSize>> {
+    : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  public:
   using Owner = OwnerT;
 
