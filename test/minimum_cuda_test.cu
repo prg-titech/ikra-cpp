@@ -3,6 +3,7 @@
 #include "executor/cuda_executor.h"
 #include "soa/soa.h"
 
+using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::executor::cuda::construct;
 
@@ -28,9 +29,10 @@ IKRA_DEVICE_STORAGE(Vertex);
 // Cannot run "cuda_execute" inside gtest case.
 void run_test_construct_and_execute() {
   Vertex::initialize_storage();
+  EXPECT_EQ(Vertex::size(), 0UL);
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
-  cuda_execute(Vertex, add_fields, kTestSize, first, 10)
+  cuda_execute(Vertex, add_fields, kTestSize, first, 10);
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
@@ -39,15 +41,19 @@ void run_test_construct_and_execute() {
     EXPECT_EQ(actual, expected);
   }
 
+  // Copy size to host memory and compare.
+  EXPECT_EQ(Vertex::size(), static_cast<IndexType>(kTestSize));
+
   // Make sure that we had no CUDA failures.
   gpuErrchk(cudaPeekAtLastError());
 }
 
 void run_test_host_side_assignment() {
   Vertex::initialize_storage();
+  EXPECT_EQ(Vertex::size(), 0UL);
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
-  cuda_execute(Vertex, add_fields, kTestSize, first, 10)
+  cuda_execute(Vertex, add_fields, kTestSize, first, 10);
 
   for (int i = 0; i < kTestSize; ++i) {
     Vertex::get(i)->field0 = Vertex::get(i)->field0*Vertex::get(i)->field0;
@@ -59,6 +65,9 @@ void run_test_host_side_assignment() {
     int expected = (10 + 5 + 6 + i)*(10 + 5 + 6 + i);
     EXPECT_EQ(actual, expected);
   }
+
+  // Copy size to host memory and compare.
+  EXPECT_EQ(Vertex::size(), static_cast<IndexType>(kTestSize));
 
   // Make sure that we had no CUDA failures.
   gpuErrchk(cudaPeekAtLastError());

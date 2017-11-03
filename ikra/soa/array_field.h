@@ -92,22 +92,22 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   array_data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
-    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                         Capacity*(Offset + Pos*sizeof(T));
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                    Capacity*(Offset + Pos*sizeof(T));
     return reinterpret_cast<T*>(p_result);
   }
 
   template<size_t Pos, int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr() const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                Owner::storage().data +
-                                Capacity*(Offset + Pos*sizeof(T)));
+                                p_base + Capacity*(Offset + Pos*sizeof(T)));
   }
 
   template<int A = AddressMode>
@@ -115,22 +115,22 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   array_data_ptr(size_t pos) const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
-    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                         Capacity*(Offset + pos*sizeof(T));
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                    Capacity*(Offset + pos*sizeof(T));
     return reinterpret_cast<T*>(p_result);
   }
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr(size_t pos) const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                Owner::storage().data +
-                                Capacity*(Offset + pos*sizeof(T)));
+                                p_base + Capacity*(Offset + pos*sizeof(T)));
   }
 };
 

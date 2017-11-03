@@ -80,42 +80,42 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, void>::type
   set_external_pointer(T* ptr) {
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
-    uintptr_t p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                           Capacity*(Offset + InlinedSize*sizeof(T));
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+    auto p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                       Capacity*(Offset + InlinedSize*sizeof(T));
     *reinterpret_cast<T**>(p_external) = ptr;
   }
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, void>::type
   set_external_pointer(T* ptr) {
-    uintptr_t p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                           reinterpret_cast<uintptr_t>(Owner::storage().data) +
-                           Capacity*(Offset + InlinedSize*sizeof(T));
+    auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+                      reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
+                      + Capacity*(Offset + InlinedSize*sizeof(T));
     *reinterpret_cast<T**>(p_external) = ptr;
   }
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, T*>::type
   get_external_pointer() const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
-    uintptr_t p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                           Capacity*(Offset + InlinedSize*sizeof(T));
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+    auto p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                      Capacity*(Offset + InlinedSize*sizeof(T));
     return *reinterpret_cast<T**>(p_external);
   }
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   get_external_pointer() const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                           reinterpret_cast<uintptr_t>(Owner::storage().data) +
-                           Capacity*(Offset + InlinedSize*sizeof(T));
+    auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+                      reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
+                      + Capacity*(Offset + InlinedSize*sizeof(T));
     return *reinterpret_cast<T**>(p_external);
   }
 
@@ -133,10 +133,10 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   array_data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
 
     if (Pos < InlinedSize) {
       // Within inlined storage.
@@ -154,10 +154,10 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   template<size_t Pos, int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr() const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
 
     if (Pos < InlinedSize) {
       // Within inlined storage.
@@ -176,10 +176,10 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   array_data_ptr(size_t pos) const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
 
     if (pos < InlinedSize) {
       // Within inlined storage.
@@ -197,10 +197,10 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr(size_t pos) const {
-    assert(this->id() < Owner::storage().size);
+    assert(this->id() < Owner::storage().size());
 
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
 
     if (pos < InlinedSize) {
       // Within inlined storage.

@@ -68,7 +68,7 @@ class Field_ {
     auto h_storage_data = reinterpret_cast<uintptr_t>(&Owner::storage());
     auto data_offset = h_data_ptr - h_storage_data;
     auto d_storage_ptr = reinterpret_cast<uintptr_t>(
-        Owner::device_storage_pointer());
+        Owner::storage().device_ptr());
     return reinterpret_cast<T*>(d_storage_ptr + data_offset);
   }
 
@@ -142,8 +142,9 @@ class Field_ {
   __ikra_device__
   typename std::enable_if<A != kAddressModeZero, IndexType>::type
   id() const {
-    return (reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Owner::storage().data)) / A - 1 - 1;
+    return (reinterpret_cast<uintptr_t>(this) -
+            reinterpret_cast<uintptr_t>(Owner::storage().data_ptr()))
+               / A - 1 - 1;
   }
 
   template<int A = AddressMode>
@@ -158,10 +159,10 @@ class Field_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
   data_ptr_uninitialized() const {
-    uintptr_t p_this = reinterpret_cast<uintptr_t>(this);
-    uintptr_t p_base = reinterpret_cast<uintptr_t>(Owner::storage().data);
-    uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                         Capacity*Offset;
+    auto p_this = reinterpret_cast<uintptr_t>(this);
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+                     Capacity*Offset;
     return reinterpret_cast<T*>(p_result);
   }
 
@@ -170,15 +171,16 @@ class Field_ {
   data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size);
+    assert(id() < Owner::storage().size());
     return data_ptr_uninitialized();
   }
 
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   data_ptr_uninitialized() const {
+    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                Owner::storage().data + Capacity*Offset);
+                                p_base + Capacity*Offset);
   }
 
   template<int A = AddressMode>
@@ -186,7 +188,7 @@ class Field_ {
   data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size);
+    assert(id() < Owner::storage().size());
     return data_ptr_uninitialized();
   }
 

@@ -25,9 +25,9 @@ __device__ void* d_storage_data_head;
 template<typename T>
 __global__ void increment_class_size_kernel(IndexType increment) {
   d_storage_data_head = reinterpret_cast<void*>(
-      T::get_uninitialized(T::storage().size));
-  d_storage_size = T::storage().size;
-  T::storage().size += increment;
+      T::get_uninitialized(T::storage().size()));
+  d_storage_size = T::storage().size();
+  T::storage().increase_size(increment);
 }
 
 // TODO: Assuming zero addressing mode.

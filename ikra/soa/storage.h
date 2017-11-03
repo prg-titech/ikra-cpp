@@ -1,6 +1,8 @@
 #ifndef SOA_STORAGE_H
 #define SOA_STORAGE_H
 
+#include <cstddef>
+
 #include "soa/constants.h"
 #include "soa/cuda.h"
 
@@ -19,19 +21,72 @@ class_name::Storage& class_name::storage() { \
 namespace ikra {
 namespace soa {
 
-// This class contains a pointer to the data for the owner class.
-// It also keeps track of the number of created instances ("size").
-template<class Owner, size_t ArenaSize>
-class DynamicStorage_ {
+// Storage classes maintain the data of all SOA columns, as well as some meta
+// data such as the number of instances of a SOA class. All storage classes are
+// singletons, i.e., instantiations of the following classes are tied to a
+// specific SOA class.
+
+template<typename Self>
+class StorageStrategyBase {
  public:
+  __ikra_device__ StorageStrategyBase() : size_(0) {}
+
+#ifdef __CUDACC__
+  Self* device_ptr() const {
+    // Get device address of storage.
+    Self* d_storage;
+    cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+    return d_storage;
+  }
+#endif  // __CUDACC__
+
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+  // Not running in CUDA mode or running on device.
+  __ikra_device__ IndexType size() const {
+    return size_;
+  }
+#else
+  // Running in CUDA mode on host.
+  IndexType size() const {
+    // Copy size to host and return.
+    IndexType host_size;
+    cudaMemcpy(&host_size, &device_ptr()->size_, sizeof(IndexType),
+               cudaMemcpyDeviceToHost);
+    return host_size;
+  }
+#endif
+
+  __ikra_device__ IndexType increase_size(IndexType increment) {
+    // TODO: Make this operation atomic.
+    IndexType result = size_;
+    size_ += increment;
+    return result;
+  }
+
+ private:
+  // The number of instances of Owner.
+  IndexType size_;
+};
+
+// This class maintains the data (char array) for the Owner class. Memory is
+// allocated dynamically. This allows programmers to take control over the
+// allocation of the storage buffer. Note: The maximum number of instances of
+// a SOA class is still a compile-time constant.
+// TODO: Use cudaMalloc for device storage (?).
+template<class OwnerT, size_t ArenaSize>
+class DynamicStorage_
+    : public StorageStrategyBase<DynamicStorage_<OwnerT, ArenaSize>> {
+ public:
+  using Owner = OwnerT;
+
   // Allocate data on the heap.
   __ikra_device__ DynamicStorage_() {
     // Note: ObjectSize is accessed within a function here.
-    data = reinterpret_cast<char*>(
-        malloc(Owner::ObjectSize::value * Owner::kCapacity));
+    data_ = malloc(Owner::ObjectSize::value * Owner::kCapacity);
 
     if (ArenaSize > 0) {
-      arena_head_ = arena_base_ = reinterpret_cast<char*>(malloc(ArenaSize));
+      arena_head_ = arena_base_ = malloc(ArenaSize);
     } else {
       arena_head_ = arena_base_ = nullptr;
     }
@@ -39,13 +94,13 @@ class DynamicStorage_ {
 
   // Use existing data allocation.
   __ikra_device__
-  explicit DynamicStorage_(void* ptr, void* arena_ptr = nullptr) : size(0) {
-    data = reinterpret_cast<char*>(ptr);
+  explicit DynamicStorage_(void* ptr, void* arena_ptr = nullptr) {
+    data_ = ptr;
 
     if (ArenaSize != 0 && arena_ptr == nullptr) {
-      arena_head_ = arena_base_ = reinterpret_cast<char*>(malloc(ArenaSize));
+      arena_head_ = arena_base_ = malloc(ArenaSize);
     } else {
-      arena_head_ = arena_base_ = reinterpret_cast<char*>(arena_ptr);
+      arena_head_ = arena_base_ = arena_ptr;
     }
   }
 
@@ -54,28 +109,36 @@ class DynamicStorage_ {
   // beyond InlineSize.
   __ikra_device__ void* allocate_in_arena(size_t bytes) {
     assert(arena_head_ != nullptr);
-    void* result = reinterpret_cast<void*>(arena_head_);
-    arena_head_ += bytes;
+    void* result = arena_head_;
+    arena_head_ = reinterpret_cast<void*>(
+        reinterpret_cast<uintptr_t>(arena_head_) + bytes);
     return result;
   }
 
-  // TODO: These should be private.
-  IndexType size;
-  char* data;
+  __ikra_device__ void* data_ptr() {
+    return data_;
+  }
 
  private:
-  char* arena_head_;
-  char* arena_base_;
+  // The base pointer (start) of the arena.
+  void* arena_base_;
+
+  // The current head of the arena. To be increased after allocation (bump
+  // pointer allocation).
+  void* arena_head_;
+
+  // A pointer to the memory where SOA columns are stored.
+  void* data_;
 };
 
-// This class contains a pointer to the data for the owner class.
-// It also keeps track of the number of created instances ("size").
-template<class Owner, size_t ArenaSize>
-class StaticStorage_ {
- private:
-  using Self = StaticStorage_<Owner, ArenaSize>;
-
+// This class defines the data/memory (char array) for the Owner class.
+// Memory is allocated statically, allowing for efficient code generation.
+template<class OwnerT, size_t ArenaSize>
+class StaticStorage_
+    : public StorageStrategyBase<StaticStorage_<OwnerT, ArenaSize>> {
  public:
+  using Owner = OwnerT;
+
   __ikra_device__ StaticStorage_() {
     if (ArenaSize == 0) {
       arena_head_ = nullptr;
@@ -83,10 +146,6 @@ class StaticStorage_ {
       arena_head_ = arena_base_;
     }
   }
-
-  // TODO: These should be private.
-  IndexType size;
-  char data[Owner::ObjectSize::value * Owner::kCapacity];
 
   __ikra_device__ void* allocate_in_arena(size_t bytes) {
     assert(arena_head_ != nullptr);
@@ -97,18 +156,23 @@ class StaticStorage_ {
     return result;
   }
 
-#ifdef __CUDACC__
-  // TODO: Consider going through the regular constructor here.
-  __device__ void cuda_initialize() {
-    size = 0;
+  __ikra_device__ void* data_ptr() {
+    return reinterpret_cast<void*>(&data_[0]);
   }
-#endif  // __CUDACC__
 
  private:
-  char* arena_head_;
+  // Statically allocated data storage for the arena.
   char arena_base_[ArenaSize];
+
+  // Current head pointer of the arena.
+  char* arena_head_;
+
+  // Statically allocated data storage for SOA columns.
+  char data_[Owner::ObjectSize::value * Owner::kCapacity];
 };
 
+// The following structs are public API types for storage strategies.
+// Programmers should not use the "underscore" types directly.
 struct DynamicStorage {
   template<class Owner>
   using type = DynamicStorage_<Owner, 0>;
@@ -132,19 +196,22 @@ struct StaticStorageWithArena {
 };
 
 #ifdef __CUDACC__
-template<typename Storage>
-__global__ void storage_cuda_initialize_kernel(Storage* self) {
-  // Delegate initialization to storage strategy.
-  self->cuda_initialize();
+template<typename Storage, typename... Args>
+__global__ void storage_cuda_initialize_kernel(Storage* buffer, Args... args) {
+  // Initialize a storage strategy in a given buffer. See layout.h for
+  // initialization of host-side storages.
+  // TODO: Check if there's a slowdown here due to zero-initialization of
+  // buffer data structure.
+  new (reinterpret_cast<void*>(buffer)) Storage(args...);
 }
 
 // Initializes a storage container located in "h_storage" with a storage
 // strategy "Storage". "h_storage" is the host representation of the
 // (statically-allocated) device storage. This function sets the instance
 // counter of the class to zero.
-template<typename Storage>
-void storage_cuda_initialize(Storage* d_storage) {
-  storage_cuda_initialize_kernel<<<1, 1>>>(d_storage);
+template<typename Storage, typename... Args>
+void storage_cuda_initialize(Storage* d_storage, Args... args) {
+  storage_cuda_initialize_kernel<<<1, 1>>>(d_storage, args...);
   cudaThreadSynchronize();
 }
 #endif  // __CUDACC__

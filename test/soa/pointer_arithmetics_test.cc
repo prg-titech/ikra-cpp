@@ -22,7 +22,7 @@ TEST(PointerArithmeticsTest, IncrementDecrement) {
   TestClass::initialize_storage();
 
   auto first = new TestClass[kTestSize];
-  EXPECT_EQ(TestClass::storage().size, kTestSize);
+  EXPECT_EQ(TestClass::storage().size(), kTestSize);
 
   int counter = 0;
   for (auto it = first; it < first + kTestSize; ++it, counter += 2) {

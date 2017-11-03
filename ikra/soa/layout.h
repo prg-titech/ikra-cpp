@@ -77,8 +77,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
     check_sizeof_class();
     assert(count == sizeof(Self));
     // Check if out of memory.
-    assert(Self::storage().size <= Capacity);
-    return get(Self::storage().size++);
+    assert(Self::storage().size() <= Capacity);
+    return get(Self::storage().increase_size(1));
   }
 
   // TODO: Implement delete operator.
@@ -109,15 +109,13 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // storage.data.
   __ikra_device__ void* operator new[](size_t count) {
     check_sizeof_class();
-    // Size of this class is 1. "count" is the number of new instances.
-    Self* first_ptr = get_uninitialized(Self::storage().size);
-    Self::storage().size += count/AddressMode;
-    return first_ptr;
+    // "count" is the number of new instances.
+    return get_uninitialized(Self::storage().increase_size(count/AddressMode));
   }
 
   // Return the number of instances of this class.
   __ikra_device__ static IndexType size() {
-    return Self::storage().size;
+    return Self::storage().size();
   }
 
   // Return a pointer to an object with a given ID. Do not check if the
@@ -132,10 +130,9 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
 #if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
   // Not running in CUDA mode or running on device.
-
   // Return a pointer to an object with a given ID.
   __ikra_device__ static Self* get(IndexType id) {
-    assert(id < Self::storage().size);
+    assert(id < Self::storage().size());
 
     // First object has actually ID 1. This is because a nullptr allows the
     // compiler to do special optimizations.
@@ -143,24 +140,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 #else
   // Running in CUDA mode and accessing object from host code.
-
+  // Return a pointer to an object with a given ID.
   static Self* get(IndexType id) {
     assert(id <= Capacity);
-
-#ifndef NDEBUG
-    // Check if ID is valid on device.
-    auto h_size_ptr = reinterpret_cast<uintptr_t>(&Self::storage().size);
-    auto h_storage_data = reinterpret_cast<uintptr_t>(&Self::storage());
-    auto size_offset = h_size_ptr - h_storage_data;
-    auto d_storage_ptr = reinterpret_cast<uintptr_t>(device_storage_pointer());
-    IndexType* d_size_ptr = reinterpret_cast<IndexType*>(
-        d_storage_ptr + size_offset);
-
-    IndexType host_size;
-    cudaMemcpy(&host_size, d_size_ptr, sizeof(IndexType),
-               cudaMemcpyDeviceToHost);
-    assert(id < host_size);
-#endif  // NDEBUG
+    assert(id < size());    // Will trigger cudaMemcpy!
     return get_uninitialized(id);
   }
 #endif
@@ -173,8 +156,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
   get_(IndexType id) {
     // Start counting from 1 internally.
     assert(id > 0);
-    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage().data) +
-                        id*AddressMode;
+    uintptr_t address = reinterpret_cast<uintptr_t>(Self::storage().data_ptr())
+                        + id*AddressMode;
     return reinterpret_cast<Self*>(address);
   }
 
@@ -205,7 +188,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   typename std::enable_if<A != kAddressModeZero, IndexType>::type 
   id() const {
     return (reinterpret_cast<uintptr_t>(this) - 
-           reinterpret_cast<uintptr_t>(Self::storage().data)) / A - 1;
+           reinterpret_cast<uintptr_t>(Self::storage().data_ptr())) / A - 1;
   }
 
   // Calculate the ID of this object (assuming zero addressing mode).
@@ -217,22 +200,15 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
 #ifdef __CUDACC__
-  static Storage* device_storage_pointer() {
-    // Get device address of storage.
-    Storage* d_storage;
-    cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage),
-                         Self::storage());
-    assert(cudaPeekAtLastError() == cudaSuccess);
-    return d_storage;
-  }
-
-  static void initialize_storage() {
-    storage_cuda_initialize(device_storage_pointer());
+  template<typename... Args>
+  static void initialize_storage(Args... args) {
+    storage_cuda_initialize(Self::storage().device_ptr(), args...);
   }
 #else
   // Initializes the storage buffer with an actual storage object.
-  static void initialize_storage() {
-    new (reinterpret_cast<void*>(&Self::storage())) Storage();
+  template<typename... Args>
+  static void initialize_storage(Args... args) {
+    new (reinterpret_cast<void*>(&Self::storage())) Storage(args...);
   }
 #endif  // __CUDACC__
 
