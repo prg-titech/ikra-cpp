@@ -83,6 +83,7 @@ void run_test_host_side_new() {
 
   for (int i = 0; i < kTestSize; ++i) {
     vertices[i] = new Vertex(i + 1, i * i);
+    EXPECT_EQ(vertices[i]->id(), static_cast<IndexType>(i));
   }
 
   cuda_execute(Vertex, add_fields, kTestSize, vertices[0], 10);
