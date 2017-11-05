@@ -259,6 +259,7 @@ template<typename Storage, typename... Args>
 void storage_cuda_initialize(Storage* d_storage, Args... args) {
   storage_cuda_initialize_kernel<<<1, 1>>>(d_storage, args...);
   cudaThreadSynchronize();
+  assert(cudaPeekAtLastError() == cudaSuccess);
 }
 #endif  // __CUDACC__
 

@@ -42,6 +42,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = typename StorageStrategy::template type<Self>;
   const static IndexType kCapacity = Capacity;
+  const static bool kIsSoaClass = true;
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
@@ -173,12 +174,13 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Return an iterator pointing to the first instance of this class.
-  __ikra_device__ static executor::Iterator<Self*> begin() {
+  // TODO: CUDA support for iterators.
+  static executor::Iterator<Self*> begin() {
     return executor::Iterator<Self*>(Self::get(0));
   }
 
   // Return an iterator pointing to the last instance of this class + 1.
-  __ikra_device__ static executor::Iterator<Self*> end() {
+  static executor::Iterator<Self*> end() {
     return ++executor::Iterator<Self*>(Self::get(size() - 1));
   }
 

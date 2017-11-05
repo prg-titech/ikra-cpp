@@ -1,6 +1,8 @@
 #ifndef SOA_ARRAY_H
 #define SOA_ARRAY_H
 
+#include <type_traits>
+
 #include "soa/constants.h"
 #include "soa/field.h"
 
@@ -46,7 +48,7 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   static const int kSize = sizeof(std::array<T, ArraySize>);
 
   // Support calling methods using -> syntax.
-  const Self* operator->() const {
+  __ikra_device__ const Self* operator->() const {
     return this;
   }
 
@@ -58,29 +60,94 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
 
   // Implement std::array interface.
 
-  T& operator[](size_t pos) const {
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+  // Not running in CUDA mode or running on device: Can return a reference to
+  // array values.
+
+  __ikra_device__ T& operator[](size_t pos) const {
     return *this->array_data_ptr(pos);
   }
 
-  T& at(size_t pos) const {
+  __ikra_device__ T& at(size_t pos) const {
     // TODO: This function should throw an exception.
     assert(pos < ArraySize);
     return this->operator[](pos);
   }
 
   template<size_t Pos>
-  T& at() const {
+  __ikra_device__ T& at() const {
     static_assert(Pos < ArraySize, "Index out of bounds.");
     return *array_data_ptr<Pos>();
   }
 
-  T& front() const {
+  __ikra_device__ T& front() const {
     return at<0>();
   }
 
-  T& back() const {
+  __ikra_device__ T& back() const {
     return at<ArraySize - 1>();
   }
+#else
+
+  // A helper class with an overridden operator= method. This class allows
+  // clients to the "[]=" syntax for array assignment, even if the array is
+  // physically located on the device.
+  // Addresses of instances point to host data locations.
+  class AssignmentHelper {
+   public:
+    // TODO: Assuming zero addressing mode. Must translate addresses in valid
+    // addressing mode.
+    void copy_from_device(T* target) {
+      cudaMemcpy(target, device_ptr(), sizeof(T), cudaMemcpyDeviceToHost);
+      assert(cudaPeekAtLastError() == cudaSuccess);
+    }
+
+    T copy_from_device() {
+      T host_data;
+      copy_from_device(&host_data);
+      return host_data;
+    }
+
+    // Implicit conversion: Copy from device.
+    operator T() {
+      return copy_from_device();
+    }
+
+    // TODO: Assuming zero addressing mode.
+    AssignmentHelper& operator=(T value) {
+      cudaMemcpy(device_ptr(), &value, sizeof(T), cudaMemcpyHostToDevice);
+      assert(cudaPeekAtLastError() == cudaSuccess);
+      return *this;
+    }
+
+    T operator->() {
+      return copy_from_device();
+    }
+
+   private:
+    T* device_ptr() {
+      auto h_data_ptr = reinterpret_cast<uintptr_t>(this);
+      auto h_storage_ptr = reinterpret_cast<uintptr_t>(&Owner::storage());
+      assert(h_data_ptr >= h_storage_ptr);
+      auto data_offset = h_data_ptr - h_storage_ptr;
+      auto d_storage_ptr = reinterpret_cast<uintptr_t>(
+          Owner::storage().device_ptr());
+      return reinterpret_cast<T*>(d_storage_ptr + data_offset);
+    }
+  };
+
+  AssignmentHelper& operator[](size_t pos) const {
+    return *reinterpret_cast<AssignmentHelper*>(array_data_ptr(pos));
+  }
+
+  AssignmentHelper& at(size_t pos) const {
+    // TODO: This function should throw an exception.
+    assert(pos < ArraySize);
+    return this->operator[](pos);
+  }
+
+  // TODO: Implement template-based accessor methods.
+#endif
 
   // TODO: Implement iterator and other methods.
 
@@ -88,7 +155,7 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   // Calculate the address of an array element. For details, see comment
   // of data_ptr in Field_.
   template<size_t Pos, int A = AddressMode>
-  typename std::enable_if<A != kAddressModeZero, T*>::type
+  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
   array_data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
@@ -102,7 +169,7 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   }
 
   template<size_t Pos, int A = AddressMode>
-  typename std::enable_if<A == kAddressModeZero, T*>::type
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr() const {
     assert(this->id() < Owner::storage().size());
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
@@ -111,7 +178,7 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   }
 
   template<int A = AddressMode>
-  typename std::enable_if<A != kAddressModeZero, T*>::type
+  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
   array_data_ptr(size_t pos) const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
@@ -125,7 +192,7 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   }
 
   template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeZero, T*>::type
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr(size_t pos) const {
     assert(this->id() < Owner::storage().size());
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());

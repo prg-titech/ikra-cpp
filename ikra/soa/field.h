@@ -64,7 +64,7 @@ class Field_ {
   }
 #else
   T* device_data_ptr() const {
-    auto h_data_ptr = reinterpret_cast<uintptr_t>(data_ptr_uninitialized());
+    auto h_data_ptr = reinterpret_cast<uintptr_t>(data_ptr());
     auto h_storage_data = reinterpret_cast<uintptr_t>(&Owner::storage());
     auto data_offset = h_data_ptr - h_storage_data;
     auto d_storage_ptr = reinterpret_cast<uintptr_t>(
