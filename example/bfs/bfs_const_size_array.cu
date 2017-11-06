@@ -13,7 +13,6 @@ static const int kMaxVertices = 20000;
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::executor::execute;
-using ikra::executor::execute_and_reduce;
 
 class Vertex : public SoaLayout<Vertex, kMaxVertices> {
  public:
@@ -28,21 +27,11 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
     for (int i = 0; i < num_neighbors(); ++i) {
       Vertex* vertex = Vertex::get_uninitialized(neighbors[i]);
       adj_list_[i] = vertex;
-      assert(adj_list_[i] == vertex);
     }
   }
 
   __host__ __device__ int num_neighbors() {
     return adj_list_size_;
-  }
-
-  __device__ bool update_distance(int distance) {
-    if (distance < distance_) {
-      distance_ = distance;
-      return true;
-    } else {
-      return false;
-    }
   }
 
   // Visit the vertex, i.e., update the distances of all neighbors if this
@@ -65,6 +54,19 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
     printf("distance[%lu] = %i\n", id(), (int) distance_);
   }
 
+  void set_distance(int value) {
+    distance_ = value;
+  }
+
+  __device__ bool update_distance(int distance) {
+    if (distance < distance_) {
+      distance_ = distance;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   int_ distance_ = std::numeric_limits<int>::max();
   int_ adj_list_size_;
 
@@ -76,7 +78,7 @@ IKRA_DEVICE_STORAGE(Vertex)
 
 
 int run() {
-  int counter = 0;
+  int iteration = 0;
   bool running = true;
 
   while (running) {
@@ -84,12 +86,12 @@ int run() {
                                       [](bool a, bool b) { return a || b; },
                                       Vertex::size(),
                                       Vertex::get(0),
-                                      counter);
+                                      iteration);
 
-    ++counter;
+    ++iteration;
   }
 
-  return counter;
+  return iteration;
 }
 
 int main(int argc, char* argv[]) {
@@ -103,7 +105,8 @@ int main(int argc, char* argv[]) {
   load_file<Vertex>(argv[1], atoi(argv[2]));
 
   // Set start vertex.
-  Vertex::get(atoi(argv[3]))->distance_ = 0;
+  Vertex* start_vertex = Vertex::get(atoi(argv[3]));
+  start_vertex->set_distance(0);
 
   // Start algorithm.
   int iterations = run();
