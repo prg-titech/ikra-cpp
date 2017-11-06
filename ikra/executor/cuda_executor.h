@@ -3,6 +3,7 @@
 
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
+#include <functional>
 
 #include "soa/constants.h"
 #include "soa/cuda.h"
@@ -81,7 +82,7 @@ __global__ void kernel_call_lambda_collect_result(
 // a member function pointer to a CUDA kernel that is parameterized by the
 // member function type. However, this is unsupported by nvcc and results in
 // strange compile errors in the nvcc-generated code.
-#define cuda_execute(class_name, method_node, length, ...) \
+#define cuda_execute(class_name, method_name, length, ...) \
   /* TODO: Support length > 1024 */ \
   ikra::executor::cuda::kernel_call_lambda<<<1, length>>>( \
       [] __device__ (auto* base, auto... args) { \
@@ -90,20 +91,26 @@ __global__ void kernel_call_lambda_collect_result(
               == ikra::soa::kAddressModeZero, \
               "Not implemented: Valid addressing mode."); \
           int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-          return class_name::get(base->id() + tid)->method_node(args...); \
+          return class_name::get(base->id() + tid)->method_name(args...); \
       }, __VA_ARGS__); \
   cudaDeviceSynchronize(); \
   assert(cudaPeekAtLastError() == cudaSuccess);
 
+#define IKRA_ALL_BUT_FIRST(first, ...) __VA_ARGS__
+
 // TODO: Reduce in parallel.
-#define cuda_execute_and_reduce(class_name, method_node, reduce_type, \
+#define cuda_execute_and_reduce(class_name, method_name, \
                                 reduce_function, length, ...) \
   /* TODO: Support length > 1024 */ \
-  /* TODO: Infer return type instead of passing reduce_type. */ \
   [&] { \
     auto reducer = reduce_function; \
-    reduce_type* d_result; \
-    cudaMalloc(&d_result, sizeof(reduce_type)*(length)); \
+    /* Infer return type of method. Nvcc does not let us use call the */ \
+    /* method from within a decltype() token because it is a dev. method. */ \
+    /* As a workaround, wrap it within std::bind. */ \
+    using return_type = decltype(std::bind(&class_name::method_name, \
+        reinterpret_cast<class_name*>(0), IKRA_ALL_BUT_FIRST(__VA_ARGS__))());\
+    return_type* d_result; \
+    cudaMalloc(&d_result, sizeof(return_type)*(length)); \
     ikra::executor::cuda::kernel_call_lambda_collect_result<<<1, length>>>( \
         [] __device__ (auto* base, auto... args) { \
             /* TODO: Assuming zero addressing mode. */ \
@@ -111,13 +118,13 @@ __global__ void kernel_call_lambda_collect_result(
                 == ikra::soa::kAddressModeZero, \
                 "Not implemented: Valid addressing mode."); \
             int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-            return class_name::get(base->id() + tid)->method_node(args...); \
+            return class_name::get(base->id() + tid)->method_name(args...); \
         }, d_result, __VA_ARGS__); \
-    reduce_type* h_result = reinterpret_cast<reduce_type*>( \
-        malloc(sizeof(reduce_type)*(length))); \
-    cudaMemcpy(h_result, d_result, sizeof(reduce_type)*(length), \
+    return_type* h_result = reinterpret_cast<return_type*>( \
+        malloc(sizeof(return_type)*(length))); \
+    cudaMemcpy(h_result, d_result, sizeof(return_type)*(length), \
                cudaMemcpyDeviceToHost); \
-    reduce_type reduced_value = h_result[0]; \
+    return_type reduced_value = h_result[0]; \
     for (uintptr_t i = 1; i < (length); ++i) { \
       reduced_value = reducer(reduced_value, h_result[i]); \
     } \

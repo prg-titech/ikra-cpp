@@ -80,9 +80,7 @@ int run() {
   bool running = true;
 
   while (running) {
-    running = cuda_execute_and_reduce(Vertex,
-                                      visit,
-                                      bool,
+    running = cuda_execute_and_reduce(Vertex, visit,
                                       [](bool a, bool b) { return a || b; },
                                       Vertex::size(),
                                       Vertex::get(0),
