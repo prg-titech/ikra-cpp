@@ -45,20 +45,20 @@ Disassembly of section .text:
   40045b:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
   400460:	be d4 06 40 00       	mov    $0x4006d4,%esi
   400465:	bf 01 00 00 00       	mov    $0x1,%edi
-  40046a:	48 c7 05 93 0d 20 00 	movq   $0x0,0x200d93(%rip)        # 601208 <__TestClassdata_buffer+0x8>
+  40046a:	48 c7 05 83 0d 20 00 	movq   $0x0,0x200d83(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
   400471:	00 00 00 00 
-  400475:	48 c7 05 80 0d 20 00 	movq   $0x1,0x200d80(%rip)        # 601200 <__TestClassdata_buffer>
+  400475:	48 c7 05 70 0d 20 00 	movq   $0x1,0x200d70(%rip)        # 6011f0 <__TestClassdata_buffer>
   40047c:	01 00 00 00 
-  400480:	c7 05 8a 0d 20 00 83 	movl   $0x27d22d83,0x200d8a(%rip)        # 601214 <__TestClassdata_buffer+0x14>
+  400480:	c7 05 7a 0d 20 00 83 	movl   $0x27d22d83,0x200d7a(%rip)        # 601204 <__TestClassdata_buffer+0x14>
   400487:	2d d2 27 
-  40048a:	c7 05 50 56 20 00 20 	movl   $0x24686420,0x205650(%rip)        # 605ae4 <__TestClassdata_buffer+0x48e4>
+  40048a:	c7 05 40 56 20 00 20 	movl   $0x24686420,0x205640(%rip)        # 605ad4 <__TestClassdata_buffer+0x48e4>
   400491:	64 68 24 
   400494:	e8 97 ff ff ff       	callq  400430 <__printf_chk@plt>
-  400499:	81 3d 71 0d 20 00 83 	cmpl   $0x27d22d83,0x200d71(%rip)        # 601214 <__TestClassdata_buffer+0x14>
+  400499:	81 3d 61 0d 20 00 83 	cmpl   $0x27d22d83,0x200d61(%rip)        # 601204 <__TestClassdata_buffer+0x14>
   4004a0:	2d d2 27 
   4004a3:	b8 01 00 00 00       	mov    $0x1,%eax
   4004a8:	75 0d                	jne    4004b7 <main+0x67>
-  4004aa:	81 3d 30 56 20 00 20 	cmpl   $0x24686420,0x205630(%rip)        # 605ae4 <__TestClassdata_buffer+0x48e4>
+  4004aa:	81 3d 20 56 20 00 20 	cmpl   $0x24686420,0x205620(%rip)        # 605ad4 <__TestClassdata_buffer+0x48e4>
   4004b1:	64 68 24 
   4004b4:	0f 95 c0             	setne  %al
   4004b7:	0f b6 c0             	movzbl %al,%eax
@@ -153,40 +153,40 @@ Disassembly of section .text:
   4005bd:	00 00 00 
 
 00000000004005c0 <_ZN9TestClass7storageEv>:
-  4005c0:	b8 00 12 60 00       	mov    $0x601200,%eax
+  4005c0:	b8 f0 11 60 00       	mov    $0x6011f0,%eax
   4005c5:	c3                   	retq   
   4005c6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   4005cd:	00 00 00 
 
 00000000004005d0 <_Z12new_instancev>:
-  4005d0:	48 8b 05 29 0c 20 00 	mov    0x200c29(%rip),%rax        # 601200 <__TestClassdata_buffer>
+  4005d0:	48 8b 05 19 0c 20 00 	mov    0x200c19(%rip),%rax        # 6011f0 <__TestClassdata_buffer>
   4005d7:	48 83 c0 01          	add    $0x1,%rax
-  4005db:	48 89 05 1e 0c 20 00 	mov    %rax,0x200c1e(%rip)        # 601200 <__TestClassdata_buffer>
+  4005db:	48 89 05 0e 0c 20 00 	mov    %rax,0x200c0e(%rip)        # 6011f0 <__TestClassdata_buffer>
   4005e2:	c3                   	retq   
   4005e3:	0f 1f 00             	nopl   (%rax)
   4005e6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   4005ed:	00 00 00 
 
 00000000004005f0 <_Z12write_field0P9TestClass>:
-  4005f0:	c7 04 bd 10 12 60 00 	movl   $0x7777,0x601210(,%rdi,4)
+  4005f0:	c7 04 bd 00 12 60 00 	movl   $0x7777,0x601200(,%rdi,4)
   4005f7:	77 77 00 00 
   4005fb:	c3                   	retq   
   4005fc:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400600 <_Z11read_field0P9TestClass>:
-  400600:	8b 04 bd 10 12 60 00 	mov    0x601210(,%rdi,4),%eax
+  400600:	8b 04 bd 00 12 60 00 	mov    0x601200(,%rdi,4),%eax
   400607:	c3                   	retq   
   400608:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40060f:	00 
 
 0000000000400610 <_Z12write_field1P9TestClass>:
-  400610:	c7 04 bd e0 5a 60 00 	movl   $0x7777,0x605ae0(,%rdi,4)
+  400610:	c7 04 bd d0 5a 60 00 	movl   $0x7777,0x605ad0(,%rdi,4)
   400617:	77 77 00 00 
   40061b:	c3                   	retq   
   40061c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400620 <_Z11read_field1P9TestClass>:
-  400620:	8b 04 bd e0 5a 60 00 	mov    0x605ae0(,%rdi,4),%eax
+  400620:	8b 04 bd d0 5a 60 00 	mov    0x605ad0(,%rdi,4),%eax
   400627:	c3                   	retq   
   400628:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40062f:	00 

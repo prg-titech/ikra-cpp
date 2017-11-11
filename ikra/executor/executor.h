@@ -107,7 +107,19 @@ void execute(T begin, IndexType length, F function, Args... args) {
 template<typename F, typename... Args,
          class T = typename FunctionTypeHelper<F>::class_type>
 void execute(F function, Args... args) {
-  for (IndexType i = 0; i < T::size(); ++i) {
+  IndexType num_instances = T::size();
+  for (IndexType i = 0; i < num_instances; ++i) {
+    ((*T::get(i)).*function)(args...);
+  }
+}
+
+// This function executes a method on all SOA objects of a given class,
+// starting from ID 0 up to a given ID (template parameter).
+// This is currently a fully sequential operation.
+template<IndexType MaxId, typename F, typename... Args,
+         class T = typename FunctionTypeHelper<F>::class_type>
+void execute(F function, Args... args) {
+  for (IndexType i = 0; i < MaxId; ++i) {
     ((*T::get(i)).*function)(args...);
   }
 }

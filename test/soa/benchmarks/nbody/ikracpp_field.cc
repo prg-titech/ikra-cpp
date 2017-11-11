@@ -35,59 +35,61 @@ class Body : public SoaLayout<Body, kNumBodies> {
 
   Body(double mass, double pos_x, double pos_y, double vel_x, double vel_y)
       : mass_(mass) {
-    position_[0] = pos_x;
-    position_[1] = pos_y;
-    velocity_[0] = vel_x;
-    velocity_[1] = vel_y;
+    position0_ = pos_x;
+    position1_ = pos_y;
+    velocity0_ = vel_x;
+    velocity1_ = vel_y;
     this->reset_force();
   }
 
   double_ mass_;
-  array_(double, 2) position_;
-  array_(double, 2) velocity_;
-  array_(double, 2) force_;
+  double_ position0_;
+  double_ position1_;
+  double_ velocity0_;
+  double_ velocity1_;
+  double_ force0_;
+  double_ force1_;
 
   void add_force(Body* body) {
     if (this == body) return;
 
     double EPS = 0.01;    // Softening parameter (just to avoid infinities).
-    double dx = body->position_[0] - position_[0];
-    double dy = body->position_[1] - position_[1];
+    double dx = body->position0_ - position0_;
+    double dy = body->position1_ - position1_;
     double dist = sqrt(dx*dx + dy*dy);
     double F = kGravityConstant*mass_*body->mass_ / (dist*dist + EPS*EPS);
-    force_[0] += F*dx / dist;
-    force_[1] += F*dy / dist;
+    force0_ += F*dx / dist;
+    force1_ += F*dy / dist;
   }
 
   void add_force_to_all() {
-    //for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->add_force(this);
-    execute(&Body::add_force, this);
+    execute<kNumBodies>(&Body::add_force, this);
   }
 
   void reset_force() {
-    force_[0] = 0.0;
-    force_[1] = 0.0;
+    force0_ = 0.0;
+    force1_ = 0.0;
   }
 
   void update(double dt) {
-    velocity_[0] += force_[0]*dt / mass_;
-    velocity_[1] += force_[1]*dt / mass_;
-    position_[0] += velocity_[0]*dt;
-    position_[1] += velocity_[1]*dt;
+    velocity0_ += force0_*dt / mass_;
+    velocity1_ += force1_*dt / mass_;
+    position0_ += velocity0_*dt;
+    position1_ += velocity1_*dt;
 
-    if (position_[0] < -1 || position_[0] > 1) {
-      velocity_[0] = -velocity_[0];
+    if (position0_ < -1 || position0_ > 1) {
+      velocity0_ = -velocity0_;
     }
-    if (position_[1] < -1 || position_[1] > 1) {
-      velocity_[1] = -velocity_[1];
+    if (position1_ < -1 || position1_ > 1) {
+      velocity1_ = -velocity1_;
     }
   }
 
   void codengen_simple_update(double dt) {
-    velocity_.at<0>() += force_.at<0>()*dt / mass_;
-    velocity_.at<1>() += force_.at<1>()*dt / mass_;
-    position_.at<0>() += velocity_.at<0>()*dt;
-    position_.at<1>() += velocity_.at<1>()*dt;
+    velocity0_ += force0_*dt / mass_;
+    velocity1_ += force1_*dt / mass_;
+    position0_ += velocity0_*dt;
+    position1_ += velocity1_*dt;
   }
 };
 
@@ -108,21 +110,19 @@ void instantiation() {
 void run_simulation() {
   for (int i = 0; i < kIterations; ++i) {
     // Reset forces.
-    execute(&Body::reset_force);
+    execute<kNumBodies>(&Body::reset_force);
 
     // Update forces.
-    //for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->add_force_to_all();
-    execute(&Body::add_force_to_all);
+    execute<kNumBodies>(&Body::add_force_to_all);
 
     // Update velocities and positions.
-    execute(&Body::update, kTimeInterval);
+    execute<kNumBodies>(&Body::update, kTimeInterval);
   }
 }
 
 void run_simple() {
   for (int i = 0; i < kIterations*10000; ++i) {
-    //execute(&Body::codengen_simple_update, kTimeInterval);
-    for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->codengen_simple_update(kTimeInterval);
+    execute<kNumBodies>(&Body::codengen_simple_update, kTimeInterval);
   }
 }
 
@@ -138,9 +138,9 @@ int main() {
   int checksum = 11;
   for (uintptr_t i = 0; i < kNumBodies; i++) {
     checksum += reinterpret_cast<int>(
-        float_as_int(Body::get(i)->position_[0]));
+        float_as_int(Body::get(i)->position0_));
     checksum += reinterpret_cast<int>(
-        float_as_int(Body::get(i)->position_[1]));
+        float_as_int(Body::get(i)->position1_));
     checksum = checksum % 1234567;
   }
 
@@ -162,12 +162,12 @@ void codegen_update(Body* self, double dt) {
 }
 
 void codegen_reset_force_manual(Body* body) {
-  body->force_[0] = 0.0;
-  body->force_[1] = 0.0;
+  body->force0_ = 0.0;
+  body->force1_ = 0.0;
 }
 
 void codegen_reset_force_half(Body* body) {
-  body->force_[0] = 0.0;
+  body->force0_ = 0.0;
 }
 
 void codegen_reset_mass(Body* body) {

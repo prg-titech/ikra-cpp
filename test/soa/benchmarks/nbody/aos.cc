@@ -10,8 +10,8 @@
 
 using namespace std;
 
-static const int kIterations = 2;
-static const int kNumBodies = 9600;
+static const int kIterations = 5;
+static const int kNumBodies = 8000;
 static const double kMaxMass = 1000;
 static const double kTimeInterval = 0.5;
 
@@ -62,8 +62,8 @@ class Body {
   }
 
   void reset_force() {
-    force_[0] = 0;
-    force_[1] = 0;
+    force_[0] = 0.0;
+    force_[1] = 0.0;
   }
 
   void update(double dt) {

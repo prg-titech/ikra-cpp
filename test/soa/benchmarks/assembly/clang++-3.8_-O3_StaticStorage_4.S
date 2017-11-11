@@ -133,7 +133,7 @@ Disassembly of section .text:
 0000000000400600 <main>:
   400600:	50                   	push   %rax
   400601:	0f 57 c0             	xorps  %xmm0,%xmm0
-  400604:	0f 29 05 45 0a 20 00 	movaps %xmm0,0x200a45(%rip)        # 601050 <__TestClassdata_buffer>
+  400604:	0f 11 05 45 0a 20 00 	movups %xmm0,0x200a45(%rip)        # 601050 <__TestClassdata_buffer>
   40060b:	48 c7 05 3a 0a 20 00 	movq   $0x1,0x200a3a(%rip)        # 601050 <__TestClassdata_buffer>
   400612:	01 00 00 00 
   400616:	c7 05 44 0a 20 00 00 	movl   $0x0,0x200a44(%rip)        # 601064 <__TestClassdata_buffer+0x14>

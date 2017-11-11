@@ -179,15 +179,27 @@ class Field_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   data_ptr_uninitialized() const {
-    constexpr uintptr_t cptr_data_offset =
-        StorageDataOffset<typename Owner::Storage>::value;
-    constexpr char* cptr_storage_buffer =
-        IKRA_fold(reinterpret_cast<char*>(Owner::storage_buffer()));
-    constexpr char* array_location =
-        cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
-    constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+    if (Owner::Storage::kIsStaticStorage) {
+      // Use constant-folded value for address computation
+      constexpr uintptr_t cptr_data_offset =
+          StorageDataOffset<typename Owner::Storage>::value;
+      constexpr char* cptr_storage_buffer =
+          IKRA_fold(reinterpret_cast<char*>(Owner::storage_buffer()));
+      constexpr char* array_location =
+          cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
+      constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+      
+      // Check alignment.
+      assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
 
-    return soa_array + reinterpret_cast<uintptr_t>(this);
+      return soa_array + reinterpret_cast<uintptr_t>(this);
+    } else {
+      // Cannot constant fold dynamically allocated storage.
+      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+      return reinterpret_cast<T*>(
+          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+          p_base + Capacity*Offset);
+    }
   }
 
   template<int A = AddressMode>

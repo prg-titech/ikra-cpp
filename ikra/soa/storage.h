@@ -181,6 +181,8 @@ class DynamicStorage_
     return data_;
   }
 
+  static const bool kIsStaticStorage = false;
+
  private:
   template<typename StorageClass>
   friend class StorageDataOffset;
@@ -226,6 +228,8 @@ class StaticStorage_
     assert(reinterpret_cast<uintptr_t>(data_) % 8 == 0);
     return reinterpret_cast<void*>(&data_[0]);
   }
+
+  static const bool kIsStaticStorage = true;
 
  private:
   template<typename StorageClass>

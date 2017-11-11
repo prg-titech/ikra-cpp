@@ -172,9 +172,26 @@ class SoaArrayField_ : public Field_<T, Capacity, Offset,
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   array_data_ptr() const {
     assert(this->id() < Owner::storage().size());
-    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                p_base + Capacity*(Offset + Pos*sizeof(T)));
+
+    if (Owner::Storage::kIsStaticStorage) {
+      // Use constant-folded value for address computation
+      constexpr uintptr_t cptr_data_offset =
+          StorageDataOffset<typename Owner::Storage>::value;
+      constexpr char* cptr_storage_buffer =
+          IKRA_fold(reinterpret_cast<char*>(Owner::storage_buffer()));
+      constexpr char* array_location =
+          cptr_storage_buffer + cptr_data_offset +
+          Capacity*(Offset + Pos*sizeof(T));
+      constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+
+      return soa_array + reinterpret_cast<uintptr_t>(this);
+    } else {
+      // Cannot constant fold dynamically allocated storage.
+      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+      return reinterpret_cast<T*>(
+          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
+          p_base + Capacity*(Offset + Pos*sizeof(T)));
+    }
   }
 
   template<int A = AddressMode>
