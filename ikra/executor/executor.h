@@ -107,7 +107,9 @@ void execute(T begin, IndexType length, F function, Args... args) {
 template<typename F, typename... Args,
          class T = typename FunctionTypeHelper<F>::class_type>
 void execute(F function, Args... args) {
-  execute(T::begin(), T::end(), function, args...);
+  for (IndexType i = 0; i < T::size(); ++i) {
+    ((*T::get(i)).*function)(args...);
+  }
 }
 
 // This function executes a method on all SOA objects of a given class and
