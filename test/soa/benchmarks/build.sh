@@ -38,3 +38,21 @@ done
 bin/cuda_codegen_test
 /usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
     > assembly/cuda_codegen_test.S
+
+
+for v_compiler in "g++" "clang++-3.8"
+do
+  # Build nbody
+  out_name="${v_compiler}_nbody_ikracpp"
+  ${v_compiler} -O3 nbody/ikracpp.cc -std=c++11 -I../../../ikra \
+      -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+
+  out_name="${v_compiler}_nbody_soa"
+  ${v_compiler} -O3 nbody/soa.cc -std=c++11 -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+
+  out_name="${v_compiler}_nbody_aos"
+  ${v_compiler} -O3 nbody/aos.cc -std=c++11 -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+done

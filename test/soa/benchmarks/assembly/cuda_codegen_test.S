@@ -23,15 +23,17 @@ compile_size = 64bit
 
 Resource usage:
  Common:
-  GLOBAL:8436
+  GLOBAL:8444
  Function _ZN4ikra8executor4cuda16construct_kernelI9TestClassJiiEEEvmDpT0_:
   REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda27increment_class_size_kernelI9TestClassEEvm:
   REG:14 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_:
-  REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5_:
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_:
   REG:7 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:340 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_:
+  REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
+  REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _Z20explicit_read_field0m:
   REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _Z21explicit_write_field0m:
@@ -78,8 +80,8 @@ Resource usage:
         /*00d8*/                   MOV R2, R4;                           /* 0x2800000010009de4 */
         /*00e0*/                   MOV R4, c[0x0][0x14c];                /* 0x2800400530011de4 */
         /*00e8*/                   IADD.X R3, R0, R3;                    /* 0x480000000c00dc43 */
-        /*00f0*/                   ST.E [R2+0x8], R5;                    /* 0x9400000020215c85 */
-        /*00f8*/                   ST.E [R2+0xfa8], R4;                  /* 0x9400003ea0211c85 */
+        /*00f0*/                   ST.E [R2+0x10], R5;                   /* 0x9400000040215c85 */
+        /*00f8*/                   ST.E [R2+0xfb0], R4;                  /* 0x9400003ec0211c85 */
                                                                          /* 0x20000000000002f7 */
         /*0108*/                   EXIT;                                 /* 0x8000000000001de7 */
         /*0110*/                   BRA 0x110;                            /* 0x4003ffffe0001de7 */
@@ -120,20 +122,7 @@ Resource usage:
 		.............................................................................
 
 
-		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_
-	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                           /* 0x200002e042804307 */
-        /*0008*/                   MOV R1, c[0x0][0x44];   /* 0x2800400110005de4 */
-        /*0010*/                   MOV R2, c[0x0][0x140];  /* 0x2800400500009de4 */
-        /*0018*/                   MOV R3, c[0x0][0x144];  /* 0x280040051000dde4 */
-        /*0020*/                   ST.E.64 [R2], RZ;       /* 0x94000000002fdca5 */
-        /*0028*/                   EXIT;                   /* 0x8000000000001de7 */
-        /*0030*/                   BRA 0x30;               /* 0x4003ffffe0001de7 */
-        /*0038*/                   NOP;                    /* 0x4000000000001de4 */
-		...................................................................................................
-
-
-		Function : _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5_
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
                                                                          /* 0x2230428042804307 */
         /*0008*/                   MOV R1, c[0x0][0x44];                 /* 0x2800400110005de4 */
@@ -157,17 +146,59 @@ Resource usage:
         /*0098*/               @P0 IADD R3, R2, R4;                      /* 0x480000001020c003 */
         /*00a0*/                   MOV R2, R6;                           /* 0x2800000018009de4 */
         /*00a8*/                   IADD.X R3, R0, R3;                    /* 0x480000000c00dc43 */
-        /*00b0*/                   LD.E R0, [R2+0x8];                    /* 0x8400000020201c85 */
-        /*00b8*/                   LD.E R4, [R2+0xfa8];                  /* 0x8400003ea0211c85 */
+        /*00b0*/                   LD.E R0, [R2+0x10];                   /* 0x8400000040201c85 */
+        /*00b8*/                   LD.E R4, [R2+0xfb0];                  /* 0x8400003ec0211c85 */
                                                                          /* 0x2002f04282828287 */
         /*00c8*/                   IADD R0, R0, c[0x0][0x150];           /* 0x4800400540001c03 */
         /*00d0*/                   IADD R0, R4, R0;                      /* 0x4800000000401c03 */
         /*00d8*/                   IADD R0, R0, R5;                      /* 0x4800000014001c03 */
         /*00e0*/                   IADD32I R4, R0, 0x7776;               /* 0x080001ddd8011c02 */
-        /*00e8*/                   ST.E [R2+0x8], R4;                    /* 0x9400000020211c85 */
+        /*00e8*/                   ST.E [R2+0x10], R4;                   /* 0x9400000040211c85 */
         /*00f0*/                   EXIT;                                 /* 0x8000000000001de7 */
         /*00f8*/                   BRA 0xf8;                             /* 0x4003ffffe0001de7 */
-		......................................................................................
+		................................................................................................
+
+
+		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                                  /* 0x22e28042e2c2c307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];                          /* 0x2800400110005de4 */
+        /*0010*/                   ISUB RZ.CC, c[0x0][0x140], RZ;                 /* 0x4801400503ffde03 */
+        /*0018*/                   ISETP.EQ.X.AND P0, PT, RZ, c[0x0][0x144], PT;  /* 0x190e400513f1dc63 */
+        /*0020*/               @P0 EXIT;                                          /* 0x80000000000001e7 */
+        /*0028*/                   MOV R2, c[0x0][0x140];                         /* 0x2800400500009de4 */
+        /*0030*/                   MOV R3, c[0x0][0x144];                         /* 0x280040051000dde4 */
+        /*0038*/                   ST.E.64 [R2], RZ;                              /* 0x94000000002fdca5 */
+                                                                                  /* 0x200000000002f047 */
+        /*0048*/                   ST.E.64 [R2+0x8], RZ;                          /* 0x94000000202fdca5 */
+        /*0050*/                   EXIT;                                          /* 0x8000000000001de7 */
+        /*0058*/                   BRA 0x58;                                      /* 0x4003ffffe0001de7 */
+        /*0060*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0068*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0070*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0078*/                   NOP;                                           /* 0x4000000000001de4 */
+		..........................................................................................................
+
+
+		Function : _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                   /* 0x22c3f20042804307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];           /* 0x2800400110005de4 */
+        /*0010*/                   MOV R2, c[0x0][0x140];          /* 0x2800400500009de4 */
+        /*0018*/                   MOV R3, c[0x0][0x144];          /* 0x280040051000dde4 */
+        /*0020*/                   LD.E.64 R4, [R2];               /* 0x8400000000211ca5 */
+        /*0028*/                   MOV32I R8, 0x0;                 /* 0x1800000000021de2 */
+        /*0030*/                   MOV32I R9, 0x0;                 /* 0x1800000000025de2 */
+        /*0038*/                   IADD R6.CC, R4, c[0x0][0x148];  /* 0x4801400520419c03 */
+                                                                   /* 0x20000002f042e287 */
+        /*0048*/                   IADD.X R7, R5, c[0x0][0x14c];   /* 0x480040053051dc43 */
+        /*0050*/                   ST.E.64 [R2], R6;               /* 0x9400000000219ca5 */
+        /*0058*/                   ST.E.64 [R8], R4;               /* 0x9400000000811ca5 */
+        /*0060*/                   EXIT;                           /* 0x8000000000001de7 */
+        /*0068*/                   BRA 0x68;                       /* 0x4003ffffe0001de7 */
+        /*0070*/                   NOP;                            /* 0x4000000000001de4 */
+        /*0078*/                   NOP;                            /* 0x4000000000001de4 */
+		..................................................................................
 
 
 		Function : _Z20explicit_read_field0m
@@ -247,7 +278,7 @@ Resource usage:
         /*0070*/               @P0 IADD R0, R2, R3;                  /* 0x480000000c200003 */
         /*0078*/                   IADD.X R5, R5, R0;                /* 0x4800000000515c43 */
                                                                      /* 0x200002f043f20047 */
-        /*0088*/                   LD.E R4, [R4+0xfa8];              /* 0x8400003ea0411c85 */
+        /*0088*/                   LD.E R4, [R4+0xfb0];              /* 0x8400003ec0411c85 */
         /*0090*/                   MOV32I R2, 0x0;                   /* 0x1800000000009de2 */
         /*0098*/                   MOV32I R3, 0x0;                   /* 0x180000000000dde2 */
         /*00a0*/                   ST.E [R2], R4;                    /* 0x9400000000211c85 */
@@ -277,7 +308,7 @@ Resource usage:
         /*0078*/                   MOV32I R4, 0x7777;                /* 0x180001dddc011de2 */
                                                                      /* 0x2000000002f04287 */
         /*0088*/                   IADD.X R3, R3, R0;                /* 0x480000000030dc43 */
-        /*0090*/                   ST.E [R2+0xfa8], R4;              /* 0x9400003ea0211c85 */
+        /*0090*/                   ST.E [R2+0xfb0], R4;              /* 0x9400003ec0211c85 */
         /*0098*/                   EXIT;                             /* 0x8000000000001de7 */
         /*00a0*/                   BRA 0xa0;                         /* 0x4003ffffe0001de7 */
         /*00a8*/                   NOP;                              /* 0x4000000000001de4 */
@@ -305,7 +336,7 @@ Resource usage:
         /*0070*/               @P0 IADD R0, R2, R3;                  /* 0x480000000c200003 */
         /*0078*/                   IADD.X R5, R5, R0;                /* 0x4800000000515c43 */
                                                                      /* 0x200002f043f20047 */
-        /*0088*/                   LD.E R4, [R4+0x8];                /* 0x8400000020411c85 */
+        /*0088*/                   LD.E R4, [R4+0x10];               /* 0x8400000040411c85 */
         /*0090*/                   MOV32I R2, 0x0;                   /* 0x1800000000009de2 */
         /*0098*/                   MOV32I R3, 0x0;                   /* 0x180000000000dde2 */
         /*00a0*/                   ST.E [R2], R4;                    /* 0x9400000000211c85 */
@@ -335,7 +366,7 @@ Resource usage:
         /*0078*/                   MOV32I R4, 0x7777;                /* 0x180001dddc011de2 */
                                                                      /* 0x2000000002f04287 */
         /*0088*/                   IADD.X R3, R3, R0;                /* 0x480000000030dc43 */
-        /*0090*/                   ST.E [R2+0x8], R4;                /* 0x9400000020211c85 */
+        /*0090*/                   ST.E [R2+0x10], R4;               /* 0x9400000040211c85 */
         /*0098*/                   EXIT;                             /* 0x8000000000001de7 */
         /*00a0*/                   BRA 0xa0;                         /* 0x4003ffffe0001de7 */
         /*00a8*/                   NOP;                              /* 0x4000000000001de4 */
@@ -369,6 +400,7 @@ compressed
 .global .align 16 .b8 __TestClassdata_buffer[8016];
 .global .align 4 .u32 int_result;
 .global .align 16 .b8 explicit_field0[400];
+.global .align 8 .u64 _ZN4ikra3soa23d_previous_storage_sizeE;
 .global .align 8 .u64 _ZN4ikra8executor4cuda14d_storage_sizeE;
 .global .align 8 .u64 _ZN4ikra8executor4cuda19d_storage_data_headE;
 
@@ -377,15 +409,16 @@ compressed
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<5>;
+.reg .b64 %rd<6>;
 
 
 ld.param.u64 %rd1, [_Z12write_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-add.s64 %rd4, %rd3, %rd2;
+cvta.global.u64 %rd4, %rd3;
+add.s64 %rd5, %rd4, %rd2;
 mov.u32 %r1, 30583;
-st.global.u32 [%rd4+8], %r1;
+st.u32 [%rd5+16], %r1;
 ret;
 }
 
@@ -395,14 +428,15 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<5>;
+.reg .b64 %rd<6>;
 
 
 ld.param.u64 %rd1, [_Z11read_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-add.s64 %rd4, %rd3, %rd2;
-ld.global.u32 %r1, [%rd4+8];
+cvta.global.u64 %rd4, %rd3;
+add.s64 %rd5, %rd4, %rd2;
+ld.u32 %r1, [%rd5+16];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -413,15 +447,16 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<5>;
+.reg .b64 %rd<6>;
 
 
 ld.param.u64 %rd1, [_Z12write_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-add.s64 %rd4, %rd2, %rd3;
+cvta.global.u64 %rd4, %rd3;
+add.s64 %rd5, %rd4, %rd2;
 mov.u32 %r1, 30583;
-st.global.u32 [%rd4+4008], %r1;
+st.u32 [%rd5+4016], %r1;
 ret;
 }
 
@@ -431,14 +466,15 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<5>;
+.reg .b64 %rd<6>;
 
 
 ld.param.u64 %rd1, [_Z11read_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-add.s64 %rd4, %rd2, %rd3;
-ld.global.u32 %r1, [%rd4+4008];
+cvta.global.u64 %rd4, %rd3;
+add.s64 %rd5, %rd4, %rd2;
+ld.u32 %r1, [%rd5+4016];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -480,18 +516,59 @@ ret;
 }
 
 
-.visible .entry _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5_(
-.param .align 1 .b8 _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5__param_0[1],
-.param .u64 _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5__param_1,
-.param .u32 _ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5__param_2
+.visible .entry _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm(
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0,
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1
+)
+{
+.reg .b64 %rd<6>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0];
+ld.param.u64 %rd2, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1];
+cvta.to.global.u64 %rd3, %rd1;
+ld.global.u64 %rd4, [%rd3];
+add.s64 %rd5, %rd4, %rd2;
+st.global.u64 [%rd3], %rd5;
+st.global.u64 [_ZN4ikra3soa23d_previous_storage_sizeE], %rd4;
+ret;
+}
+
+
+.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_(
+.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0__param_0
+)
+{
+.reg .pred %p<2>;
+.reg .b64 %rd<4>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0__param_0];
+setp.eq.s64	%p1, %rd1, 0;
+@%p1 bra BB7_2;
+
+cvta.to.global.u64 %rd2, %rd1;
+mov.u64 %rd3, 0;
+st.global.u64 [%rd2], %rd3;
+st.global.u64 [%rd2+8], %rd3;
+
+BB7_2:
+ret;
+}
+
+
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_(
+.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_0[1],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_1,
+.param .u32 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_2
 )
 {
 .reg .b32 %r<10>;
-.reg .b64 %rd<10>;
+.reg .b64 %rd<11>;
 
 
-ld.param.u64 %rd1, [_ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5__param_1];
-ld.param.u32 %r1, [_ZN4ikra3soa18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS2_S5__param_2];
+ld.param.u64 %rd1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_1];
+ld.param.u32 %r1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_2];
 mov.u32 %r2, %tid.x;
 mov.u32 %r3, %ctaid.x;
 mov.u32 %r4, %ntid.x;
@@ -500,30 +577,16 @@ cvt.s64.s32	%rd2, %r5;
 add.s64 %rd3, %rd2, %rd1;
 shl.b64 %rd4, %rd3, 2;
 mov.u64 %rd5, __TestClassdata_buffer;
-add.s64 %rd6, %rd5, %rd4;
-ld.global.u32 %r6, [%rd6+8];
-ld.global.u32 %r7, [%rd6+4008];
+cvta.global.u64 %rd6, %rd5;
+add.s64 %rd7, %rd6, %rd4;
+ld.u32 %r6, [%rd7+16];
+ld.u32 %r7, [%rd7+4016];
 add.s32 %r8, %r6, %r1;
 add.s32 %r9, %r8, %r7;
-cvt.u64.u32	%rd7, %r9;
-add.s64 %rd8, %rd7, %rd3;
-add.s64 %rd9, %rd8, 30582;
-st.global.u32 [%rd6+8], %rd9;
-ret;
-}
-
-
-.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_(
-.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT__param_0
-)
-{
-.reg .b64 %rd<4>;
-
-
-ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT__param_0];
-cvta.to.global.u64 %rd2, %rd1;
-mov.u64 %rd3, 0;
-st.global.u64 [%rd2], %rd3;
+cvt.u64.u32	%rd8, %r9;
+add.s64 %rd9, %rd8, %rd3;
+add.s64 %rd10, %rd9, 30582;
+st.u32 [%rd7+16], %rd10;
 ret;
 }
 
@@ -554,7 +617,7 @@ ret;
 {
 .reg .pred %p<2>;
 .reg .b32 %r<7>;
-.reg .b64 %rd<8>;
+.reg .b64 %rd<9>;
 
 
 ld.param.u64 %rd2, [_ZN4ikra8executor4cuda16construct_kernelI9TestClassJiiEEEvmDpT0__param_0];
@@ -568,15 +631,16 @@ cvt.s64.s32	%rd3, %r6;
 add.s64 %rd4, %rd2, %rd3;
 add.s64 %rd1, %rd4, 1;
 setp.eq.s64	%p1, %rd1, 0;
-@%p1 bra BB9_2;
+@%p1 bra BB10_2;
 
 shl.b64 %rd5, %rd1, 2;
 mov.u64 %rd6, __TestClassdata_buffer;
-add.s64 %rd7, %rd6, %rd5;
-st.global.u32 [%rd7+8], %r1;
-st.global.u32 [%rd7+4008], %r2;
+cvta.global.u64 %rd7, %rd6;
+add.s64 %rd8, %rd7, %rd5;
+st.u32 [%rd8+16], %r1;
+st.u32 [%rd8+4016], %r2;
 
-BB9_2:
+BB10_2:
 ret;
 }
 
