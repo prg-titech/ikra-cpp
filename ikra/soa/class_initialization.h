@@ -54,6 +54,7 @@ using ObjectSize = ObjectSize_<0>; \
 /* Function that returns a reference to the storage buffer.
  * Will be inlined. Pointer dereference will be optimized out. */ \
 __ikra_host_device__ static Storage& storage(); \
+__ikra_host_device__ static constexpr void* storage_buffer(); \
 \
 static const uint32_t kCounterFirstIndex = __COUNTER__;
 

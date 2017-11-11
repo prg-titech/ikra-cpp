@@ -3,6 +3,7 @@
 
 #include "soa/constants.h"
 #include "soa/cuda.h"
+#include "soa/storage.h"
 #include "soa/util.h"
 
 // This marco is expanded for every inplace assignment operator and forwards
@@ -178,9 +179,15 @@ class Field_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   data_ptr_uninitialized() const {
-    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                p_base + Capacity*Offset);
+    constexpr uintptr_t cptr_data_offset =
+        StorageDataOffset<typename Owner::Storage>::value;
+    constexpr char* cptr_storage_buffer =
+        IKRA_fold(reinterpret_cast<char*>(Owner::storage_buffer()));
+    constexpr char* array_location =
+        cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
+    constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+
+    return soa_array + reinterpret_cast<uintptr_t>(this);
   }
 
   template<int A = AddressMode>
