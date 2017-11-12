@@ -65,7 +65,7 @@ T* construct(size_t count, Args... args) {
 
 // Calls a device lambda function with an arbitrary number of arguments.
 template<typename F, typename... Args>
-__global__ void kernel_call_lambda(F func, Args... args) {
+__global__ void kernel_call_lambda(F func, IndexType num_jobs, Args... args) {
   func(args...);
 }
 
@@ -76,6 +76,14 @@ __global__ void kernel_call_lambda_collect_result(
   result[tid] = func(args...);
 }
 
+IndexType cuda_blocks_1d(IndexType length) {
+  return (length + 256 - 1) / 256;
+}
+
+IndexType cuda_threads_1d(IndexType length) {
+  return length < 256 ? length : 256;
+}
+
 // This macro expands to a series of statements that execute a given method
 // of a given class on a given range of objects. This is done by constructing
 // a device lambda that calls the method. A more elegant solution would pass
@@ -83,18 +91,24 @@ __global__ void kernel_call_lambda_collect_result(
 // member function type. However, this is unsupported by nvcc and results in
 // strange compile errors in the nvcc-generated code.
 #define cuda_execute(class_name, method_name, length, ...) \
-  /* TODO: Support length > 1024 */ \
-  ikra::executor::cuda::kernel_call_lambda<<<1, length>>>( \
-      [] __device__ (auto* base, auto... args) { \
-          /* TODO: Assuming zero addressing mode. */ \
-          static_assert(class_name::kAddressMode \
-              == ikra::soa::kAddressModeZero, \
-              "Not implemented: Valid addressing mode."); \
-          int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-          return class_name::get(base->id() + tid)->method_name(args...); \
-      }, __VA_ARGS__); \
-  cudaDeviceSynchronize(); \
-  assert(cudaPeekAtLastError() == cudaSuccess);
+  [&] { \
+    /* TODO: Determine good configuration. */ \
+    uintptr_t num_jobs = length; \
+    uintptr_t num_blocks = ikra::executor::cuda::cuda_blocks_1d(num_jobs); \
+    uintptr_t num_threads = ikra::executor::cuda::cuda_threads_1d(num_jobs); \
+    ikra::executor::cuda::kernel_call_lambda<<<num_blocks, num_threads>>>( \
+        [num_jobs] __device__ (auto* base, auto... args) { \
+            /* TODO: Assuming zero addressing mode. */ \
+            static_assert(class_name::kAddressMode \
+                == ikra::soa::kAddressModeZero, \
+                "Not implemented: Valid addressing mode."); \
+            int tid = threadIdx.x + blockIdx.x * blockDim.x; \
+            if (tid < num_jobs) \
+            return class_name::get(base->id() + tid)->method_name(args...); \
+        }, num_jobs, __VA_ARGS__); \
+    cudaDeviceSynchronize(); \
+    assert(cudaPeekAtLastError() == cudaSuccess); \
+  } ()
 
 #define IKRA_ALL_BUT_FIRST(first, ...) __VA_ARGS__
 

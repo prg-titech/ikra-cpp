@@ -137,7 +137,7 @@ Disassembly of section .text:
 
 0000000000400640 <main>:
   400640:	50                   	push   %rax
-  400641:	bf a0 91 00 00       	mov    $0x91a0,%edi
+  400641:	bf a8 91 00 00       	mov    $0x91a8,%edi
   400646:	e8 b5 fe ff ff       	callq  400500 <malloc@plt>
   40064b:	48 89 05 16 0a 20 00 	mov    %rax,0x200a16(%rip)        # 601068 <__TestClassdata_buffer+0x18>
   400652:	0f 57 c0             	xorps  %xmm0,%xmm0

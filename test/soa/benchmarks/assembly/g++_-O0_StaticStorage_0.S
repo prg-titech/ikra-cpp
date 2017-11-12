@@ -455,7 +455,7 @@ Disassembly of section .text:
   40090b:	48 89 e5             	mov    %rsp,%rbp
   40090e:	e8 83 fc ff ff       	callq  400596 <_ZN9TestClass7storageEv>
   400913:	48 89 c6             	mov    %rax,%rsi
-  400916:	bf b0 91 00 00       	mov    $0x91b0,%edi
+  400916:	bf b8 91 00 00       	mov    $0x91b8,%edi
   40091b:	e8 20 fe ff ff       	callq  400740 <_ZnwmPv>
   400920:	48 85 c0             	test   %rax,%rax
   400923:	74 08                	je     40092d <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18initialize_storageIIEEEvDpT_+0x23>

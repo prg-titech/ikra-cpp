@@ -699,7 +699,7 @@ Disassembly of section .text:
   400de3:	48 89 7d f0          	mov    %rdi,-0x10(%rbp)
   400de7:	48 89 c7             	mov    %rax,%rdi
   400dea:	e8 31 00 00 00       	callq  400e20 <_ZN4ikra3soa19StorageStrategySelfINS0_15DynamicStorage_I9TestClassLm0EEEEC2Ev>
-  400def:	b9 a0 91 00 00       	mov    $0x91a0,%ecx
+  400def:	b9 a8 91 00 00       	mov    $0x91a8,%ecx
   400df4:	89 cf                	mov    %ecx,%edi
   400df6:	e8 f5 f7 ff ff       	callq  4005f0 <malloc@plt>
   400dfb:	48 8b 7d f0          	mov    -0x10(%rbp),%rdi

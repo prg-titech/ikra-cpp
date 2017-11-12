@@ -146,7 +146,8 @@ class DynamicStorage_
   // Allocate data on the heap.
   __ikra_device__ DynamicStorage_() {
     // Note: ObjectSize is accessed within a function here.
-    data_ = malloc(Owner::ObjectSize::value * Owner::kCapacity);
+    // Add one because first object has ID 0.
+    data_ = malloc(Owner::ObjectSize::value * (Owner::kCapacity + 1));
 
     if (ArenaSize > 0) {
       arena_head_ = arena_base_ = malloc(ArenaSize);
@@ -245,7 +246,8 @@ class StaticStorage_
   char* arena_head_;
 
   // Statically allocated data storage for SOA columns.
-  char data_[Owner::ObjectSize::value * Owner::kCapacity];
+  // Add one because first object has ID 0.
+  char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
 };
 
 // The following structs are public API types for storage strategies.

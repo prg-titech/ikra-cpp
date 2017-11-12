@@ -23,10 +23,6 @@ static const double kTimeInterval = 0.5;
 
 static const double kGravityConstant = 6.673e-11;   // gravitational constant
 
-static const int kWindowWidth = 1000;
-static const int kWindowHeight = 1000;
-static const int kMaxRect = 20;
-
 #define RAND (1.0 * rand() / RAND_MAX)
 
 class Body : public SoaLayout<Body, kNumBodies> {
@@ -64,8 +60,8 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   void reset_force() {
-    force_.at<0>() = 0.0;
-    force_.at<1>() = 0.0;
+    force_[0] = 0.0;
+    force_[1] = 0.0;
   }
 
   void update(double dt) {
@@ -100,6 +96,8 @@ class Body : public SoaLayout<Body, kNumBodies> {
 IKRA_HOST_STORAGE(Body)
 
 void instantiation() {
+  srand(42);
+
   // Create objects.
   for (int i = 0; i < kNumBodies; ++i) {
     double mass = (RAND/2 + 0.5) * kMaxMass;
@@ -142,10 +140,16 @@ int main() {
   int checksum = 11;
   for (uintptr_t i = 0; i < kNumBodies; i++) {
     checksum += reinterpret_cast<int>(
-        float_as_int(Body::get(i)->position_[0]));
+        r_float2int(Body::get(i)->position_[0]));
     checksum += reinterpret_cast<int>(
-        float_as_int(Body::get(i)->position_[1]));
+        r_float2int(Body::get(i)->position_[1]));
     checksum = checksum % 1234567;
+
+    if (i < 10) {
+      printf("VALUE[%lu] = %f, %f\n", i,
+             (double) Body::get(i)->position_[0],
+             (double) Body::get(i)->position_[1]);
+    }
   }
 
   printf("instantiation: %lu\nsimulation: %lu\nsimple: %lu\n checksum: %i\n",

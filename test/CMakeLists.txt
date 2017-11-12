@@ -21,3 +21,8 @@ include_directories(${CMAKE_SOURCE_DIR}/ikra ${gtest_SOURCE_DIR}/include ${gtest
 cuda_add_executable(minimum_cuda_test minimum_cuda_test.cu)
 target_link_libraries(minimum_cuda_test gtest gtest_main ikra)
 add_test(minimum_cuda_test ${CMAKE_BINARY_DIR}/bin/minimum_cuda_test)
+
+include_directories(${CMAKE_SOURCE_DIR}/ikra ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+cuda_add_executable(array_cuda_test array_cuda_test.cu)
+target_link_libraries(array_cuda_test gtest gtest_main ikra)
+add_test(array_cuda_test ${CMAKE_BINARY_DIR}/bin/array_cuda_test)

@@ -45,7 +45,7 @@ Disassembly of section .text:
 
 00000000004004a0 <main>:
   4004a0:	48 83 ec 08          	sub    $0x8,%rsp
-  4004a4:	bf a0 91 00 00       	mov    $0x91a0,%edi
+  4004a4:	bf a8 91 00 00       	mov    $0x91a8,%edi
   4004a9:	e8 c2 ff ff ff       	callq  400470 <malloc@plt>
   4004ae:	48 c7 05 3f 0d 20 00 	movq   $0x0,0x200d3f(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
   4004b5:	00 00 00 00 

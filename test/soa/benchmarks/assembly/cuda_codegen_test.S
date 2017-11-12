@@ -23,13 +23,13 @@ compile_size = 64bit
 
 Resource usage:
  Common:
-  GLOBAL:8444
+  GLOBAL:8452
  Function _ZN4ikra8executor4cuda16construct_kernelI9TestClassJiiEEEvmDpT0_:
   REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda27increment_class_size_kernelI9TestClassEEvm:
   REG:14 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_:
-  REG:7 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:340 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7_:
+  REG:7 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:348 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_:
   REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
@@ -122,41 +122,49 @@ Resource usage:
 		.............................................................................
 
 
-		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                                         /* 0x2230428042804307 */
-        /*0008*/                   MOV R1, c[0x0][0x44];                 /* 0x2800400110005de4 */
-        /*0010*/                   MOV32I R2, 0x2;                       /* 0x1800000008009de2 */
-        /*0018*/                   S2R R0, SR_TID.X;                     /* 0x2c00000084001c04 */
-        /*0020*/                   S2R R3, SR_CTAID.X;                   /* 0x2c0000009400dc04 */
-        /*0028*/                   IADD32I RZ.CC, R2, -0x20;             /* 0x0fffffff802fdc02 */
-        /*0030*/                   IMAD R0, R3, c[0x0][0x28], R0;        /* 0x20004000a0301ca3 */
-        /*0038*/                   MOV32I R3, 0x2;                       /* 0x180000000800dde2 */
-                                                                         /* 0x220232320042c247 */
-        /*0048*/                   CSETP.SFT.AND P0, PT, CC, PT;         /* 0x040e00000151dc04 */
-        /*0050*/                   IADD R5.CC, R0, c[0x0][0x148];        /* 0x4801400520015c03 */
-        /*0058*/                   IMAD.HI.X R2, R0, R3, c[0x0][0x14c];  /* 0x2086800530009ce3 */
-        /*0060*/                   MOV32I R0, 0x0;                       /* 0x1800000000001de2 */
-        /*0068*/                   SHL R3, R5, -0x1e;                    /* 0x6000ffff8850dc03 */
-        /*0070*/                   SHR.U32 R4, R5, 0x1e;                 /* 0x5800c00078511c03 */
-        /*0078*/                   SHL R2, R2, 0x2;                      /* 0x6000c00008209c03 */
-                                                                         /* 0x23f2328232427047 */
-        /*0088*/                   IMAD.U32.U32 R6.CC, R5, 0x4, R0;      /* 0x2001c00010519c03 */
-        /*0090*/                   MOV32I R0, 0x0;                       /* 0x1800000000001de2 */
-        /*0098*/               @P0 IADD R3, R2, R4;                      /* 0x480000001020c003 */
-        /*00a0*/                   MOV R2, R6;                           /* 0x2800000018009de4 */
-        /*00a8*/                   IADD.X R3, R0, R3;                    /* 0x480000000c00dc43 */
-        /*00b0*/                   LD.E R0, [R2+0x10];                   /* 0x8400000040201c85 */
-        /*00b8*/                   LD.E R4, [R2+0xfb0];                  /* 0x8400003ec0211c85 */
-                                                                         /* 0x2002f04282828287 */
-        /*00c8*/                   IADD R0, R0, c[0x0][0x150];           /* 0x4800400540001c03 */
-        /*00d0*/                   IADD R0, R4, R0;                      /* 0x4800000000401c03 */
-        /*00d8*/                   IADD R0, R0, R5;                      /* 0x4800000014001c03 */
-        /*00e0*/                   IADD32I R4, R0, 0x7776;               /* 0x080001ddd8011c02 */
-        /*00e8*/                   ST.E [R2+0x10], R4;                   /* 0x9400000040211c85 */
-        /*00f0*/                   EXIT;                                 /* 0x8000000000001de7 */
-        /*00f8*/                   BRA 0xf8;                             /* 0x4003ffffe0001de7 */
-		................................................................................................
+                                                                                      /* 0x22c2b20282823307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];                              /* 0x2800400110005de4 */
+        /*0010*/                   S2R R0, SR_CTAID.X;                                /* 0x2c00000094001c04 */
+        /*0018*/                   S2R R3, SR_TID.X;                                  /* 0x2c0000008400dc04 */
+        /*0020*/                   IMAD R0, R0, c[0x0][0x28], R3;                     /* 0x20064000a0001ca3 */
+        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x140];                     /* 0x48014005000fdd03 */
+        /*0030*/                   SHR R2, R0, 0x1f;                                  /* 0x5800c0007c009c23 */
+        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x144], PT;  /* 0x1b0e40051021dc43 */
+                                                                                      /* 0x2200423042c042e7 */
+        /*0048*/               @P0 EXIT;                                              /* 0x80000000000001e7 */
+        /*0050*/                   IADD R5.CC, R0, c[0x0][0x150];                     /* 0x4801400540015c03 */
+        /*0058*/                   MOV32I R0, 0x2;                                    /* 0x1800000008001de2 */
+        /*0060*/                   IADD.X R2, R2, c[0x0][0x154];                      /* 0x4800400550209c43 */
+        /*0068*/                   SHL R3, R5, -0x1e;                                 /* 0x6000ffff8850dc03 */
+        /*0070*/                   IADD32I RZ.CC, R0, -0x20;                          /* 0x0fffffff800fdc02 */
+        /*0078*/                   SHR.U32 R4, R5, 0x1e;                              /* 0x5800c00078511c03 */
+                                                                                      /* 0x227202b042027237 */
+        /*0088*/                   MOV32I R0, 0x0;                                    /* 0x1800000000001de2 */
+        /*0090*/                   SHL R2, R2, 0x2;                                   /* 0x6000c00008209c03 */
+        /*0098*/                   CSETP.SFT.AND P0, PT, CC, PT;                      /* 0x040e00000151dc04 */
+        /*00a0*/                   IMAD.U32.U32 R6.CC, R5, 0x4, R0;                   /* 0x2001c00010519c03 */
+        /*00a8*/                   MOV32I R0, 0x0;                                    /* 0x1800000000001de2 */
+        /*00b0*/               @P0 IADD R3, R2, R4;                                   /* 0x480000001020c003 */
+        /*00b8*/                   MOV R2, R6;                                        /* 0x2800000018009de4 */
+                                                                                      /* 0x2282828283f23287 */
+        /*00c8*/                   IADD.X R3, R0, R3;                                 /* 0x480000000c00dc43 */
+        /*00d0*/                   LD.E R0, [R2+0x10];                                /* 0x8400000040201c85 */
+        /*00d8*/                   LD.E R4, [R2+0xfb0];                               /* 0x8400003ec0211c85 */
+        /*00e0*/                   IADD R0, R0, c[0x0][0x158];                        /* 0x4800400560001c03 */
+        /*00e8*/                   IADD R0, R0, R4;                                   /* 0x4800000010001c03 */
+        /*00f0*/                   IADD R0, R0, R5;                                   /* 0x4800000014001c03 */
+        /*00f8*/                   IADD32I R4, R0, 0x7776;                            /* 0x080001ddd8011c02 */
+                                                                                      /* 0x200000000002f047 */
+        /*0108*/                   ST.E [R2+0x10], R4;                                /* 0x9400000040211c85 */
+        /*0110*/                   EXIT;                                              /* 0x8000000000001de7 */
+        /*0118*/                   BRA 0x118;                                         /* 0x4003ffffe0001de7 */
+        /*0120*/                   NOP;                                               /* 0x4000000000001de4 */
+        /*0128*/                   NOP;                                               /* 0x4000000000001de4 */
+        /*0130*/                   NOP;                                               /* 0x4000000000001de4 */
+        /*0138*/                   NOP;                                               /* 0x4000000000001de4 */
+		..............................................................................................................
 
 
 		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_
@@ -397,7 +405,7 @@ compressed
 .address_size 64
 
 
-.global .align 16 .b8 __TestClassdata_buffer[8016];
+.global .align 16 .b8 __TestClassdata_buffer[8024];
 .global .align 4 .u32 int_result;
 .global .align 16 .b8 explicit_field0[400];
 .global .align 8 .u64 _ZN4ikra3soa23d_previous_storage_sizeE;
@@ -557,36 +565,44 @@ ret;
 }
 
 
-.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6_(
-.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_0[1],
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_1,
-.param .u32 _ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_2
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7_(
+.param .align 8 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_0[8],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_1,
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_2,
+.param .u32 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_3
 )
 {
+.reg .pred %p<2>;
 .reg .b32 %r<10>;
-.reg .b64 %rd<11>;
+.reg .b64 %rd<12>;
 
 
-ld.param.u64 %rd1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_1];
-ld.param.u32 %r1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZ4mainEUlPT_DpT0_E_JP9TestClassiEEEvS3_S6__param_2];
-mov.u32 %r2, %tid.x;
+ld.param.u64 %rd3, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_0];
+ld.param.u64 %rd2, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_2];
+ld.param.u32 %r1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_3];
+mov.u32 %r2, %ntid.x;
 mov.u32 %r3, %ctaid.x;
-mov.u32 %r4, %ntid.x;
-mad.lo.s32 %r5, %r4, %r3, %r2;
-cvt.s64.s32	%rd2, %r5;
-add.s64 %rd3, %rd2, %rd1;
-shl.b64 %rd4, %rd3, 2;
-mov.u64 %rd5, __TestClassdata_buffer;
-cvta.global.u64 %rd6, %rd5;
-add.s64 %rd7, %rd6, %rd4;
-ld.u32 %r6, [%rd7+16];
-ld.u32 %r7, [%rd7+4016];
-add.s32 %r8, %r6, %r1;
-add.s32 %r9, %r8, %r7;
-cvt.u64.u32	%rd8, %r9;
-add.s64 %rd9, %rd8, %rd3;
-add.s64 %rd10, %rd9, 30582;
-st.u32 [%rd7+16], %rd10;
+mov.u32 %r4, %tid.x;
+mad.lo.s32 %r5, %r2, %r3, %r4;
+cvt.s64.s32	%rd1, %r5;
+setp.ge.u64	%p1, %rd1, %rd3;
+@%p1 bra BB8_2;
+
+add.s64 %rd4, %rd1, %rd2;
+shl.b64 %rd5, %rd4, 2;
+mov.u64 %rd6, __TestClassdata_buffer;
+cvta.global.u64 %rd7, %rd6;
+add.s64 %rd8, %rd7, %rd5;
+ld.u32 %r6, [%rd8+16];
+add.s32 %r7, %r6, %r1;
+ld.u32 %r8, [%rd8+4016];
+add.s32 %r9, %r7, %r8;
+cvt.u64.u32	%rd9, %r9;
+add.s64 %rd10, %rd4, %rd9;
+add.s64 %rd11, %rd10, 30582;
+st.u32 [%rd8+16], %rd11;
+
+BB8_2:
 ret;
 }
 

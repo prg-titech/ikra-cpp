@@ -45,7 +45,7 @@ Disassembly of section .text:
 
 00000000004004a0 <main>:
   4004a0:	53                   	push   %rbx
-  4004a1:	bf a0 91 00 00       	mov    $0x91a0,%edi
+  4004a1:	bf a8 91 00 00       	mov    $0x91a8,%edi
   4004a6:	e8 c5 ff ff ff       	callq  400470 <malloc@plt>
   4004ab:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
   4004b0:	b9 20 64 68 24       	mov    $0x24686420,%ecx

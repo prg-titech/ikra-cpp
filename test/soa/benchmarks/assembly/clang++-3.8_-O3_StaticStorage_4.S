@@ -216,13 +216,13 @@ Disassembly of section .text:
   40073a:	84 00 00 00 00 00 
 
 0000000000400740 <_Z21explicit_write_field0m>:
-  400740:	c7 04 bd 00 a2 60 00 	movl   $0x7777,0x60a200(,%rdi,4)
+  400740:	c7 04 bd 10 a2 60 00 	movl   $0x7777,0x60a210(,%rdi,4)
   400747:	77 77 00 00 
   40074b:	c3                   	retq   
   40074c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400750 <_Z20explicit_read_field0m>:
-  400750:	8b 04 bd 00 a2 60 00 	mov    0x60a200(,%rdi,4),%eax
+  400750:	8b 04 bd 10 a2 60 00 	mov    0x60a210(,%rdi,4),%eax
   400757:	c3                   	retq   
   400758:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40075f:	00 
