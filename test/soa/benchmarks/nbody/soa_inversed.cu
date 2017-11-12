@@ -112,7 +112,7 @@ __global__ void kernel_Body_update(double dt) {
 }
 
 __device__ void Body_codegen_simple_update(IdType self, double dt) {
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < 1000; ++i) {
     d_container.a_Body_velocity_0[self] +=
         d_container.a_Body_force_0[self]*dt / d_container.a_Body_mass[self];
     d_container.a_Body_velocity_1[self] +=

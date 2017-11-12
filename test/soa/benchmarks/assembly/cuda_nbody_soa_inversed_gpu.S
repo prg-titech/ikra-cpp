@@ -101,7 +101,7 @@ Resource usage:
         /*01e0*/                   MOV R11, R7;                                                /* 0x280000001c02dde4 */
         /*01e8*/                   CAL 0x5b8;                                                  /* 0x5000000f20011c07 */
         /*01f0*/                   LD.E.64 R12, [R4+0x2ee00];                                  /* 0x84000bb800431ca5 */
-        /*01f8*/                   MOV32I R0, 0xffffff9c;                                      /* 0x1bfffffe70001de2 */
+        /*01f8*/                   MOV32I R0, 0xfffffc18;                                      /* 0x1bfffff060001de2 */
                                                                                                /* 0x2232325232b23237 */
         /*0208*/                   LD.E.64 R14, [R4+0x3e800];                                  /* 0x84000fa000439ca5 */
         /*0210*/                   LD.E.64 R6, [R4+0xfa00];                                    /* 0x840003e800419ca5 */
@@ -383,7 +383,7 @@ Resource usage:
         /*01c8*/                   CAL 0x538;                                                  /* 0x5000000da0011c07 */
         /*01d0*/                   NOP.S;                                                      /* 0x4000000000001df4 */
         /*01d8*/                   LD.E.64 R4, [R2+0x2ee00];                                   /* 0x84000bb800211ca5 */
-        /*01e0*/                   MOV32I R0, 0xffffff9c;                                      /* 0x1bfffffe70001de2 */
+        /*01e0*/                   MOV32I R0, 0xfffffc18;                                      /* 0x1bfffff060001de2 */
         /*01e8*/                   LD.E.64 R6, [R2+0x3e800];                                   /* 0x84000fa000219ca5 */
         /*01f0*/                   LD.E.64 R12, [R2+0xfa00];                                   /* 0x840003e800231ca5 */
         /*01f8*/                   LD.E.64 R14, [R2+0x1f400];                                  /* 0x840007d000239ca5 */
@@ -1966,7 +1966,7 @@ ld.global.f64 %fd100, [%rd4+192000];
 ld.global.f64 %fd99, [%rd4+256000];
 ld.global.f64 %fd98, [%rd4+64000];
 ld.global.f64 %fd97, [%rd4+128000];
-mov.u32 %r8, -100;
+mov.u32 %r8, -1000;
 
 BB3_2:
 add.f64 %fd21, %fd1, %fd100;
@@ -2090,7 +2090,7 @@ ld.global.f64 %fd100, [%rd5+192000];
 ld.global.f64 %fd99, [%rd5+256000];
 ld.global.f64 %fd98, [%rd5+64000];
 ld.global.f64 %fd97, [%rd5+128000];
-mov.u32 %r4, -100;
+mov.u32 %r4, -1000;
 
 BB4_1:
 add.f64 %fd21, %fd1, %fd100;

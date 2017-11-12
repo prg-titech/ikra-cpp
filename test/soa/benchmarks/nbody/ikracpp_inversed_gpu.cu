@@ -82,7 +82,7 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   __device__ void codengen_simple_update(double dt) {
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 1000; ++i) {
       velocity_[0] += force_[0]*dt / mass_;
       velocity_[1] += force_[1]*dt / mass_;
       position_[0] += velocity_[0]*dt;
