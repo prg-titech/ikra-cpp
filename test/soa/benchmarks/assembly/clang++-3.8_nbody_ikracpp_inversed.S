@@ -1,5 +1,5 @@
 
-bin/clang++-3.8_nbody_ikracpp:     file format elf64-x86-64
+bin/clang++-3.8_nbody_ikracpp_inversed:     file format elf64-x86-64
 
 
 Disassembly of section .init:
@@ -73,7 +73,7 @@ Disassembly of section .plt.got:
 
 Disassembly of section .text:
 
-00000000004007a0 <_GLOBAL__sub_I_ikracpp.cc>:
+00000000004007a0 <_GLOBAL__sub_I_ikracpp_inversed.cc>:
   4007a0:	50                   	push   %rax
   4007a1:	bf 78 20 60 00       	mov    $0x602078,%edi
   4007a6:	e8 65 ff ff ff       	callq  400710 <_ZNSt8ios_base4InitC1Ev@plt>
@@ -319,8 +319,8 @@ Disassembly of section .text:
   400b53:	bb 01 00 00 00       	mov    $0x1,%ebx
   400b58:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   400b5f:	00 
-  400b60:	48 89 df             	mov    %rbx,%rdi
-  400b63:	4c 89 fe             	mov    %r15,%rsi
+  400b60:	4c 89 ff             	mov    %r15,%rdi
+  400b63:	48 89 de             	mov    %rbx,%rsi
   400b66:	e8 f5 0b 00 00       	callq  401760 <_ZN4Body9add_forceEPS_>
   400b6b:	48 ff c3             	inc    %rbx
   400b6e:	48 81 fb 41 1f 00 00 	cmp    $0x1f41,%rbx
@@ -381,8 +381,8 @@ Disassembly of section .text:
   400c93:	bb 01 00 00 00       	mov    $0x1,%ebx
   400c98:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   400c9f:	00 
-  400ca0:	48 89 df             	mov    %rbx,%rdi
-  400ca3:	4c 89 fe             	mov    %r15,%rsi
+  400ca0:	4c 89 ff             	mov    %r15,%rdi
+  400ca3:	48 89 de             	mov    %rbx,%rsi
   400ca6:	e8 b5 0a 00 00       	callq  401760 <_ZN4Body9add_forceEPS_>
   400cab:	48 ff c3             	inc    %rbx
   400cae:	48 81 fb 41 1f 00 00 	cmp    $0x1f41,%rbx
@@ -443,8 +443,8 @@ Disassembly of section .text:
   400dd3:	bb 01 00 00 00       	mov    $0x1,%ebx
   400dd8:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   400ddf:	00 
-  400de0:	48 89 df             	mov    %rbx,%rdi
-  400de3:	4c 89 fe             	mov    %r15,%rsi
+  400de0:	4c 89 ff             	mov    %r15,%rdi
+  400de3:	48 89 de             	mov    %rbx,%rsi
   400de6:	e8 75 09 00 00       	callq  401760 <_ZN4Body9add_forceEPS_>
   400deb:	48 ff c3             	inc    %rbx
   400dee:	48 81 fb 41 1f 00 00 	cmp    $0x1f41,%rbx
@@ -505,8 +505,8 @@ Disassembly of section .text:
   400f13:	bb 01 00 00 00       	mov    $0x1,%ebx
   400f18:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   400f1f:	00 
-  400f20:	48 89 df             	mov    %rbx,%rdi
-  400f23:	4c 89 fe             	mov    %r15,%rsi
+  400f20:	4c 89 ff             	mov    %r15,%rdi
+  400f23:	48 89 de             	mov    %rbx,%rsi
   400f26:	e8 35 08 00 00       	callq  401760 <_ZN4Body9add_forceEPS_>
   400f2b:	48 ff c3             	inc    %rbx
   400f2e:	48 81 fb 41 1f 00 00 	cmp    $0x1f41,%rbx
@@ -567,8 +567,8 @@ Disassembly of section .text:
   401053:	bb 01 00 00 00       	mov    $0x1,%ebx
   401058:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40105f:	00 
-  401060:	48 89 df             	mov    %rbx,%rdi
-  401063:	4c 89 fe             	mov    %r15,%rsi
+  401060:	4c 89 ff             	mov    %r15,%rdi
+  401063:	48 89 de             	mov    %rbx,%rsi
   401066:	e8 f5 06 00 00       	callq  401760 <_ZN4Body9add_forceEPS_>
   40106b:	48 ff c3             	inc    %rbx
   40106e:	48 81 fb 41 1f 00 00 	cmp    $0x1f41,%rbx

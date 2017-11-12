@@ -1,5 +1,5 @@
 
-bin/g++_nbody_ikracpp:     file format elf64-x86-64
+bin/g++_nbody_ikracpp_field:     file format elf64-x86-64
 
 
 Disassembly of section .init:
@@ -623,210 +623,204 @@ Disassembly of section .text:
 
 0000000000401020 <_Z19codegen_reset_forceP4Body>:
   401020:	66 0f ef c0          	pxor   %xmm0,%xmm0
-  401024:	f2 0f 11 04 fd a0 02 	movsd  %xmm0,0x6502a0(,%rdi,8)
-  40102b:	65 00 
-  40102d:	f2 0f 11 04 fd a0 fc 	movsd  %xmm0,0x65fca0(,%rdi,8)
-  401034:	65 00 
-  401036:	c3                   	retq   
-  401037:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
-  40103e:	00 00 
+  401024:	48 81 c7 42 9c 00 00 	add    $0x9c42,%rdi
+  40102b:	f2 0f 11 04 fd 90 20 	movsd  %xmm0,0x602090(,%rdi,8)
+  401032:	60 00 
+  401034:	f2 0f 11 04 fd 90 1a 	movsd  %xmm0,0x611a90(,%rdi,8)
+  40103b:	61 00 
+  40103d:	c3                   	retq   
+  40103e:	66 90                	xchg   %ax,%ax
 
 0000000000401040 <_Z17codegen_add_forceP4BodyS0_>:
   401040:	48 39 f7             	cmp    %rsi,%rdi
-  401043:	0f 84 c7 00 00 00    	je     401110 <_Z17codegen_add_forceP4BodyS0_+0xd0>
+  401043:	0f 84 d1 00 00 00    	je     40111a <_Z17codegen_add_forceP4BodyS0_+0xda>
   401049:	41 54                	push   %r12
   40104b:	55                   	push   %rbp
-  40104c:	49 89 fc             	mov    %rdi,%r12
-  40104f:	53                   	push   %rbx
-  401050:	48 89 f5             	mov    %rsi,%rbp
-  401053:	48 8d 1c fd 00 00 00 	lea    0x0(,%rdi,8),%rbx
-  40105a:	00 
+  40104c:	48 8d ae 42 1f 00 00 	lea    0x1f42(%rsi),%rbp
+  401053:	53                   	push   %rbx
+  401054:	4c 8d a7 42 1f 00 00 	lea    0x1f42(%rdi),%r12
   40105b:	48 83 ec 10          	sub    $0x10,%rsp
-  40105f:	f2 0f 10 0c f5 a0 14 	movsd  0x6214a0(,%rsi,8),%xmm1
-  401066:	62 00 
-  401068:	f2 0f 10 1c f5 a0 1a 	movsd  0x611aa0(,%rsi,8),%xmm3
-  40106f:	61 00 
-  401071:	66 0f 28 e9          	movapd %xmm1,%xmm5
-  401075:	f2 0f 5c 1c fd a0 1a 	subsd  0x611aa0(,%rdi,8),%xmm3
-  40107c:	61 00 
-  40107e:	f2 0f 5c 2c fd a0 14 	subsd  0x6214a0(,%rdi,8),%xmm5
-  401085:	62 00 
-  401087:	66 0f 28 cb          	movapd %xmm3,%xmm1
-  40108b:	66 0f 28 c5          	movapd %xmm5,%xmm0
-  40108f:	f2 0f 59 cb          	mulsd  %xmm3,%xmm1
-  401093:	f2 0f 59 c5          	mulsd  %xmm5,%xmm0
-  401097:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
-  40109b:	f2 0f 51 e0          	sqrtsd %xmm0,%xmm4
-  40109f:	66 0f 2e e4          	ucomisd %xmm4,%xmm4
-  4010a3:	7a 6d                	jp     401112 <_Z17codegen_add_forceP4BodyS0_+0xd2>
-  4010a5:	f2 0f 10 15 c3 03 00 	movsd  0x3c3(%rip),%xmm2        # 401470 <_IO_stdin_used+0x80>
-  4010ac:	00 
-  4010ad:	66 0f 28 c4          	movapd %xmm4,%xmm0
-  4010b1:	f2 42 0f 59 14 e5 a0 	mulsd  0x6020a0(,%r12,8),%xmm2
-  4010b8:	20 60 00 
-  4010bb:	f2 0f 59 c4          	mulsd  %xmm4,%xmm0
-  4010bf:	f2 0f 58 05 b1 03 00 	addsd  0x3b1(%rip),%xmm0        # 401478 <_IO_stdin_used+0x88>
-  4010c6:	00 
-  4010c7:	f2 0f 59 14 ed a0 20 	mulsd  0x6020a0(,%rbp,8),%xmm2
-  4010ce:	60 00 
-  4010d0:	f2 0f 5e d0          	divsd  %xmm0,%xmm2
-  4010d4:	66 0f 28 ca          	movapd %xmm2,%xmm1
-  4010d8:	f2 0f 59 da          	mulsd  %xmm2,%xmm3
-  4010dc:	f2 0f 59 cd          	mulsd  %xmm5,%xmm1
-  4010e0:	f2 0f 5e dc          	divsd  %xmm4,%xmm3
-  4010e4:	f2 0f 5e cc          	divsd  %xmm4,%xmm1
-  4010e8:	f2 0f 58 9b a0 02 65 	addsd  0x6502a0(%rbx),%xmm3
-  4010ef:	00 
-  4010f0:	f2 0f 11 9b a0 02 65 	movsd  %xmm3,0x6502a0(%rbx)
-  4010f7:	00 
-  4010f8:	f2 0f 58 8b a0 fc 65 	addsd  0x65fca0(%rbx),%xmm1
-  4010ff:	00 
-  401100:	f2 0f 11 8b a0 fc 65 	movsd  %xmm1,0x65fca0(%rbx)
-  401107:	00 
-  401108:	48 83 c4 10          	add    $0x10,%rsp
-  40110c:	5b                   	pop    %rbx
-  40110d:	5d                   	pop    %rbp
-  40110e:	41 5c                	pop    %r12
-  401110:	f3 c3                	repz retq 
-  401112:	f2 0f 11 6c 24 08    	movsd  %xmm5,0x8(%rsp)
-  401118:	f2 0f 11 1c 24       	movsd  %xmm3,(%rsp)
-  40111d:	e8 be f6 ff ff       	callq  4007e0 <sqrt@plt>
-  401122:	f2 0f 10 6c 24 08    	movsd  0x8(%rsp),%xmm5
-  401128:	66 0f 28 e0          	movapd %xmm0,%xmm4
-  40112c:	f2 0f 10 1c 24       	movsd  (%rsp),%xmm3
-  401131:	e9 6f ff ff ff       	jmpq   4010a5 <_Z17codegen_add_forceP4BodyS0_+0x65>
-  401136:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  40113d:	00 00 00 
+  40105f:	4a 8d 1c e5 00 00 00 	lea    0x0(,%r12,8),%rbx
+  401066:	00 
+  401067:	f2 0f 10 0c ed 90 1a 	movsd  0x611a90(,%rbp,8),%xmm1
+  40106e:	61 00 
+  401070:	f2 0f 10 1c ed 90 20 	movsd  0x602090(,%rbp,8),%xmm3
+  401077:	60 00 
+  401079:	66 0f 28 e9          	movapd %xmm1,%xmm5
+  40107d:	f2 42 0f 5c 1c e5 90 	subsd  0x602090(,%r12,8),%xmm3
+  401084:	20 60 00 
+  401087:	f2 42 0f 5c 2c e5 90 	subsd  0x611a90(,%r12,8),%xmm5
+  40108e:	1a 61 00 
+  401091:	66 0f 28 cb          	movapd %xmm3,%xmm1
+  401095:	66 0f 28 c5          	movapd %xmm5,%xmm0
+  401099:	f2 0f 59 cb          	mulsd  %xmm3,%xmm1
+  40109d:	f2 0f 59 c5          	mulsd  %xmm5,%xmm0
+  4010a1:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+  4010a5:	f2 0f 51 e0          	sqrtsd %xmm0,%xmm4
+  4010a9:	66 0f 2e e4          	ucomisd %xmm4,%xmm4
+  4010ad:	7a 6d                	jp     40111c <_Z17codegen_add_forceP4BodyS0_+0xdc>
+  4010af:	f2 0f 10 15 b9 03 00 	movsd  0x3b9(%rip),%xmm2        # 401470 <_IO_stdin_used+0x80>
+  4010b6:	00 
+  4010b7:	66 0f 28 c4          	movapd %xmm4,%xmm0
+  4010bb:	f2 42 0f 59 14 e5 90 	mulsd  0x5f2690(,%r12,8),%xmm2
+  4010c2:	26 5f 00 
+  4010c5:	f2 0f 59 c4          	mulsd  %xmm4,%xmm0
+  4010c9:	f2 0f 58 05 a7 03 00 	addsd  0x3a7(%rip),%xmm0        # 401478 <_IO_stdin_used+0x88>
+  4010d0:	00 
+  4010d1:	f2 0f 59 14 ed 90 26 	mulsd  0x5f2690(,%rbp,8),%xmm2
+  4010d8:	5f 00 
+  4010da:	f2 0f 5e d0          	divsd  %xmm0,%xmm2
+  4010de:	66 0f 28 ca          	movapd %xmm2,%xmm1
+  4010e2:	f2 0f 59 da          	mulsd  %xmm2,%xmm3
+  4010e6:	f2 0f 59 cd          	mulsd  %xmm5,%xmm1
+  4010ea:	f2 0f 5e dc          	divsd  %xmm4,%xmm3
+  4010ee:	f2 0f 5e cc          	divsd  %xmm4,%xmm1
+  4010f2:	f2 0f 58 9b 90 08 64 	addsd  0x640890(%rbx),%xmm3
+  4010f9:	00 
+  4010fa:	f2 0f 11 9b 90 08 64 	movsd  %xmm3,0x640890(%rbx)
+  401101:	00 
+  401102:	f2 0f 58 8b 90 02 65 	addsd  0x650290(%rbx),%xmm1
+  401109:	00 
+  40110a:	f2 0f 11 8b 90 02 65 	movsd  %xmm1,0x650290(%rbx)
+  401111:	00 
+  401112:	48 83 c4 10          	add    $0x10,%rsp
+  401116:	5b                   	pop    %rbx
+  401117:	5d                   	pop    %rbp
+  401118:	41 5c                	pop    %r12
+  40111a:	f3 c3                	repz retq 
+  40111c:	f2 0f 11 6c 24 08    	movsd  %xmm5,0x8(%rsp)
+  401122:	f2 0f 11 1c 24       	movsd  %xmm3,(%rsp)
+  401127:	e8 b4 f6 ff ff       	callq  4007e0 <sqrt@plt>
+  40112c:	f2 0f 10 6c 24 08    	movsd  0x8(%rsp),%xmm5
+  401132:	66 0f 28 e0          	movapd %xmm0,%xmm4
+  401136:	f2 0f 10 1c 24       	movsd  (%rsp),%xmm3
+  40113b:	e9 6f ff ff ff       	jmpq   4010af <_Z17codegen_add_forceP4BodyS0_+0x6f>
 
 0000000000401140 <_Z14codegen_updateP4Bodyd>:
-  401140:	f2 0f 10 0c fd a0 02 	movsd  0x6502a0(,%rdi,8),%xmm1
-  401147:	65 00 
-  401149:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
-  401150:	00 
-  401151:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  401155:	48 8d 88 10 ee 02 00 	lea    0x2ee10(%rax),%rcx
-  40115c:	48 8d 90 10 e8 03 00 	lea    0x3e810(%rax),%rdx
-  401163:	48 8d b0 10 fa 00 00 	lea    0xfa10(%rax),%rsi
-  40116a:	48 05 10 f4 01 00    	add    $0x1f410,%rax
-  401170:	f2 0f 5e 88 90 2c 5e 	divsd  0x5e2c90(%rax),%xmm1
-  401177:	00 
-  401178:	f2 0f 58 89 90 20 60 	addsd  0x602090(%rcx),%xmm1
-  40117f:	00 
-  401180:	f2 0f 11 89 90 20 60 	movsd  %xmm1,0x602090(%rcx)
-  401187:	00 
-  401188:	f2 0f 10 0c fd a0 fc 	movsd  0x65fca0(,%rdi,8),%xmm1
-  40118f:	65 00 
-  401191:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  401195:	f2 0f 5e 88 90 2c 5e 	divsd  0x5e2c90(%rax),%xmm1
+  401140:	48 81 c7 42 9c 00 00 	add    $0x9c42,%rdi
+  401147:	f2 0f 10 15 31 03 00 	movsd  0x331(%rip),%xmm2        # 401480 <_IO_stdin_used+0x90>
+  40114e:	00 
+  40114f:	f2 0f 10 0c fd 90 20 	movsd  0x602090(,%rdi,8),%xmm1
+  401156:	60 00 
+  401158:	48 8d 04 fd 00 06 ff 	lea    -0xfa00(,%rdi,8),%rax
+  40115f:	ff 
+  401160:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  401164:	f2 0f 5e 0c fd 90 3e 	divsd  0x5b3e90(,%rdi,8),%xmm1
+  40116b:	5b 00 
+  40116d:	f2 0f 58 0c fd 90 2c 	addsd  0x5e2c90(,%rdi,8),%xmm1
+  401174:	5e 00 
+  401176:	f2 0f 11 0c fd 90 2c 	movsd  %xmm1,0x5e2c90(,%rdi,8)
+  40117d:	5e 00 
+  40117f:	f2 0f 10 0c fd 90 1a 	movsd  0x611a90(,%rdi,8),%xmm1
+  401186:	61 00 
+  401188:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  40118c:	f2 0f 5e 0c fd 90 3e 	divsd  0x5b3e90(,%rdi,8),%xmm1
+  401193:	5b 00 
+  401195:	f2 0f 58 88 90 20 60 	addsd  0x602090(%rax),%xmm1
   40119c:	00 
-  40119d:	f2 0f 58 8a 90 20 60 	addsd  0x602090(%rdx),%xmm1
+  40119d:	f2 0f 11 88 90 20 60 	movsd  %xmm1,0x602090(%rax)
   4011a4:	00 
-  4011a5:	f2 0f 11 8a 90 20 60 	movsd  %xmm1,0x602090(%rdx)
-  4011ac:	00 
-  4011ad:	f2 0f 10 89 90 20 60 	movsd  0x602090(%rcx),%xmm1
-  4011b4:	00 
-  4011b5:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  4011b9:	f2 0f 58 88 90 26 5f 	addsd  0x5f2690(%rax),%xmm1
-  4011c0:	00 
-  4011c1:	f2 0f 11 88 90 26 5f 	movsd  %xmm1,0x5f2690(%rax)
-  4011c8:	00 
-  4011c9:	f2 0f 10 0d af 02 00 	movsd  0x2af(%rip),%xmm1        # 401480 <_IO_stdin_used+0x90>
-  4011d0:	00 
-  4011d1:	f2 0f 59 82 90 20 60 	mulsd  0x602090(%rdx),%xmm0
-  4011d8:	00 
-  4011d9:	f2 0f 58 80 90 20 60 	addsd  0x602090(%rax),%xmm0
-  4011e0:	00 
-  4011e1:	f2 0f 11 80 90 20 60 	movsd  %xmm0,0x602090(%rax)
-  4011e8:	00 
-  4011e9:	f2 0f 10 96 90 20 60 	movsd  0x602090(%rsi),%xmm2
-  4011f0:	00 
-  4011f1:	66 0f 2e ca          	ucomisd %xmm2,%xmm1
-  4011f5:	77 0a                	ja     401201 <_Z14codegen_updateP4Bodyd+0xc1>
-  4011f7:	66 0f 2e 15 69 02 00 	ucomisd 0x269(%rip),%xmm2        # 401468 <_IO_stdin_used+0x78>
+  4011a5:	f2 0f 10 0c fd 90 2c 	movsd  0x5e2c90(,%rdi,8),%xmm1
+  4011ac:	5e 00 
+  4011ae:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  4011b2:	f2 0f 58 0c fd 90 38 	addsd  0x5c3890(,%rdi,8),%xmm1
+  4011b9:	5c 00 
+  4011bb:	f2 0f 11 0c fd 90 38 	movsd  %xmm1,0x5c3890(,%rdi,8)
+  4011c2:	5c 00 
+  4011c4:	66 0f 2e d1          	ucomisd %xmm1,%xmm2
+  4011c8:	f2 0f 59 80 90 20 60 	mulsd  0x602090(%rax),%xmm0
+  4011cf:	00 
+  4011d0:	f2 0f 58 04 fd 90 32 	addsd  0x5d3290(,%rdi,8),%xmm0
+  4011d7:	5d 00 
+  4011d9:	f2 0f 11 04 fd 90 32 	movsd  %xmm0,0x5d3290(,%rdi,8)
+  4011e0:	5d 00 
+  4011e2:	77 0a                	ja     4011ee <_Z14codegen_updateP4Bodyd+0xae>
+  4011e4:	66 0f 2e 0d 7c 02 00 	ucomisd 0x27c(%rip),%xmm1        # 401468 <_IO_stdin_used+0x78>
+  4011eb:	00 
+  4011ec:	76 27                	jbe    401215 <_Z14codegen_updateP4Bodyd+0xd5>
+  4011ee:	f2 0f 10 04 fd 90 2c 	movsd  0x5e2c90(,%rdi,8),%xmm0
+  4011f5:	5e 00 
+  4011f7:	f2 0f 10 0d a1 02 00 	movsd  0x2a1(%rip),%xmm1        # 4014a0 <_IO_stdin_used+0xb0>
   4011fe:	00 
-  4011ff:	76 24                	jbe    401225 <_Z14codegen_updateP4Bodyd+0xe5>
-  401201:	f2 0f 10 81 90 20 60 	movsd  0x602090(%rcx),%xmm0
-  401208:	00 
-  401209:	f2 0f 10 15 8f 02 00 	movsd  0x28f(%rip),%xmm2        # 4014a0 <_IO_stdin_used+0xb0>
-  401210:	00 
-  401211:	66 0f 57 c2          	xorpd  %xmm2,%xmm0
-  401215:	f2 0f 11 81 90 20 60 	movsd  %xmm0,0x602090(%rcx)
-  40121c:	00 
-  40121d:	f2 0f 10 80 90 20 60 	movsd  0x602090(%rax),%xmm0
-  401224:	00 
-  401225:	66 0f 2e c8          	ucomisd %xmm0,%xmm1
-  401229:	77 0a                	ja     401235 <_Z14codegen_updateP4Bodyd+0xf5>
-  40122b:	66 0f 2e 05 35 02 00 	ucomisd 0x235(%rip),%xmm0        # 401468 <_IO_stdin_used+0x78>
-  401232:	00 
-  401233:	76 23                	jbe    401258 <_Z14codegen_updateP4Bodyd+0x118>
-  401235:	f2 0f 10 82 90 20 60 	movsd  0x602090(%rdx),%xmm0
-  40123c:	00 
-  40123d:	f2 0f 10 0d 5b 02 00 	movsd  0x25b(%rip),%xmm1        # 4014a0 <_IO_stdin_used+0xb0>
-  401244:	00 
-  401245:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
-  401249:	f2 0f 11 82 90 20 60 	movsd  %xmm0,0x602090(%rdx)
-  401250:	00 
-  401251:	c3                   	retq   
-  401252:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
-  401258:	f3 c3                	repz retq 
-  40125a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+  4011ff:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
+  401203:	f2 0f 11 04 fd 90 2c 	movsd  %xmm0,0x5e2c90(,%rdi,8)
+  40120a:	5e 00 
+  40120c:	f2 0f 10 04 fd 90 32 	movsd  0x5d3290(,%rdi,8),%xmm0
+  401213:	5d 00 
+  401215:	66 0f 2e d0          	ucomisd %xmm0,%xmm2
+  401219:	77 0a                	ja     401225 <_Z14codegen_updateP4Bodyd+0xe5>
+  40121b:	66 0f 2e 05 45 02 00 	ucomisd 0x245(%rip),%xmm0        # 401468 <_IO_stdin_used+0x78>
+  401222:	00 
+  401223:	76 23                	jbe    401248 <_Z14codegen_updateP4Bodyd+0x108>
+  401225:	f2 0f 10 80 90 20 60 	movsd  0x602090(%rax),%xmm0
+  40122c:	00 
+  40122d:	f2 0f 10 0d 6b 02 00 	movsd  0x26b(%rip),%xmm1        # 4014a0 <_IO_stdin_used+0xb0>
+  401234:	00 
+  401235:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
+  401239:	f2 0f 11 80 90 20 60 	movsd  %xmm0,0x602090(%rax)
+  401240:	00 
+  401241:	c3                   	retq   
+  401242:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+  401248:	f3 c3                	repz retq 
+  40124a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
 
-0000000000401260 <_Z26codegen_reset_force_manualP4Body>:
-  401260:	66 0f ef c0          	pxor   %xmm0,%xmm0
-  401264:	f2 0f 11 04 fd a0 02 	movsd  %xmm0,0x6502a0(,%rdi,8)
-  40126b:	65 00 
-  40126d:	f2 0f 11 04 fd a0 fc 	movsd  %xmm0,0x65fca0(,%rdi,8)
-  401274:	65 00 
-  401276:	c3                   	retq   
-  401277:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
-  40127e:	00 00 
+0000000000401250 <_Z26codegen_reset_force_manualP4Body>:
+  401250:	66 0f ef c0          	pxor   %xmm0,%xmm0
+  401254:	48 81 c7 42 9c 00 00 	add    $0x9c42,%rdi
+  40125b:	f2 0f 11 04 fd 90 20 	movsd  %xmm0,0x602090(,%rdi,8)
+  401262:	60 00 
+  401264:	f2 0f 11 04 fd 90 1a 	movsd  %xmm0,0x611a90(,%rdi,8)
+  40126b:	61 00 
+  40126d:	c3                   	retq   
+  40126e:	66 90                	xchg   %ax,%ax
 
-0000000000401280 <_Z24codegen_reset_force_halfP4Body>:
-  401280:	48 c7 04 fd a0 02 65 	movq   $0x0,0x6502a0(,%rdi,8)
+0000000000401270 <_Z24codegen_reset_force_halfP4Body>:
+  401270:	48 c7 04 fd a0 02 65 	movq   $0x0,0x6502a0(,%rdi,8)
+  401277:	00 00 00 00 00 
+  40127c:	c3                   	retq   
+  40127d:	0f 1f 00             	nopl   (%rax)
+
+0000000000401280 <_Z18codegen_reset_massP4Body>:
+  401280:	48 c7 04 fd a0 20 60 	movq   $0x0,0x6020a0(,%rdi,8)
   401287:	00 00 00 00 00 
   40128c:	c3                   	retq   
   40128d:	0f 1f 00             	nopl   (%rax)
 
-0000000000401290 <_Z18codegen_reset_massP4Body>:
-  401290:	48 c7 04 fd a0 20 60 	movq   $0x0,0x6020a0(,%rdi,8)
-  401297:	00 00 00 00 00 
-  40129c:	c3                   	retq   
-  40129d:	0f 1f 00             	nopl   (%rax)
-
-00000000004012a0 <_Z22codengen_simple_updateP4Bodyd>:
-  4012a0:	f2 0f 10 0c fd a0 02 	movsd  0x6502a0(,%rdi,8),%xmm1
-  4012a7:	65 00 
-  4012a9:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
-  4012b0:	00 
-  4012b1:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  4012b5:	f2 0f 5e 88 a0 20 60 	divsd  0x6020a0(%rax),%xmm1
-  4012bc:	00 
-  4012bd:	f2 0f 58 88 a0 0e 63 	addsd  0x630ea0(%rax),%xmm1
-  4012c4:	00 
-  4012c5:	f2 0f 11 88 a0 0e 63 	movsd  %xmm1,0x630ea0(%rax)
-  4012cc:	00 
-  4012cd:	f2 0f 10 0c fd a0 fc 	movsd  0x65fca0(,%rdi,8),%xmm1
-  4012d4:	65 00 
-  4012d6:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  4012da:	f2 0f 5e 88 a0 20 60 	divsd  0x6020a0(%rax),%xmm1
-  4012e1:	00 
-  4012e2:	f2 0f 58 88 a0 08 64 	addsd  0x6408a0(%rax),%xmm1
-  4012e9:	00 
-  4012ea:	f2 0f 11 88 a0 08 64 	movsd  %xmm1,0x6408a0(%rax)
-  4012f1:	00 
-  4012f2:	f2 0f 10 88 a0 0e 63 	movsd  0x630ea0(%rax),%xmm1
-  4012f9:	00 
-  4012fa:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
-  4012fe:	f2 0f 59 80 a0 08 64 	mulsd  0x6408a0(%rax),%xmm0
-  401305:	00 
-  401306:	f2 0f 58 88 a0 1a 61 	addsd  0x611aa0(%rax),%xmm1
-  40130d:	00 
-  40130e:	f2 0f 58 80 a0 14 62 	addsd  0x6214a0(%rax),%xmm0
-  401315:	00 
-  401316:	f2 0f 11 88 a0 1a 61 	movsd  %xmm1,0x611aa0(%rax)
-  40131d:	00 
-  40131e:	f2 0f 11 80 a0 14 62 	movsd  %xmm0,0x6214a0(%rax)
-  401325:	00 
+0000000000401290 <_Z22codengen_simple_updateP4Bodyd>:
+  401290:	48 81 c7 42 9c 00 00 	add    $0x9c42,%rdi
+  401297:	f2 0f 10 0c fd 90 20 	movsd  0x602090(,%rdi,8),%xmm1
+  40129e:	60 00 
+  4012a0:	48 8d 04 fd 00 06 ff 	lea    -0xfa00(,%rdi,8),%rax
+  4012a7:	ff 
+  4012a8:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  4012ac:	f2 0f 5e 0c fd 90 3e 	divsd  0x5b3e90(,%rdi,8),%xmm1
+  4012b3:	5b 00 
+  4012b5:	f2 0f 58 0c fd 90 2c 	addsd  0x5e2c90(,%rdi,8),%xmm1
+  4012bc:	5e 00 
+  4012be:	f2 0f 11 0c fd 90 2c 	movsd  %xmm1,0x5e2c90(,%rdi,8)
+  4012c5:	5e 00 
+  4012c7:	f2 0f 10 0c fd 90 1a 	movsd  0x611a90(,%rdi,8),%xmm1
+  4012ce:	61 00 
+  4012d0:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  4012d4:	f2 0f 5e 0c fd 90 3e 	divsd  0x5b3e90(,%rdi,8),%xmm1
+  4012db:	5b 00 
+  4012dd:	f2 0f 58 88 90 20 60 	addsd  0x602090(%rax),%xmm1
+  4012e4:	00 
+  4012e5:	f2 0f 11 88 90 20 60 	movsd  %xmm1,0x602090(%rax)
+  4012ec:	00 
+  4012ed:	f2 0f 10 0c fd 90 2c 	movsd  0x5e2c90(,%rdi,8),%xmm1
+  4012f4:	5e 00 
+  4012f6:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+  4012fa:	f2 0f 58 0c fd 90 38 	addsd  0x5c3890(,%rdi,8),%xmm1
+  401301:	5c 00 
+  401303:	f2 0f 11 0c fd 90 38 	movsd  %xmm1,0x5c3890(,%rdi,8)
+  40130a:	5c 00 
+  40130c:	f2 0f 59 80 90 20 60 	mulsd  0x602090(%rax),%xmm0
+  401313:	00 
+  401314:	f2 0f 58 04 fd 90 32 	addsd  0x5d3290(,%rdi,8),%xmm0
+  40131b:	5d 00 
+  40131d:	f2 0f 11 04 fd 90 32 	movsd  %xmm0,0x5d3290(,%rdi,8)
+  401324:	5d 00 
   401326:	c3                   	retq   
   401327:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
   40132e:	00 00 

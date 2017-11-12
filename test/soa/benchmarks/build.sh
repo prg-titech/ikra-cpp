@@ -48,6 +48,17 @@ do
       -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
 
+  out_name="${v_compiler}_nbody_ikracpp_field"
+  ${v_compiler} -O3 nbody/ikracpp_field.cc -std=c++11 -I../../../ikra \
+      -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+
+  out_name="${v_compiler}_nbody_ikracpp_inversed"
+  ${v_compiler} -O3 nbody/ikracpp_inversed.cc -std=c++11 -I../../../ikra \
+      -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+
+  # No vectorization with: -fno-tree-vectorize
   out_name="${v_compiler}_nbody_soa"
   ${v_compiler} -O3 nbody/soa.cc -std=c++11 -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
@@ -56,3 +67,13 @@ do
   ${v_compiler} -O3 nbody/aos.cc -std=c++11 -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
 done
+
+/usr/local/cuda/bin/nvcc \
+    -std=c++14 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_nbody_ikracpp_inversed_gpu \
+    nbody/ikracpp_inversed_gpu.cu
+/usr/local/cuda/bin/cuobjdump bin/cuda_nbody_ikracpp_inversed_gpu \
+    -ptx -sass -res-usage > assembly/cuda_nbody_ikracpp_inversed_gpu.S

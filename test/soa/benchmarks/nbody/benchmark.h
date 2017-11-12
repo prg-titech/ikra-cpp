@@ -1,5 +1,8 @@
 // Taken from: https://stackoverflow.com/questions/2808398/easily-measure-elapsed-time
 
+#ifndef TEST_SOA_BENCHMARK_NBODY_BENCHMARK_H
+#define TEST_SOA_BENCHMARK_NBODY_BENCHMARK_H
+
 #include <iostream>
 #include <chrono>
 
@@ -17,6 +20,8 @@ struct measure
     }
 };
 
-int float_as_int(float value) {
+int r_float2int(float value) {
   return *reinterpret_cast<int*>(&value);
 }
+
+#endif  // TEST_SOA_BENCHMARK_NBODY_BENCHMARK_H

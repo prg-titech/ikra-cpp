@@ -12,6 +12,8 @@ struct NvccWorkaroundIdentityClassHolder {
   using type = T;
 };
 
+#define IKRA_fold(x) (__builtin_constant_p(x) ? (x) : (x))
+
 }  // soa
 }  // ikra
 

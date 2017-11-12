@@ -3,17 +3,26 @@
 
 #include "soa/constants.h"
 #include "soa/cuda.h"
+#include "soa/util.h"
 
 #define IKRA_DEVICE_STORAGE(class_name) \
-__device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
+__device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
+    __attribute__((aligned(8))); \
 __host__ __device__ class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
+} \
+constexpr void* class_name::storage_buffer() { \
+  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
 }
 
 #define IKRA_HOST_STORAGE(class_name) \
-char __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
+char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
+    __attribute__((aligned(8))); \
 class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
+} \
+constexpr void* class_name::storage_buffer() { \
+  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
 }
 
 
@@ -28,6 +37,14 @@ __device__ IndexType d_previous_storage_size;
 // data such as the number of instances of a SOA class. All storage classes are
 // singletons, i.e., instantiations of the following classes are tied to a
 // specific SOA class.
+
+// Determine the offset of the data field of a storage strategy at compile
+// time.
+template<typename StorageClass>
+struct StorageDataOffset {
+  static constexpr uintptr_t value = IKRA_fold(
+      reinterpret_cast<uintptr_t>(&reinterpret_cast<StorageClass*>(0)->data_));
+};
 
 class StorageStrategyBase {
  public:
@@ -129,7 +146,8 @@ class DynamicStorage_
   // Allocate data on the heap.
   __ikra_device__ DynamicStorage_() {
     // Note: ObjectSize is accessed within a function here.
-    data_ = malloc(Owner::ObjectSize::value * Owner::kCapacity);
+    // Add one because first object has ID 0.
+    data_ = malloc(Owner::ObjectSize::value * (Owner::kCapacity + 1));
 
     if (ArenaSize > 0) {
       arena_head_ = arena_base_ = malloc(ArenaSize);
@@ -162,10 +180,17 @@ class DynamicStorage_
   }
 
   __ikra_device__ void* data_ptr() {
+    // Check alignment.
+    assert(reinterpret_cast<uintptr_t>(data_) % 8 == 0);
     return data_;
   }
 
+  static const bool kIsStaticStorage = false;
+
  private:
+  template<typename StorageClass>
+  friend class StorageDataOffset;
+
   // The base pointer (start) of the arena.
   void* arena_base_;
 
@@ -203,10 +228,17 @@ class StaticStorage_
   }
 
   __ikra_device__ void* data_ptr() {
+    // Check alignment.
+    assert(reinterpret_cast<uintptr_t>(data_) % 8 == 0);
     return reinterpret_cast<void*>(&data_[0]);
   }
 
+  static const bool kIsStaticStorage = true;
+
  private:
+  template<typename StorageClass>
+  friend class StorageDataOffset;
+
   // Statically allocated data storage for the arena.
   char arena_base_[ArenaSize];
 
@@ -214,7 +246,8 @@ class StaticStorage_
   char* arena_head_;
 
   // Statically allocated data storage for SOA columns.
-  char data_[Owner::ObjectSize::value * Owner::kCapacity];
+  // Add one because first object has ID 0.
+  char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
 };
 
 // The following structs are public API types for storage strategies.

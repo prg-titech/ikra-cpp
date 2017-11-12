@@ -10,8 +10,8 @@
 using namespace std;
 using IdType = uintptr_t;
 
-static const int kIterations = 2;
-static const int kNumBodies = 9600;
+static const int kIterations = 5;
+static const int kNumBodies = 8000;
 static const double kMaxMass = 1000;
 static const double kTimeInterval = 0.5;
 
@@ -88,6 +88,8 @@ void Body_codegen_simple_update(IdType self, double dt) {
 }
 
 void instantiation() {
+  srand(42);
+
   // Create objects.
   for (IdType i = 0; i < kNumBodies; ++i) {
     double mass = (RAND/2 + 0.5) * kMaxMass;
@@ -134,12 +136,18 @@ int main() {
   // Calculate checksum
   int checksum = 11;
   for (uintptr_t i = 0; i < kNumBodies; i++) {
-    checksum += reinterpret_cast<int>(float_as_int(a_Body_position_0[i]));
-    checksum += reinterpret_cast<int>(float_as_int(a_Body_position_1[i]));
+    checksum += reinterpret_cast<int>(r_float2int(a_Body_position_0[i]));
+    checksum += reinterpret_cast<int>(r_float2int(a_Body_position_1[i]));
     checksum = checksum % 1234567;
+
+    if (i < 10) {
+      printf("VALUE[%lu] = %f, %f\n", i,
+             a_Body_position_0[i],
+             a_Body_position_1[i]);
+    }
   }
 
-  printf("instantiation: %lu\nsimulation: %lu\nsimple: %lu\n checksum: %i\n",
+  printf("instantiation: %lu\nsimulation: %lu\nsimple: %lu\nchecksum: %i\n",
          time_instantiation, time_simulation, time_simple, checksum);
   return 0;
 }

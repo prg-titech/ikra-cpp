@@ -133,7 +133,7 @@ Disassembly of section .text:
 0000000000400600 <main>:
   400600:	50                   	push   %rax
   400601:	0f 57 c0             	xorps  %xmm0,%xmm0
-  400604:	0f 29 05 45 0a 20 00 	movaps %xmm0,0x200a45(%rip)        # 601050 <__TestClassdata_buffer>
+  400604:	0f 11 05 45 0a 20 00 	movups %xmm0,0x200a45(%rip)        # 601050 <__TestClassdata_buffer>
   40060b:	48 c7 05 3a 0a 20 00 	movq   $0x1,0x200a3a(%rip)        # 601050 <__TestClassdata_buffer>
   400612:	01 00 00 00 
   400616:	c7 05 44 0a 20 00 00 	movl   $0x0,0x200a44(%rip)        # 601064 <__TestClassdata_buffer+0x14>
@@ -216,13 +216,13 @@ Disassembly of section .text:
   40073a:	84 00 00 00 00 00 
 
 0000000000400740 <_Z21explicit_write_field0m>:
-  400740:	c7 04 bd 00 a2 60 00 	movl   $0x7777,0x60a200(,%rdi,4)
+  400740:	c7 04 bd 10 a2 60 00 	movl   $0x7777,0x60a210(,%rdi,4)
   400747:	77 77 00 00 
   40074b:	c3                   	retq   
   40074c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400750 <_Z20explicit_read_field0m>:
-  400750:	8b 04 bd 00 a2 60 00 	mov    0x60a200(,%rdi,4),%eax
+  400750:	8b 04 bd 10 a2 60 00 	mov    0x60a210(,%rdi,4),%eax
   400757:	c3                   	retq   
   400758:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40075f:	00 

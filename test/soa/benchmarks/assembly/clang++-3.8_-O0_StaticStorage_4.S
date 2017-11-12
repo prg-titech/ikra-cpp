@@ -324,7 +324,7 @@ Disassembly of section .text:
   400961:	48 89 e5             	mov    %rsp,%rbp
   400964:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400968:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
-  40096c:	c7 04 bd 10 b2 60 00 	movl   $0x7777,0x60b210(,%rdi,4)
+  40096c:	c7 04 bd 20 b2 60 00 	movl   $0x7777,0x60b220(,%rdi,4)
   400973:	77 77 00 00 
   400977:	5d                   	pop    %rbp
   400978:	c3                   	retq   
@@ -335,7 +335,7 @@ Disassembly of section .text:
   400981:	48 89 e5             	mov    %rsp,%rbp
   400984:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
   400988:	48 8b 7d f8          	mov    -0x8(%rbp),%rdi
-  40098c:	8b 04 bd 10 b2 60 00 	mov    0x60b210(,%rdi,4),%eax
+  40098c:	8b 04 bd 20 b2 60 00 	mov    0x60b220(,%rdi,4),%eax
   400993:	5d                   	pop    %rbp
   400994:	c3                   	retq   
   400995:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)

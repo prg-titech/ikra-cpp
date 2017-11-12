@@ -3,6 +3,7 @@
 
 #include "soa/constants.h"
 #include "soa/cuda.h"
+#include "soa/storage.h"
 #include "soa/util.h"
 
 // This marco is expanded for every inplace assignment operator and forwards
@@ -138,62 +139,8 @@ class Field_ {
   // work.
   __ikra_device__ Field_(Field_&& /*other*/) {}
 
-  template<int A = AddressMode>
-  __ikra_device__
-  typename std::enable_if<A != kAddressModeZero, IndexType>::type
-  id() const {
-    return (reinterpret_cast<uintptr_t>(this) -
-            reinterpret_cast<uintptr_t>(Owner::storage().data_ptr()))
-               / A - 1 - 1;
-  }
 
-  template<int A = AddressMode>
-  __ikra_device__
-  typename std::enable_if<A == kAddressModeZero, IndexType>::type
-  id() const {
-    return reinterpret_cast<uintptr_t>(this) - 1;
-  }
-
-  // Calculate the address of this field based on the "this" pointer of this
-  // Field instance.
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
-  data_ptr_uninitialized() const {
-    auto p_this = reinterpret_cast<uintptr_t>(this);
-    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                     Capacity*Offset;
-    return reinterpret_cast<T*>(p_result);
-  }
-
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
-  data_ptr() const {
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size());
-    return data_ptr_uninitialized();
-  }
-
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
-  data_ptr_uninitialized() const {
-    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-                                p_base + Capacity*Offset);
-  }
-
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
-  data_ptr() const {
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size());
-    return data_ptr_uninitialized();
-  }
-
-  // Force size of this class to be 0.
-  char dummy_[0];
+#include "soa/field_shared.inc"
 };
 
 }  // namespace soa
