@@ -5,7 +5,7 @@
 
 #ifdef __CUDA_ARCH__
 // Make all SOA functions device functions when compiling device code.
-#define __ikra_device__ __device__ 
+#define __ikra_device__ __device__
 #else
 #define __ikra_device__
 #endif  // __CUDA_ARCH__

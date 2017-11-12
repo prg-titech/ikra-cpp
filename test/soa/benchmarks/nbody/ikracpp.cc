@@ -60,13 +60,12 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   void add_force_to_all() {
-    //for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->add_force(this);
-    execute(&Body::add_force, this);
+    execute<kNumBodies>(&Body::add_force, this);
   }
 
   void reset_force() {
-    force_[0] = 0.0;
-    force_[1] = 0.0;
+    force_.at<0>() = 0.0;
+    force_.at<1>() = 0.0;
   }
 
   void update(double dt) {
@@ -83,11 +82,18 @@ class Body : public SoaLayout<Body, kNumBodies> {
     }
   }
 
-  void codengen_simple_update(double dt) {
+  void codengen_simple_update_templated(double dt) {
     velocity_.at<0>() += force_.at<0>()*dt / mass_;
     velocity_.at<1>() += force_.at<1>()*dt / mass_;
     position_.at<0>() += velocity_.at<0>()*dt;
     position_.at<1>() += velocity_.at<1>()*dt;
+  }
+
+  void codengen_simple_update(double dt) {
+    velocity_[0] += force_[0]*dt / mass_;
+    velocity_[1] += force_[1]*dt / mass_;
+    position_[0] += velocity_[0]*dt;
+    position_[1] += velocity_[1]*dt;
   }
 };
 
@@ -108,21 +114,19 @@ void instantiation() {
 void run_simulation() {
   for (int i = 0; i < kIterations; ++i) {
     // Reset forces.
-    execute(&Body::reset_force);
+    execute<kNumBodies>(&Body::reset_force);
 
     // Update forces.
-    //for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->add_force_to_all();
-    execute(&Body::add_force_to_all);
+    execute<kNumBodies>(&Body::add_force_to_all);
 
     // Update velocities and positions.
-    execute(&Body::update, kTimeInterval);
+    execute<kNumBodies>(&Body::update, kTimeInterval);
   }
 }
 
 void run_simple() {
   for (int i = 0; i < kIterations*10000; ++i) {
-    //execute(&Body::codengen_simple_update, kTimeInterval);
-    for (uintptr_t j = 0; j < kNumBodies; ++j) Body::get(j)->codengen_simple_update(kTimeInterval);
+    execute<kNumBodies>(&Body::codengen_simple_update, kTimeInterval);
   }
 }
 

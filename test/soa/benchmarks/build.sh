@@ -7,7 +7,7 @@ mkdir -p assembly
 
 for v_compiler in "g++" "clang++-3.8"
 do
-  for v_storage in "StaticStorage" #"DynamicStorage"
+  for v_storage in "StaticStorage" "DynamicStorage"
   do
     for v_opt_mode in "-O0" "-O3"
     do
@@ -28,16 +28,16 @@ do
 done
 
 # CUDA test
-#/usr/local/cuda/bin/nvcc \
-#    -std=c++14 \
-#    --expt-extended-lambda \
-#    -O3 \
-#    -I../../../ikra \
-#    -o bin/cuda_codegen_test \
-#    cuda_codegen_test.cu
-#bin/cuda_codegen_test
-#/usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
-#    > assembly/cuda_codegen_test.S
+/usr/local/cuda/bin/nvcc \
+    -std=c++14 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_codegen_test \
+    cuda_codegen_test.cu
+bin/cuda_codegen_test
+/usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
+    > assembly/cuda_codegen_test.S
 
 
 for v_compiler in "g++" "clang++-3.8"

@@ -180,7 +180,7 @@ class Field_ {
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
   data_ptr_uninitialized() const {
     if (Owner::Storage::kIsStaticStorage) {
-      // Use constant-folded value for address computation
+      // Use constant-folded value for address computation.
       constexpr uintptr_t cptr_data_offset =
           StorageDataOffset<typename Owner::Storage>::value;
       constexpr char* cptr_storage_buffer =

@@ -10,6 +10,9 @@ __device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
     __attribute__((aligned(8))); \
 __host__ __device__ class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
+} \
+constexpr void* class_name::storage_buffer() { \
+  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
 }
 
 #define IKRA_HOST_STORAGE(class_name) \
