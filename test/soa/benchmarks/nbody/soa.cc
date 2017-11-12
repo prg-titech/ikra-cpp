@@ -17,10 +17,6 @@ static const double kTimeInterval = 0.5;
 
 static const double kGravityConstant = 6.673e-11;   // gravitational constant
 
-static const int kWindowWidth = 1000;
-static const int kWindowHeight = 1000;
-static const int kMaxRect = 20;
-
 double a_Body_mass[kNumBodies];
 double a_Body_position_0[kNumBodies];
 double a_Body_position_1[kNumBodies];
@@ -81,10 +77,12 @@ void Body_update(IdType self, double dt) {
 }
 
 void Body_codegen_simple_update(IdType self, double dt) {
-  a_Body_velocity_0[self] += a_Body_force_0[self]*dt / a_Body_mass[self];
-  a_Body_velocity_1[self] += a_Body_force_1[self]*dt / a_Body_mass[self];
-  a_Body_position_0[self] += a_Body_velocity_0[self]*dt;
-  a_Body_position_1[self] += a_Body_velocity_1[self]*dt;
+  for (int i = 0; i < 100; ++i) {
+    a_Body_velocity_0[self] += a_Body_force_0[self]*dt / a_Body_mass[self];
+    a_Body_velocity_1[self] += a_Body_force_1[self]*dt / a_Body_mass[self];
+    a_Body_position_0[self] += a_Body_velocity_0[self]*dt;
+    a_Body_position_1[self] += a_Body_velocity_1[self]*dt;
+  }
 }
 
 void instantiation() {
@@ -121,7 +119,7 @@ void run_simulation() {
 }
 
 void run_simple() {
-  for (int i = 0; i < kIterations*10000; ++i) {
+  for (int i = 0; i < kIterations*100; ++i) {
     for (IdType j = 0; j < kNumBodies; ++j) {
       Body_codegen_simple_update(j, kTimeInterval);
     }

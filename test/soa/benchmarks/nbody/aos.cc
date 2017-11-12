@@ -77,10 +77,12 @@ class Body {
   }
 
   void codengen_simple_update(double dt) {
-    velocity_[0] += force_[0]*dt / mass_;
-    velocity_[1] += force_[1]*dt / mass_;
-    position_[0] += velocity_[0]*dt;
-    position_[1] += velocity_[1]*dt;
+    for (int i = 0; i < 100; ++i) {
+      velocity_[0] += force_[0]*dt / mass_;
+      velocity_[1] += force_[1]*dt / mass_;
+      position_[0] += velocity_[0]*dt;
+      position_[1] += velocity_[1]*dt;
+    }
   }
 };
 
@@ -123,7 +125,7 @@ void run_simulation() {
 }
 
 void run_simple() {
-  for (int i = 0; i < kIterations*10000; ++i) {
+  for (int i = 0; i < kIterations*100; ++i) {
     for (int j = 0; j < kNumBodies; ++j) {
       Body* body = reinterpret_cast<Body*>(Body_arena + sizeof(Body)*j);
       body->codengen_simple_update(kTimeInterval);

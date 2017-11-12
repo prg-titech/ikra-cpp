@@ -82,10 +82,12 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   void codengen_simple_update(double dt) {
-    velocity0_ += force0_*dt / mass_;
-    velocity1_ += force1_*dt / mass_;
-    position0_ += velocity0_*dt;
-    position1_ += velocity1_*dt;
+    for (int i = 0; i < 100; ++i) {
+      velocity0_ += force0_*dt / mass_;
+      velocity1_ += force1_*dt / mass_;
+      position0_ += velocity0_*dt;
+      position1_ += velocity1_*dt;
+    }
   }
 };
 
@@ -119,7 +121,7 @@ void run_simulation() {
 }
 
 void run_simple() {
-  for (int i = 0; i < kIterations*10000; ++i) {
+  for (int i = 0; i < kIterations*100; ++i) {
     execute<kNumBodies>(&Body::codengen_simple_update, kTimeInterval);
   }
 }

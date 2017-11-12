@@ -77,3 +77,13 @@ done
     nbody/ikracpp_inversed_gpu.cu
 /usr/local/cuda/bin/cuobjdump bin/cuda_nbody_ikracpp_inversed_gpu \
     -ptx -sass -res-usage > assembly/cuda_nbody_ikracpp_inversed_gpu.S
+
+/usr/local/cuda/bin/nvcc \
+    -std=c++14 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_nbody_soa_inversed_gpu \
+    nbody/soa_inversed.cu
+/usr/local/cuda/bin/cuobjdump bin/cuda_nbody_soa_inversed_gpu \
+    -ptx -sass -res-usage > assembly/cuda_nbody_soa_inversed_gpu.S
