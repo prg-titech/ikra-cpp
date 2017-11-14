@@ -140,42 +140,43 @@ Disassembly of section .text:
   400641:	bf a8 91 00 00       	mov    $0x91a8,%edi
   400646:	e8 b5 fe ff ff       	callq  400500 <malloc@plt>
   40064b:	48 89 05 16 0a 20 00 	mov    %rax,0x200a16(%rip)        # 601068 <__TestClassdata_buffer+0x18>
-  400652:	0f 57 c0             	xorps  %xmm0,%xmm0
-  400655:	0f 11 05 fc 09 20 00 	movups %xmm0,0x2009fc(%rip)        # 601058 <__TestClassdata_buffer+0x8>
-  40065c:	48 c7 05 e9 09 20 00 	movq   $0x1,0x2009e9(%rip)        # 601050 <__TestClassdata_buffer>
-  400663:	01 00 00 00 
-  400667:	c7 40 04 77 77 00 00 	movl   $0x7777,0x4(%rax)
-  40066e:	c7 80 d4 48 00 00 88 	movl   $0x8888,0x48d4(%rax)
-  400675:	88 00 00 
-  400678:	69 48 04 55 55 00 00 	imul   $0x5555,0x4(%rax),%ecx
-  40067f:	89 48 04             	mov    %ecx,0x4(%rax)
-  400682:	69 90 d4 48 00 00 44 	imul   $0x4444,0x48d4(%rax),%edx
-  400689:	44 00 00 
-  40068c:	89 90 d4 48 00 00    	mov    %edx,0x48d4(%rax)
-  400692:	8b 70 04             	mov    0x4(%rax),%esi
-  400695:	bf e4 07 40 00       	mov    $0x4007e4,%edi
-  40069a:	31 c0                	xor    %eax,%eax
-  40069c:	e8 4f fe ff ff       	callq  4004f0 <printf@plt>
-  4006a1:	48 8b 0d c0 09 20 00 	mov    0x2009c0(%rip),%rcx        # 601068 <__TestClassdata_buffer+0x18>
-  4006a8:	b0 01                	mov    $0x1,%al
-  4006aa:	81 79 04 83 2d d2 27 	cmpl   $0x27d22d83,0x4(%rcx)
-  4006b1:	75 0d                	jne    4006c0 <main+0x80>
-  4006b3:	81 b9 d4 48 00 00 20 	cmpl   $0x24686420,0x48d4(%rcx)
-  4006ba:	64 68 24 
-  4006bd:	0f 95 c0             	setne  %al
-  4006c0:	0f b6 c0             	movzbl %al,%eax
-  4006c3:	59                   	pop    %rcx
-  4006c4:	c3                   	retq   
-  4006c5:	66 66 2e 0f 1f 84 00 	data16 nopw %cs:0x0(%rax,%rax,1)
-  4006cc:	00 00 00 00 
+  400652:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+  400656:	c7 40 04 77 77 00 00 	movl   $0x7777,0x4(%rax)
+  40065d:	c7 80 d4 48 00 00 88 	movl   $0x8888,0x48d4(%rax)
+  400664:	88 00 00 
+  400667:	69 48 04 55 55 00 00 	imul   $0x5555,0x4(%rax),%ecx
+  40066e:	89 48 04             	mov    %ecx,0x4(%rax)
+  400671:	69 90 d4 48 00 00 44 	imul   $0x4444,0x48d4(%rax),%edx
+  400678:	44 00 00 
+  40067b:	c5 f8 11 05 d5 09 20 	vmovups %xmm0,0x2009d5(%rip)        # 601058 <__TestClassdata_buffer+0x8>
+  400682:	00 
+  400683:	48 c7 05 c2 09 20 00 	movq   $0x1,0x2009c2(%rip)        # 601050 <__TestClassdata_buffer>
+  40068a:	01 00 00 00 
+  40068e:	89 90 d4 48 00 00    	mov    %edx,0x48d4(%rax)
+  400694:	8b 70 04             	mov    0x4(%rax),%esi
+  400697:	bf e4 07 40 00       	mov    $0x4007e4,%edi
+  40069c:	31 c0                	xor    %eax,%eax
+  40069e:	e8 4d fe ff ff       	callq  4004f0 <printf@plt>
+  4006a3:	48 8b 0d be 09 20 00 	mov    0x2009be(%rip),%rcx        # 601068 <__TestClassdata_buffer+0x18>
+  4006aa:	b0 01                	mov    $0x1,%al
+  4006ac:	81 79 04 83 2d d2 27 	cmpl   $0x27d22d83,0x4(%rcx)
+  4006b3:	75 0d                	jne    4006c2 <main+0x82>
+  4006b5:	81 b9 d4 48 00 00 20 	cmpl   $0x24686420,0x48d4(%rcx)
+  4006bc:	64 68 24 
+  4006bf:	0f 95 c0             	setne  %al
+  4006c2:	0f b6 c0             	movzbl %al,%eax
+  4006c5:	59                   	pop    %rcx
+  4006c6:	c3                   	retq   
+  4006c7:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  4006ce:	00 00 
 
 00000000004006d0 <_Z12new_instancev>:
   4006d0:	48 8b 05 79 09 20 00 	mov    0x200979(%rip),%rax        # 601050 <__TestClassdata_buffer>
-  4006d7:	48 ff c0             	inc    %rax
-  4006da:	48 89 05 6f 09 20 00 	mov    %rax,0x20096f(%rip)        # 601050 <__TestClassdata_buffer>
-  4006e1:	c3                   	retq   
-  4006e2:	66 66 66 66 66 2e 0f 	data16 data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
-  4006e9:	1f 84 00 00 00 00 00 
+  4006d7:	48 83 c0 01          	add    $0x1,%rax
+  4006db:	48 89 05 6e 09 20 00 	mov    %rax,0x20096e(%rip)        # 601050 <__TestClassdata_buffer>
+  4006e2:	c3                   	retq   
+  4006e3:	66 66 66 66 2e 0f 1f 	data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
+  4006ea:	84 00 00 00 00 00 
 
 00000000004006f0 <_Z12write_field0P9TestClass>:
   4006f0:	48 8b 05 71 09 20 00 	mov    0x200971(%rip),%rax        # 601068 <__TestClassdata_buffer+0x18>

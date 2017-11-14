@@ -132,38 +132,39 @@ Disassembly of section .text:
 
 0000000000400600 <main>:
   400600:	50                   	push   %rax
-  400601:	0f 57 c0             	xorps  %xmm0,%xmm0
-  400604:	0f 11 05 45 0a 20 00 	movups %xmm0,0x200a45(%rip)        # 601050 <__TestClassdata_buffer>
-  40060b:	48 c7 05 3a 0a 20 00 	movq   $0x1,0x200a3a(%rip)        # 601050 <__TestClassdata_buffer>
-  400612:	01 00 00 00 
-  400616:	c7 05 44 0a 20 00 00 	movl   $0x0,0x200a44(%rip)        # 601064 <__TestClassdata_buffer+0x14>
-  40061d:	00 00 00 
-  400620:	c7 05 3a 0a 20 00 77 	movl   $0x7777,0x200a3a(%rip)        # 601064 <__TestClassdata_buffer+0x14>
-  400627:	77 00 00 
-  40062a:	c7 05 00 53 20 00 88 	movl   $0x8888,0x205300(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
-  400631:	88 00 00 
-  400634:	69 05 26 0a 20 00 55 	imul   $0x5555,0x200a26(%rip),%eax        # 601064 <__TestClassdata_buffer+0x14>
-  40063b:	55 00 00 
-  40063e:	89 05 20 0a 20 00    	mov    %eax,0x200a20(%rip)        # 601064 <__TestClassdata_buffer+0x14>
-  400644:	69 15 e6 52 20 00 44 	imul   $0x4444,0x2052e6(%rip),%edx        # 605934 <__TestClassdata_buffer+0x48e4>
-  40064b:	44 00 00 
-  40064e:	89 15 e0 52 20 00    	mov    %edx,0x2052e0(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
-  400654:	8b 35 0a 0a 20 00    	mov    0x200a0a(%rip),%esi        # 601064 <__TestClassdata_buffer+0x14>
-  40065a:	bf e4 07 40 00       	mov    $0x4007e4,%edi
-  40065f:	31 c0                	xor    %eax,%eax
-  400661:	e8 5a fe ff ff       	callq  4004c0 <printf@plt>
-  400666:	b0 01                	mov    $0x1,%al
-  400668:	81 3d f2 09 20 00 83 	cmpl   $0x27d22d83,0x2009f2(%rip)        # 601064 <__TestClassdata_buffer+0x14>
-  40066f:	2d d2 27 
-  400672:	75 0d                	jne    400681 <main+0x81>
-  400674:	81 3d b6 52 20 00 20 	cmpl   $0x24686420,0x2052b6(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
-  40067b:	64 68 24 
-  40067e:	0f 95 c0             	setne  %al
-  400681:	0f b6 c0             	movzbl %al,%eax
-  400684:	59                   	pop    %rcx
-  400685:	c3                   	retq   
-  400686:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  40068d:	00 00 00 
+  400601:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+  400605:	c5 f8 11 05 43 0a 20 	vmovups %xmm0,0x200a43(%rip)        # 601050 <__TestClassdata_buffer>
+  40060c:	00 
+  40060d:	48 c7 05 38 0a 20 00 	movq   $0x1,0x200a38(%rip)        # 601050 <__TestClassdata_buffer>
+  400614:	01 00 00 00 
+  400618:	c7 05 42 0a 20 00 00 	movl   $0x0,0x200a42(%rip)        # 601064 <__TestClassdata_buffer+0x14>
+  40061f:	00 00 00 
+  400622:	c7 05 38 0a 20 00 77 	movl   $0x7777,0x200a38(%rip)        # 601064 <__TestClassdata_buffer+0x14>
+  400629:	77 00 00 
+  40062c:	c7 05 fe 52 20 00 88 	movl   $0x8888,0x2052fe(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
+  400633:	88 00 00 
+  400636:	69 05 24 0a 20 00 55 	imul   $0x5555,0x200a24(%rip),%eax        # 601064 <__TestClassdata_buffer+0x14>
+  40063d:	55 00 00 
+  400640:	89 05 1e 0a 20 00    	mov    %eax,0x200a1e(%rip)        # 601064 <__TestClassdata_buffer+0x14>
+  400646:	69 15 e4 52 20 00 44 	imul   $0x4444,0x2052e4(%rip),%edx        # 605934 <__TestClassdata_buffer+0x48e4>
+  40064d:	44 00 00 
+  400650:	89 15 de 52 20 00    	mov    %edx,0x2052de(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
+  400656:	8b 35 08 0a 20 00    	mov    0x200a08(%rip),%esi        # 601064 <__TestClassdata_buffer+0x14>
+  40065c:	bf e4 07 40 00       	mov    $0x4007e4,%edi
+  400661:	31 c0                	xor    %eax,%eax
+  400663:	e8 58 fe ff ff       	callq  4004c0 <printf@plt>
+  400668:	b0 01                	mov    $0x1,%al
+  40066a:	81 3d f0 09 20 00 83 	cmpl   $0x27d22d83,0x2009f0(%rip)        # 601064 <__TestClassdata_buffer+0x14>
+  400671:	2d d2 27 
+  400674:	75 0d                	jne    400683 <main+0x83>
+  400676:	81 3d b4 52 20 00 20 	cmpl   $0x24686420,0x2052b4(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
+  40067d:	64 68 24 
+  400680:	0f 95 c0             	setne  %al
+  400683:	0f b6 c0             	movzbl %al,%eax
+  400686:	59                   	pop    %rcx
+  400687:	c3                   	retq   
+  400688:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  40068f:	00 
 
 0000000000400690 <_Z12new_instancev>:
   400690:	48 8b 0d b9 09 20 00 	mov    0x2009b9(%rip),%rcx        # 601050 <__TestClassdata_buffer>

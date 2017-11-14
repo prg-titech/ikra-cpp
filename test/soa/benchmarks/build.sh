@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo "Script will stop on error or incorrect result."
-
+extra_args="-march=native -fomit-frame-pointer"
 mkdir -p bin
 mkdir -p assembly
 
@@ -14,7 +14,7 @@ do
       for v_addr_mode in "0" "4"
       do
         out_name="${v_compiler}_${v_opt_mode}_${v_storage}_${v_addr_mode}"
-        ${v_compiler} -std=c++11 ${v_opt_mode} \
+        ${v_compiler} -std=c++11 ${v_opt_mode} ${extra_args} \
             -DSTORAGE_STRATEGY=${v_storage} \
             -DADDRESS_MODE=${v_addr_mode} \
             codegen_test.cc \
@@ -40,32 +40,38 @@ bin/cuda_codegen_test
     > assembly/cuda_codegen_test.S
 
 
+extra_args="-march=native -fomit-frame-pointer -Ofast"
 for v_compiler in "g++" "clang++-3.8"
 do
   # Build nbody
   out_name="${v_compiler}_nbody_ikracpp"
-  ${v_compiler} -O3 nbody/ikracpp.cc -std=c++11 -I../../../ikra \
+  ${v_compiler} -O3 ${extra_args} nbody/ikracpp.cc -std=c++11 -I../../../ikra \
       -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
 
   out_name="${v_compiler}_nbody_ikracpp_field"
-  ${v_compiler} -O3 nbody/ikracpp_field.cc -std=c++11 -I../../../ikra \
+  ${v_compiler} -O3 ${extra_args} nbody/ikracpp_field.cc -std=c++11 -I../../../ikra \
       -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
 
   out_name="${v_compiler}_nbody_ikracpp_inversed"
-  ${v_compiler} -O3 nbody/ikracpp_inversed.cc -std=c++11 -I../../../ikra \
+  ${v_compiler} -O3 ${extra_args} nbody/ikracpp_inversed.cc -std=c++11 -I../../../ikra \
       -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
 
   # No vectorization with: -fno-tree-vectorize
   out_name="${v_compiler}_nbody_soa"
-  ${v_compiler} -O3 nbody/soa.cc -std=c++11 -o bin/${out_name}
+  ${v_compiler} -O3 ${extra_args} nbody/soa.cc -std=c++11 -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
 
   out_name="${v_compiler}_nbody_aos"
-  ${v_compiler} -O3 nbody/aos.cc -std=c++11 -o bin/${out_name}
+  ${v_compiler} -O3 ${extra_args} nbody/aos.cc -std=c++11 -o bin/${out_name}
   objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
 done
 
 /usr/local/cuda/bin/nvcc \
@@ -77,6 +83,7 @@ done
     nbody/ikracpp_inversed_gpu.cu
 /usr/local/cuda/bin/cuobjdump bin/cuda_nbody_ikracpp_inversed_gpu \
     -ptx -sass -res-usage > assembly/cuda_nbody_ikracpp_inversed_gpu.S
+echo -n "."
 
 /usr/local/cuda/bin/nvcc \
     -std=c++14 \
@@ -87,3 +94,4 @@ done
     nbody/soa_inversed.cu
 /usr/local/cuda/bin/cuobjdump bin/cuda_nbody_soa_inversed_gpu \
     -ptx -sass -res-usage > assembly/cuda_nbody_soa_inversed_gpu.S
+echo "."
