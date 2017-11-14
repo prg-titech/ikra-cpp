@@ -2,10 +2,12 @@
 set -e
 echo "Script will stop on error or incorrect result."
 extra_args="-march=native -fomit-frame-pointer"
+clang_bin="clang++-3.8"
+
 mkdir -p bin
 mkdir -p assembly
 
-for v_compiler in "g++" "clang++-3.8"
+for v_compiler in "g++" "${clang_bin}"
 do
   for v_storage in "StaticStorage" "DynamicStorage"
   do
@@ -41,7 +43,7 @@ bin/cuda_codegen_test
 
 
 extra_args="-march=native -fomit-frame-pointer -Ofast"
-for v_compiler in "g++" "clang++-3.8"
+for v_compiler in "g++" "${clang_bin}"
 do
   # Build nbody
   out_name="${v_compiler}_nbody_ikracpp"
