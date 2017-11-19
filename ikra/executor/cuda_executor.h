@@ -1,6 +1,11 @@
 #ifndef EXECUTOR_CUDA_EXECUTOR_H
 #define EXECUTOR_CUDA_EXECUTOR_H
 
+#if __cplusplus < 201402L
+  // Use CUDA Toolkit 9.0 or higher.
+  #error GPU support requires at least a C++14 compliant compiler.
+#endif
+
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
 #include <functional>
