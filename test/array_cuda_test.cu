@@ -44,7 +44,7 @@ void run_test_set_from_host_and_read() {
   gpuErrchk(cudaPeekAtLastError());
 
   TestClass* first = TestClass::get(0);
-  cuda_execute(TestClass, add_fields, kTestSize, first);
+  cuda_execute(&TestClass::add_fields, first, kTestSize);
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {

@@ -10,6 +10,7 @@
 #include <cassert>
 #include <functional>
 
+#include "executor/util.h"
 #include "soa/constants.h"
 #include "soa/cuda.h"
 
@@ -70,7 +71,7 @@ T* construct(size_t count, Args... args) {
 
 // Calls a device lambda function with an arbitrary number of arguments.
 template<typename F, typename... Args>
-__global__ void kernel_call_lambda(F func, IndexType num_jobs, Args... args) {
+__global__ void kernel_call_lambda(F func, Args... args) {
   func(args...);
 }
 
@@ -89,35 +90,51 @@ IndexType cuda_threads_1d(IndexType length) {
   return length < 256 ? length : 256;
 }
 
-// This macro expands to a series of statements that execute a given method
-// of a given class on a given range of objects. This is done by constructing
-// a device lambda that calls the method. A more elegant solution would pass
-// a member function pointer to a CUDA kernel that is parameterized by the
-// member function type. However, this is unsupported by nvcc and results in
-// strange compile errors in the nvcc-generated code.
-#define cuda_execute(class_name, method_name, length, ...) \
-  [&] { \
-    /* TODO: Determine good configuration. */ \
-    uintptr_t num_jobs = length; \
-    uintptr_t num_blocks = ikra::executor::cuda::cuda_blocks_1d(num_jobs); \
-    uintptr_t num_threads = ikra::executor::cuda::cuda_threads_1d(num_jobs); \
-    ikra::executor::cuda::kernel_call_lambda<<<num_blocks, num_threads>>>( \
-        [num_jobs] __device__ (auto* base, auto... args) { \
-            /* TODO: Assuming zero addressing mode. */ \
-            static_assert(class_name::kAddressMode \
-                == ikra::soa::kAddressModeZero, \
-                "Not implemented: Valid addressing mode."); \
-            int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-            if (tid < num_jobs) \
-            return class_name::get(base->id() + tid)->method_name(args...); \
-        }, num_jobs, __VA_ARGS__); \
-    cudaDeviceSynchronize(); \
-    assert(cudaPeekAtLastError() == cudaSuccess); \
-  } ()
+// Proxy idea based on:
+// https://stackoverflow.com/questions/9779105/
+// generic-member-function-pointer-as-a-template-parameter
+// This struct is used to extract the class name, return type and argument
+// types from member function that is passed as a template argument.
+template<typename T, T> struct ExecuteKernelProxy;
+
+template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
+struct ExecuteKernelProxy<R (T::*)(Args...), func>
+{
+  // Invoke a CUDA kernel. Note: The function "func" is a compile-time template
+  // parameter. This is crucial since taking the address of a device function
+  // is forbidden in host code when used as an expression.
+  static void call(T* first, IndexType num_objects, Args... args)
+  {
+    static_assert(T::kAddressMode == ikra::soa::kAddressModeZero,
+                  "Not implemented: Valid addressing mode.");
+
+    IndexType num_blocks = cuda_blocks_1d(num_objects);
+    IndexType num_threads = cuda_threads_1d(num_objects);
+
+    auto invoke_function = [] __device__ (T* first, IndexType num_objects,
+                                          Args... args) {
+      int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      if (tid < num_objects) {
+        auto* object = T::get(first->id() + tid);
+        return (object->*func)(args...);
+      }
+    };
+    
+    kernel_call_lambda<<<num_blocks, num_threads>>>(
+        invoke_function, first, num_objects, args...);
+    cudaDeviceSynchronize();
+    gpuErrchk(cudaPeekAtLastError());
+  }
+};
+
+#define cuda_execute(func, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
+      ::call(__VA_ARGS__)
 
 #define IKRA_ALL_BUT_FIRST(first, ...) __VA_ARGS__
 
 // TODO: Reduce in parallel.
+// TODO: Rewrite with proxy.
 #define cuda_execute_and_reduce(class_name, method_name, \
                                 reduce_function, length, ...) \
   /* TODO: Support length > 1024 */ \

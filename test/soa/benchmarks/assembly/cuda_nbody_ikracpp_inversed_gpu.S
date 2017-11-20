@@ -24,18 +24,18 @@ compile_size = 64bit
 Resource usage:
  Common:
   GLOBAL:448096
- Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_:
-  REG:34 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:352 CONSTANT[2]:36 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_:
-  REG:27 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:352 CONSTANT[2]:36 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_:
-  REG:42 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:344 CONSTANT[2]:64 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_:
-  REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:344 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0_:
   REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
   REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_:
+  REG:34 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:352 CONSTANT[2]:36 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_:
+  REG:27 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:352 CONSTANT[2]:36 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_:
+  REG:42 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:344 CONSTANT[2]:64 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_:
+  REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:344 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _Z22codengen_simple_updateP4Bodyd:
   REG:34 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 CONSTANT[2]:36 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _Z18codegen_reset_massP4Body:
@@ -52,21 +52,63 @@ Resource usage:
   REG:6 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
 
 	code for sm_30
-		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_
+		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0_
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                                  /* 0x22e28042e2c2c307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];                          /* 0x2800400110005de4 */
+        /*0010*/                   ISUB RZ.CC, c[0x0][0x140], RZ;                 /* 0x4801400503ffde03 */
+        /*0018*/                   ISETP.EQ.X.AND P0, PT, RZ, c[0x0][0x144], PT;  /* 0x190e400513f1dc63 */
+        /*0020*/               @P0 EXIT;                                          /* 0x80000000000001e7 */
+        /*0028*/                   MOV R2, c[0x0][0x140];                         /* 0x2800400500009de4 */
+        /*0030*/                   MOV R3, c[0x0][0x144];                         /* 0x280040051000dde4 */
+        /*0038*/                   ST.E.64 [R2], RZ;                              /* 0x94000000002fdca5 */
+                                                                                  /* 0x200000000002f047 */
+        /*0048*/                   ST.E.64 [R2+0x8], RZ;                          /* 0x94000000202fdca5 */
+        /*0050*/                   EXIT;                                          /* 0x8000000000001de7 */
+        /*0058*/                   BRA 0x58;                                      /* 0x4003ffffe0001de7 */
+        /*0060*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0068*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0070*/                   NOP;                                           /* 0x4000000000001de4 */
+        /*0078*/                   NOP;                                           /* 0x4000000000001de4 */
+		.....................................................................................................
+
+
+		Function : _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                   /* 0x22c3f20042804307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];           /* 0x2800400110005de4 */
+        /*0010*/                   MOV R2, c[0x0][0x140];          /* 0x2800400500009de4 */
+        /*0018*/                   MOV R3, c[0x0][0x144];          /* 0x280040051000dde4 */
+        /*0020*/                   LD.E.64 R4, [R2];               /* 0x8400000000211ca5 */
+        /*0028*/                   MOV32I R8, 0x0;                 /* 0x1800000000021de2 */
+        /*0030*/                   MOV32I R9, 0x0;                 /* 0x1800000000025de2 */
+        /*0038*/                   IADD R6.CC, R4, c[0x0][0x148];  /* 0x4801400520419c03 */
+                                                                   /* 0x20000002f042e287 */
+        /*0048*/                   IADD.X R7, R5, c[0x0][0x14c];   /* 0x480040053051dc43 */
+        /*0050*/                   ST.E.64 [R2], R6;               /* 0x9400000000219ca5 */
+        /*0058*/                   ST.E.64 [R8], R4;               /* 0x9400000000811ca5 */
+        /*0060*/                   EXIT;                           /* 0x8000000000001de7 */
+        /*0068*/                   BRA 0x68;                       /* 0x4003ffffe0001de7 */
+        /*0070*/                   NOP;                            /* 0x4000000000001de4 */
+        /*0078*/                   NOP;                            /* 0x4000000000001de4 */
+		..................................................................................
+
+
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
                                                                                               /* 0x22c2b202828232b7 */
         /*0008*/                   MOV R1, c[0x0][0x44];                                      /* 0x2800400110005de4 */
-        /*0010*/                   S2R R0, SR_CTAID.X;                                        /* 0x2c00000094001c04 */
-        /*0018*/                   S2R R3, SR_TID.X;                                          /* 0x2c0000008400dc04 */
-        /*0020*/                   IMAD R0, R0, c[0x0][0x28], R3;                             /* 0x20064000a0001ca3 */
-        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x140];                             /* 0x48014005000fdd03 */
+        /*0010*/                   S2R R0, SR_TID.X;                                          /* 0x2c00000084001c04 */
+        /*0018*/                   S2R R3, SR_CTAID.X;                                        /* 0x2c0000009400dc04 */
+        /*0020*/                   IMAD R0, R3, c[0x0][0x28], R0;                             /* 0x20004000a0301ca3 */
+        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x150];                             /* 0x48014005400fdd03 */
         /*0030*/                   SHR R2, R0, 0x1f;                                          /* 0x5800c0007c009c23 */
-        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x144], PT;          /* 0x1b0e40051021dc43 */
+        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x154], PT;          /* 0x1b0e40055021dc43 */
                                                                                               /* 0x2200423042c042e7 */
         /*0048*/               @P0 EXIT;                                                      /* 0x80000000000001e7 */
-        /*0050*/                   IADD R4.CC, R0, c[0x0][0x150];                             /* 0x4801400540011c03 */
+        /*0050*/                   IADD R4.CC, R0, c[0x0][0x148];                             /* 0x4801400520011c03 */
         /*0058*/                   MOV32I R0, 0x3;                                            /* 0x180000000c001de2 */
-        /*0060*/                   IADD.X R2, R2, c[0x0][0x154];                              /* 0x4800400550209c43 */
+        /*0060*/                   IADD.X R2, R2, c[0x0][0x14c];                              /* 0x4800400530209c43 */
         /*0068*/                   SHL R3, R4, -0x1d;                                         /* 0x6000ffff8c40dc03 */
         /*0070*/                   IADD32I RZ.CC, R0, -0x20;                                  /* 0x0fffffff800fdc02 */
         /*0078*/                   SHR.U32 R5, R4, 0x1d;                                      /* 0x5800c00074415c03 */
@@ -486,24 +528,24 @@ Resource usage:
         /*0d68*/                   RET;                                                       /* 0x9000000000001de7 */
         /*0d70*/                   BRA 0xd70;                                                 /* 0x4003ffffe0001de7 */
         /*0d78*/                   NOP;                                                       /* 0x4000000000001de4 */
-		.................................................................................................................
+		........................................................................................................................................................................
 
 
-		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
                                                                                                /* 0x22c2b202828232b7 */
         /*0008*/                   MOV R1, c[0x0][0x44];                                       /* 0x2800400110005de4 */
-        /*0010*/                   S2R R0, SR_CTAID.X;                                         /* 0x2c00000094001c04 */
-        /*0018*/                   S2R R3, SR_TID.X;                                           /* 0x2c0000008400dc04 */
-        /*0020*/                   IMAD R0, R0, c[0x0][0x28], R3;                              /* 0x20064000a0001ca3 */
-        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x140];                              /* 0x48014005000fdd03 */
+        /*0010*/                   S2R R0, SR_TID.X;                                           /* 0x2c00000084001c04 */
+        /*0018*/                   S2R R3, SR_CTAID.X;                                         /* 0x2c0000009400dc04 */
+        /*0020*/                   IMAD R0, R3, c[0x0][0x28], R0;                              /* 0x20004000a0301ca3 */
+        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x150];                              /* 0x48014005400fdd03 */
         /*0030*/                   SHR R2, R0, 0x1f;                                           /* 0x5800c0007c009c23 */
-        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x144], PT;           /* 0x1b0e40051021dc43 */
+        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x154], PT;           /* 0x1b0e40055021dc43 */
                                                                                                /* 0x2200420042c042e7 */
         /*0048*/               @P0 EXIT;                                                       /* 0x80000000000001e7 */
-        /*0050*/                   IADD R4.CC, R0, c[0x0][0x150];                              /* 0x4801400540011c03 */
+        /*0050*/                   IADD R4.CC, R0, c[0x0][0x148];                              /* 0x4801400520011c03 */
         /*0058*/                   MOV32I R0, 0x3;                                             /* 0x180000000c001de2 */
-        /*0060*/                   IADD.X R2, R2, c[0x0][0x154];                               /* 0x4800400550209c43 */
+        /*0060*/                   IADD.X R2, R2, c[0x0][0x14c];                               /* 0x4800400530209c43 */
         /*0068*/                   SHL R3, R4, -0x1d;                                          /* 0x6000ffff8c40dc03 */
         /*0070*/                   IADD32I RZ.CC, R0, -0x20;                                   /* 0x0fffffff800fdc02 */
         /*0078*/                   MOV32I R8, 0x1;                                             /* 0x1800000004021de2 */
@@ -691,22 +733,22 @@ Resource usage:
         /*0628*/                   NOP;                                                        /* 0x4000000000001de4 */
         /*0630*/                   NOP;                                                        /* 0x4000000000001de4 */
         /*0638*/                   NOP;                                                        /* 0x4000000000001de4 */
-		......................................................................................................................
+		.......................................................................................................................................................
 
 
-		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
                                                                                                /* 0x22c2b202828232b7 */
         /*0008*/                   MOV R1, c[0x0][0x44];                                       /* 0x2800400110005de4 */
-        /*0010*/                   S2R R16, SR_CTAID.X;                                        /* 0x2c00000094041c04 */
-        /*0018*/                   S2R R3, SR_TID.X;                                           /* 0x2c0000008400dc04 */
-        /*0020*/                   IMAD R16, R16, c[0x0][0x28], R3;                            /* 0x20064000a1041ca3 */
-        /*0028*/                   ISUB RZ.CC, R16, c[0x0][0x140];                             /* 0x48014005010fdd03 */
+        /*0010*/                   S2R R16, SR_TID.X;                                          /* 0x2c00000084041c04 */
+        /*0018*/                   S2R R3, SR_CTAID.X;                                         /* 0x2c0000009400dc04 */
+        /*0020*/                   IMAD R16, R3, c[0x0][0x28], R16;                            /* 0x20204000a0341ca3 */
+        /*0028*/                   ISUB RZ.CC, R16, c[0x0][0x150];                             /* 0x48014005410fdd03 */
         /*0030*/                   SHR R0, R16, 0x1f;                                          /* 0x5800c0007d001c23 */
-        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R0, c[0x0][0x144], PT;           /* 0x1b0e40051001dc43 */
+        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R0, c[0x0][0x154], PT;           /* 0x1b0e40055001dc43 */
                                                                                                /* 0x22004220420042e7 */
         /*0048*/               @P0 EXIT;                                                       /* 0x80000000000001e7 */
-        /*0050*/                   IADD R16.CC, R16, c[0x0][0x150];                            /* 0x4801400541041c03 */
+        /*0050*/                   IADD R16.CC, R16, c[0x0][0x148];                            /* 0x4801400521041c03 */
         /*0058*/                   MOV32I R39, 0x1f40;                                         /* 0x1800007d0009dde2 */
         /*0060*/                   MOV32I R4, 0x0;                                             /* 0x1800000000011de2 */
         /*0068*/                   MOV R40, RZ;                                                /* 0x28000000fc0a1de4 */
@@ -721,10 +763,10 @@ Resource usage:
         /*00b0*/                   MOV32I R12, 0x1;                                            /* 0x1800000004031de2 */
         /*00b8*/                   MOV R38, RZ;                                                /* 0x28000000fc099de4 */
                                                                                                /* 0x22d042c202c042b7 */
-        /*00c8*/                   IADD.X R0, R0, c[0x0][0x154];                               /* 0x4800400550001c43 */
-        /*00d0*/                   IADD RZ.CC, -R12, R16;                                      /* 0x4801000040cfde03 */
+        /*00c8*/                   IADD.X R0, R0, c[0x0][0x14c];                               /* 0x4800400530001c43 */
+        /*00d0*/                   ISUB RZ.CC, R12, R16;                                       /* 0x4801000040cfdd03 */
         /*00d8*/                   SSY 0x560;                                                  /* 0x6000001200001c07 */
-        /*00e0*/                   ISETP.EQ.X.AND P1, PT, R0, R38, PT;                         /* 0x190e00009803dc63 */
+        /*00e0*/                   ISETP.EQ.X.AND P1, PT, R38, R0, PT;                         /* 0x190e00000263dc63 */
         /*00e8*/                   IADD32I R39.CC, R39, -0x4;                                  /* 0x0ffffffff279dc02 */
         /*00f0*/                   IADD32I.X R40, R40, -0x1;                                   /* 0x0bfffffffe8a1c42 */
         /*00f8*/                   IADD RZ.CC, -RZ, R39;                                       /* 0x480100009fffde03 */
@@ -868,9 +910,9 @@ Resource usage:
         /*0548*/                   CAL 0x12e8;                                                 /* 0x5000003660011c07 */
         /*0550*/                   DADD.S R28, R28, R10;                                       /* 0x4800000029c71c11 */
         /*0558*/                   ST.E.64.S [R2+0x5dc10], R28;                                /* 0x9400177040271cb5 */
-        /*0560*/                   IADD RZ.CC, -R13, R16;                                      /* 0x4801000040dfde03 */
+        /*0560*/                   ISUB RZ.CC, R13, R16;                                       /* 0x4801000040dfdd03 */
         /*0568*/                   SSY 0x9b8;                                                  /* 0x6000001120001c07 */
-        /*0570*/                   ISETP.EQ.X.AND P1, PT, R0, R37, PT;                         /* 0x190e00009403dc63 */
+        /*0570*/                   ISETP.EQ.X.AND P1, PT, R37, R0, PT;                         /* 0x190e00000253dc63 */
         /*0578*/               @P1 NOP.S;                                                      /* 0x40000000000005f4 */
                                                                                                /* 0x22b2004270420047 */
         /*0588*/                   MOV32I R2, 0x3;                                             /* 0x180000000c009de2 */
@@ -1007,9 +1049,9 @@ Resource usage:
         /*09a0*/                   CAL 0x12e8;                                                 /* 0x5000002500011c07 */
         /*09a8*/                   DADD.S R28, R28, R10;                                       /* 0x4800000029c71c11 */
         /*09b0*/                   ST.E.64.S [R2+0x5dc10], R28;                                /* 0x9400177040271cb5 */
-        /*09b8*/                   IADD RZ.CC, -R14, R16;                                      /* 0x4801000040efde03 */
+        /*09b8*/                   ISUB RZ.CC, R14, R16;                                       /* 0x4801000040efdd03 */
                                                                                                /* 0x2270420042b2c047 */
-        /*09c8*/                   ISETP.EQ.X.AND P1, PT, R0, R36, PT;                         /* 0x190e00009003dc63 */
+        /*09c8*/                   ISETP.EQ.X.AND P1, PT, R36, R0, PT;                         /* 0x190e00000243dc63 */
         /*09d0*/                   SSY 0xe18;                                                  /* 0x6000001100001c07 */
         /*09d8*/               @P1 NOP.S;                                                      /* 0x40000000000005f4 */
         /*09e0*/                   MOV32I R2, 0x3;                                             /* 0x180000000c009de2 */
@@ -1147,9 +1189,9 @@ Resource usage:
                                                                                                /* 0x2202b2c2c042b2b7 */
         /*0e08*/                   DADD.S R28, R28, R10;                                       /* 0x4800000029c71c11 */
         /*0e10*/                   ST.E.64.S [R2+0x5dc10], R28;                                /* 0x9400177040271cb5 */
-        /*0e18*/                   IADD RZ.CC, -R15, R16;                                      /* 0x4801000040ffde03 */
+        /*0e18*/                   ISUB RZ.CC, R15, R16;                                       /* 0x4801000040ffdd03 */
         /*0e20*/                   SSY 0x1278;                                                 /* 0x6000001140001c07 */
-        /*0e28*/                   ISETP.EQ.X.AND P1, PT, R0, R35, PT;                         /* 0x190e00008c03dc63 */
+        /*0e28*/                   ISETP.EQ.X.AND P1, PT, R35, R0, PT;                         /* 0x190e00000233dc63 */
         /*0e30*/               @P1 NOP.S;                                                      /* 0x40000000000005f4 */
         /*0e38*/                   MOV32I R2, 0x3;                                             /* 0x180000000c009de2 */
                                                                                                /* 0x2232b04200427047 */
@@ -1464,24 +1506,24 @@ Resource usage:
         /*17e8*/                   NOP;                                                        /* 0x4000000000001de4 */
         /*17f0*/                   NOP;                                                        /* 0x4000000000001de4 */
         /*17f8*/                   NOP;                                                        /* 0x4000000000001de4 */
-		.....................................................................................................................
+		.....................................................................................................................................................................
 
 
-		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_
+		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
                                                                                       /* 0x22c2b20282823307 */
         /*0008*/                   MOV R1, c[0x0][0x44];                              /* 0x2800400110005de4 */
-        /*0010*/                   S2R R0, SR_CTAID.X;                                /* 0x2c00000094001c04 */
-        /*0018*/                   S2R R3, SR_TID.X;                                  /* 0x2c0000008400dc04 */
-        /*0020*/                   IMAD R0, R0, c[0x0][0x28], R3;                     /* 0x20064000a0001ca3 */
-        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x140];                     /* 0x48014005000fdd03 */
+        /*0010*/                   S2R R0, SR_TID.X;                                  /* 0x2c00000084001c04 */
+        /*0018*/                   S2R R3, SR_CTAID.X;                                /* 0x2c0000009400dc04 */
+        /*0020*/                   IMAD R0, R3, c[0x0][0x28], R0;                     /* 0x20004000a0301ca3 */
+        /*0028*/                   ISUB RZ.CC, R0, c[0x0][0x150];                     /* 0x48014005400fdd03 */
         /*0030*/                   SHR R2, R0, 0x1f;                                  /* 0x5800c0007c009c23 */
-        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x144], PT;  /* 0x1b0e40051021dc43 */
+        /*0038*/                   ISETP.GE.U32.X.AND P0, PT, R2, c[0x0][0x154], PT;  /* 0x1b0e40055021dc43 */
                                                                                       /* 0x2200423042c042e7 */
         /*0048*/               @P0 EXIT;                                              /* 0x80000000000001e7 */
-        /*0050*/                   IADD R4.CC, R0, c[0x0][0x150];                     /* 0x4801400540011c03 */
+        /*0050*/                   IADD R4.CC, R0, c[0x0][0x148];                     /* 0x4801400520011c03 */
         /*0058*/                   MOV32I R0, 0x3;                                    /* 0x180000000c001de2 */
-        /*0060*/                   IADD.X R2, R2, c[0x0][0x154];                      /* 0x4800400550209c43 */
+        /*0060*/                   IADD.X R2, R2, c[0x0][0x14c];                      /* 0x4800400530209c43 */
         /*0068*/                   SHL R3, R4, -0x1d;                                 /* 0x6000ffff8c40dc03 */
         /*0070*/                   IADD32I RZ.CC, R0, -0x20;                          /* 0x0fffffff800fdc02 */
         /*0078*/                   SHR.U32 R5, R4, 0x1d;                              /* 0x5800c00074415c03 */
@@ -1501,49 +1543,7 @@ Resource usage:
         /*00e8*/                   BRA 0xe8;                                          /* 0x4003ffffe0001de7 */
         /*00f0*/                   NOP;                                               /* 0x4000000000001de4 */
         /*00f8*/                   NOP;                                               /* 0x4000000000001de4 */
-		....................................................................................................................
-
-
-		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0_
-	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                                                  /* 0x22e28042e2c2c307 */
-        /*0008*/                   MOV R1, c[0x0][0x44];                          /* 0x2800400110005de4 */
-        /*0010*/                   ISUB RZ.CC, c[0x0][0x140], RZ;                 /* 0x4801400503ffde03 */
-        /*0018*/                   ISETP.EQ.X.AND P0, PT, RZ, c[0x0][0x144], PT;  /* 0x190e400513f1dc63 */
-        /*0020*/               @P0 EXIT;                                          /* 0x80000000000001e7 */
-        /*0028*/                   MOV R2, c[0x0][0x140];                         /* 0x2800400500009de4 */
-        /*0030*/                   MOV R3, c[0x0][0x144];                         /* 0x280040051000dde4 */
-        /*0038*/                   ST.E.64 [R2], RZ;                              /* 0x94000000002fdca5 */
-                                                                                  /* 0x200000000002f047 */
-        /*0048*/                   ST.E.64 [R2+0x8], RZ;                          /* 0x94000000202fdca5 */
-        /*0050*/                   EXIT;                                          /* 0x8000000000001de7 */
-        /*0058*/                   BRA 0x58;                                      /* 0x4003ffffe0001de7 */
-        /*0060*/                   NOP;                                           /* 0x4000000000001de4 */
-        /*0068*/                   NOP;                                           /* 0x4000000000001de4 */
-        /*0070*/                   NOP;                                           /* 0x4000000000001de4 */
-        /*0078*/                   NOP;                                           /* 0x4000000000001de4 */
-		.....................................................................................................
-
-
-		Function : _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm
-	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                                   /* 0x22c3f20042804307 */
-        /*0008*/                   MOV R1, c[0x0][0x44];           /* 0x2800400110005de4 */
-        /*0010*/                   MOV R2, c[0x0][0x140];          /* 0x2800400500009de4 */
-        /*0018*/                   MOV R3, c[0x0][0x144];          /* 0x280040051000dde4 */
-        /*0020*/                   LD.E.64 R4, [R2];               /* 0x8400000000211ca5 */
-        /*0028*/                   MOV32I R8, 0x0;                 /* 0x1800000000021de2 */
-        /*0030*/                   MOV32I R9, 0x0;                 /* 0x1800000000025de2 */
-        /*0038*/                   IADD R6.CC, R4, c[0x0][0x148];  /* 0x4801400520419c03 */
-                                                                   /* 0x20000002f042e287 */
-        /*0048*/                   IADD.X R7, R5, c[0x0][0x14c];   /* 0x480040053051dc43 */
-        /*0050*/                   ST.E.64 [R2], R6;               /* 0x9400000000219ca5 */
-        /*0058*/                   ST.E.64 [R8], R4;               /* 0x9400000000811ca5 */
-        /*0060*/                   EXIT;                           /* 0x8000000000001de7 */
-        /*0068*/                   BRA 0x68;                       /* 0x4003ffffe0001de7 */
-        /*0070*/                   NOP;                            /* 0x4000000000001de4 */
-        /*0078*/                   NOP;                            /* 0x4000000000001de4 */
-		..................................................................................
+		..........................................................................................................................................................
 
 
 		Function : _Z22codengen_simple_updateP4Bodyd
@@ -2564,9 +2564,9 @@ compressed
 
 
 .global .align 16 .b8 __Bodydata_buffer[448072];
-.global .align 8 .u64 _ZN4ikra3soa23d_previous_storage_sizeE;
 .global .align 8 .u64 _ZN4ikra8executor4cuda14d_storage_sizeE;
 .global .align 8 .u64 _ZN4ikra8executor4cuda19d_storage_data_headE;
+.global .align 8 .u64 _ZN4ikra3soa23d_previous_storage_sizeE;
 
 .visible .entry _Z19codegen_reset_forceP4Body(
 .param .u64 _Z19codegen_reset_forceP4Body_param_0
@@ -2894,51 +2894,10 @@ ret;
 }
 
 
-.visible .entry _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm(
-.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0,
-.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1
-)
-{
-.reg .b64 %rd<6>;
-
-
-ld.param.u64 %rd1, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0];
-ld.param.u64 %rd2, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1];
-cvta.to.global.u64 %rd3, %rd1;
-ld.global.u64 %rd4, [%rd3];
-add.s64 %rd5, %rd4, %rd2;
-st.global.u64 [%rd3], %rd5;
-st.global.u64 [_ZN4ikra3soa23d_previous_storage_sizeE], %rd4;
-ret;
-}
-
-
-.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0_(
-.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0__param_0
-)
-{
-.reg .pred %p<2>;
-.reg .b64 %rd<4>;
-
-
-ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0__param_0];
-setp.eq.s64	%p1, %rd1, 0;
-@%p1 bra BB8_2;
-
-cvta.to.global.u64 %rd2, %rd1;
-mov.u64 %rd3, 0;
-st.global.u64 [%rd2], %rd3;
-st.global.u64 [%rd2+8], %rd3;
-
-BB8_2:
-ret;
-}
-
-
-.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_(
-.param .align 8 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_0[8],
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_1,
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_2
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_(
+.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_0[1],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_1,
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_2
 )
 {
 .reg .pred %p<2>;
@@ -2946,15 +2905,15 @@ ret;
 .reg .b64 %rd<9>;
 
 
-ld.param.u64 %rd3, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_0];
-ld.param.u64 %rd2, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_2];
-mov.u32 %r1, %ntid.x;
-mov.u32 %r2, %ctaid.x;
-mov.u32 %r3, %tid.x;
-mad.lo.s32 %r4, %r1, %r2, %r3;
+ld.param.u64 %rd2, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_1];
+ld.param.u64 %rd3, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_11reset_forceEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_2];
+mov.u32 %r1, %tid.x;
+mov.u32 %r2, %ntid.x;
+mov.u32 %r3, %ctaid.x;
+mad.lo.s32 %r4, %r2, %r3, %r1;
 cvt.s64.s32	%rd1, %r4;
 setp.ge.u64	%p1, %rd1, %rd3;
-@%p1 bra BB9_2;
+@%p1 bra BB7_2;
 
 add.s64 %rd4, %rd1, %rd2;
 shl.b64 %rd5, %rd4, 3;
@@ -2964,15 +2923,15 @@ mov.u64 %rd8, 0;
 st.global.u64 [%rd7+320016], %rd8;
 st.global.u64 [%rd7+384016], %rd8;
 
-BB9_2:
+BB7_2:
 ret;
 }
 
 
-.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7_(
-.param .align 8 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_0[8],
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_1,
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_2
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0_(
+.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_0[1],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_1,
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_2
 )
 {
 .reg .pred %p<7>;
@@ -2981,15 +2940,15 @@ ret;
 .reg .b64 %rd<61>;
 
 
-ld.param.u64 %rd16, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_0];
-ld.param.u64 %rd15, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE0_clEvEUlPT_DpT0_E_JP4BodyEEEvS4_mS7__param_2];
-mov.u32 %r1, %ntid.x;
-mov.u32 %r2, %ctaid.x;
-mov.u32 %r3, %tid.x;
-mad.lo.s32 %r4, %r1, %r2, %r3;
+ld.param.u64 %rd15, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_1];
+ld.param.u64 %rd16, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvvEXadL_ZNS4_22add_all_forces_to_thisEvEEE4callEPS4_mEUlS8_mE_JS8_mEEEvT_DpT0__param_2];
+mov.u32 %r1, %tid.x;
+mov.u32 %r2, %ntid.x;
+mov.u32 %r3, %ctaid.x;
+mad.lo.s32 %r4, %r2, %r3, %r1;
 cvt.s64.s32	%rd1, %r4;
 setp.ge.u64	%p1, %rd1, %rd16;
-@%p1 bra BB10_11;
+@%p1 bra BB8_11;
 
 add.s64 %rd2, %rd1, %rd15;
 mov.u64 %rd60, 8000;
@@ -2999,9 +2958,9 @@ mov.u64 %rd57, 3;
 mov.u64 %rd56, 2;
 mov.u64 %rd55, 1;
 
-BB10_2:
-setp.eq.s64	%p2, %rd2, %rd55;
-@%p2 bra BB10_4;
+BB8_2:
+setp.eq.s64	%p2, %rd55, %rd2;
+@%p2 bra BB8_4;
 
 shl.b64 %rd23, %rd55, 3;
 mov.u64 %rd24, __Bodydata_buffer;
@@ -3035,9 +2994,9 @@ div.rn.f64 %fd22, %fd21, %fd9;
 add.f64 %fd23, %fd22, %fd20;
 st.global.f64 [%rd30+384000], %fd23;
 
-BB10_4:
-setp.eq.s64	%p3, %rd2, %rd56;
-@%p3 bra BB10_6;
+BB8_4:
+setp.eq.s64	%p3, %rd56, %rd2;
+@%p3 bra BB8_6;
 
 shl.b64 %rd31, %rd56, 3;
 mov.u64 %rd32, __Bodydata_buffer;
@@ -3071,9 +3030,9 @@ div.rn.f64 %fd45, %fd44, %fd32;
 add.f64 %fd46, %fd45, %fd43;
 st.global.f64 [%rd38+384000], %fd46;
 
-BB10_6:
-setp.eq.s64	%p4, %rd2, %rd57;
-@%p4 bra BB10_8;
+BB8_6:
+setp.eq.s64	%p4, %rd57, %rd2;
+@%p4 bra BB8_8;
 
 shl.b64 %rd39, %rd57, 3;
 mov.u64 %rd40, __Bodydata_buffer;
@@ -3107,9 +3066,9 @@ div.rn.f64 %fd68, %fd67, %fd55;
 add.f64 %fd69, %fd68, %fd66;
 st.global.f64 [%rd46+384000], %fd69;
 
-BB10_8:
-setp.eq.s64	%p5, %rd2, %rd58;
-@%p5 bra BB10_10;
+BB8_8:
+setp.eq.s64	%p5, %rd58, %rd2;
+@%p5 bra BB8_10;
 
 shl.b64 %rd47, %rd58, 3;
 mov.u64 %rd48, __Bodydata_buffer;
@@ -3143,7 +3102,7 @@ div.rn.f64 %fd91, %fd90, %fd78;
 add.f64 %fd92, %fd91, %fd89;
 st.global.f64 [%rd54+384000], %fd92;
 
-BB10_10:
+BB8_10:
 add.s64 %rd60, %rd60, -4;
 add.s64 %rd59, %rd59, 32;
 add.s64 %rd58, %rd58, 4;
@@ -3151,18 +3110,18 @@ add.s64 %rd57, %rd57, 4;
 add.s64 %rd56, %rd56, 4;
 add.s64 %rd55, %rd55, 4;
 setp.ne.s64	%p6, %rd60, 0;
-@%p6 bra BB10_2;
+@%p6 bra BB8_2;
 
-BB10_11:
+BB8_11:
 ret;
 }
 
 
-.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_(
-.param .align 8 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_0[8],
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_1,
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_2,
-.param .f64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_3
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_(
+.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_0[1],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_1,
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_2,
+.param .f64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_3
 )
 {
 .reg .pred %p<8>;
@@ -3171,16 +3130,16 @@ ret;
 .reg .b64 %rd<10>;
 
 
-ld.param.u64 %rd5, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_0];
-ld.param.u64 %rd4, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_2];
-ld.param.f64 %fd4, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ14run_simulationvENKUlvE1_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_3];
-mov.u32 %r1, %ntid.x;
-mov.u32 %r2, %ctaid.x;
-mov.u32 %r3, %tid.x;
-mad.lo.s32 %r4, %r1, %r2, %r3;
+ld.param.u64 %rd4, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_1];
+ld.param.u64 %rd5, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_2];
+ld.param.f64 %fd4, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_6updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_3];
+mov.u32 %r1, %tid.x;
+mov.u32 %r2, %ntid.x;
+mov.u32 %r3, %ctaid.x;
+mad.lo.s32 %r4, %r2, %r3, %r1;
 cvt.s64.s32	%rd1, %r4;
 setp.ge.u64	%p1, %rd1, %rd5;
-@%p1 bra BB11_5;
+@%p1 bra BB9_5;
 
 add.s64 %rd6, %rd1, %rd4;
 shl.b64 %rd7, %rd6, 3;
@@ -3211,37 +3170,37 @@ st.global.f64 [%rd9+128016], %fd24;
 setp.lt.f64	%p2, %fd16, 0dBFF0000000000000;
 setp.gt.f64	%p3, %fd16, 0d3FF0000000000000;
 or.pred %p4, %p2, %p3;
-@!%p4 bra BB11_3;
-bra.uni BB11_2;
+@!%p4 bra BB9_3;
+bra.uni BB9_2;
 
-BB11_2:
+BB9_2:
 ld.global.f64 %fd20, [%rd2];
 neg.f64 %fd21, %fd20;
 st.global.f64 [%rd2], %fd21;
 ld.global.f64 %fd24, [%rd3+64000];
 
-BB11_3:
+BB9_3:
 setp.gt.f64	%p5, %fd24, 0d3FF0000000000000;
 setp.lt.f64	%p6, %fd24, 0dBFF0000000000000;
 or.pred %p7, %p6, %p5;
-@!%p7 bra BB11_5;
-bra.uni BB11_4;
+@!%p7 bra BB9_5;
+bra.uni BB9_4;
 
-BB11_4:
+BB9_4:
 ld.global.f64 %fd22, [%rd2+64000];
 neg.f64 %fd23, %fd22;
 st.global.f64 [%rd2+64000], %fd23;
 
-BB11_5:
+BB9_5:
 ret;
 }
 
 
-.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7_(
-.param .align 8 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_0[8],
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_1,
-.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_2,
-.param .f64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_3
+.visible .entry _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0_(
+.param .align 1 .b8 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_0[1],
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_1,
+.param .u64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_2,
+.param .f64 _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_3
 )
 {
 .reg .pred %p<3>;
@@ -3250,16 +3209,16 @@ ret;
 .reg .b64 %rd<12>;
 
 
-ld.param.u64 %rd7, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_0];
-ld.param.u64 %rd6, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_2];
-ld.param.f64 %fd1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ10run_simplevENKUlvE_clEvEUlPT_DpT0_E_JP4BodydEEEvS4_mS7__param_3];
-mov.u32 %r3, %ntid.x;
-mov.u32 %r4, %ctaid.x;
-mov.u32 %r5, %tid.x;
-mad.lo.s32 %r6, %r3, %r4, %r5;
+ld.param.u64 %rd6, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_1];
+ld.param.u64 %rd7, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_2];
+ld.param.f64 %fd1, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM4BodyFvdEXadL_ZNS4_22codengen_simple_updateEdEEE4callEPS4_mdEUlS8_mdE_JS8_mdEEEvT_DpT0__param_3];
+mov.u32 %r3, %tid.x;
+mov.u32 %r4, %ntid.x;
+mov.u32 %r5, %ctaid.x;
+mad.lo.s32 %r6, %r4, %r5, %r3;
 cvt.s64.s32	%rd1, %r6;
 setp.ge.u64	%p1, %rd1, %rd7;
-@%p1 bra BB12_3;
+@%p1 bra BB10_3;
 
 add.s64 %rd8, %rd1, %rd6;
 shl.b64 %rd9, %rd8, 3;
@@ -3271,7 +3230,7 @@ add.s64 %rd4, %rd11, 192016;
 add.s64 %rd5, %rd11, 64016;
 mov.u32 %r8, -1000;
 
-BB12_2:
+BB10_2:
 ld.global.f64 %fd2, [%rd2];
 mul.f64 %fd3, %fd2, %fd1;
 ld.global.f64 %fd4, [%rd3];
@@ -3379,9 +3338,50 @@ fma.rn.f64 %fd86, %fd85, %fd1, %fd84;
 st.global.f64 [%rd5+64000], %fd86;
 add.s32 %r8, %r8, 5;
 setp.ne.s32	%p2, %r8, 0;
-@%p2 bra BB12_2;
+@%p2 bra BB10_2;
 
-BB12_3:
+BB10_3:
+ret;
+}
+
+
+.visible .entry _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm(
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0,
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1
+)
+{
+.reg .b64 %rd<6>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0];
+ld.param.u64 %rd2, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1];
+cvta.to.global.u64 %rd3, %rd1;
+ld.global.u64 %rd4, [%rd3];
+add.s64 %rd5, %rd4, %rd2;
+st.global.u64 [%rd3], %rd5;
+st.global.u64 [_ZN4ikra3soa23d_previous_storage_sizeE], %rd4;
+ret;
+}
+
+
+.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0_(
+.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0__param_0
+)
+{
+.reg .pred %p<2>;
+.reg .b64 %rd<4>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I4BodyLm0EEEJEEEvPT_DpT0__param_0];
+setp.eq.s64	%p1, %rd1, 0;
+@%p1 bra BB12_2;
+
+cvta.to.global.u64 %rd2, %rd1;
+mov.u64 %rd3, 0;
+st.global.u64 [%rd2], %rd3;
+st.global.u64 [%rd2+8], %rd3;
+
+BB12_2:
 ret;
 }
 
