@@ -185,6 +185,11 @@ class DynamicStorage_
     return data_;
   }
 
+  // Note: Returning as reference not supported in dynamic storage.
+  __ikra_device__ char* data_reference() {
+    return reinterpret_cast<char*>(data_ptr());
+  }
+
   static const bool kIsStaticStorage = false;
 
  private:
@@ -248,6 +253,14 @@ class StaticStorage_
   // Statically allocated data storage for SOA columns.
   // Add one because first object has ID 0.
   char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
+
+ public:
+  // Returning the storage buffer data array as reference retains the
+  // (type) information that the storage is allocated in global device memory.
+  // (When running in device mode.)
+  __ikra_device__ auto data_reference() -> decltype(data_)& {
+    return data_;
+  }
 };
 
 // The following structs are public API types for storage strategies.

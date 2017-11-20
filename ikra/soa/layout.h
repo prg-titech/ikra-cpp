@@ -8,6 +8,7 @@
 #include "soa/field.h"
 #include "soa/inlined_dynamic_array_field.h"
 #include "soa/storage.h"
+#include "soa/util.h"
 
 namespace ikra {
 namespace soa {
@@ -43,6 +44,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
   using Storage = typename StorageStrategy::template type<Self>;
   const static IndexType kCapacity = Capacity;
   const static bool kIsSoaClass = true;
+
+  // Check if the compiler supports this address mode.
+  static_assert(
+      sizeof(AddressingModeCompilerCheck<AddressMode>) == AddressMode,
+      "Selected addressing mode not supported by compiler.");
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
@@ -222,10 +228,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A != kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDACC__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == AddressMode,
                   "SOA class must have only SOA fields.");
-#endif  // __CUDACC__
   }
 
   // Compile-time check for the size of this class. This check should fail

@@ -169,8 +169,8 @@ class SoaArrayField_ {
     assert(this->id() < Owner::storage().size());
 
     auto p_this = reinterpret_cast<uintptr_t>(this);
-    auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+    auto p_base = Owner::storage().data_reference();
+    auto p_result = (p_base + p_this - p_base - A)/A*sizeof(T) +
                     Capacity*(Offset + Pos*sizeof(T));
     return reinterpret_cast<T*>(p_result);
   }
@@ -198,10 +198,10 @@ class SoaArrayField_ {
 #endif  // __CUDACC__
     {
       // Cannot constant fold dynamically allocated storage.
-      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+      auto p_base = Owner::storage().data_reference();
       return reinterpret_cast<T*>(
-          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-          p_base + Capacity*(Offset + Pos*sizeof(T)));
+          p_base + Capacity*(Offset + Pos*sizeof(T)) +
+          reinterpret_cast<uintptr_t>(this)*sizeof(T));
     }
   }
 
@@ -214,7 +214,8 @@ class SoaArrayField_ {
 
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-    auto p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
+    auto p_base_ref = Owner::storage().data_reference();
+    auto p_result = p_base_ref + (p_this - p_base - A)/A*sizeof(T) +
                     Capacity*(Offset + pos*sizeof(T));
     return reinterpret_cast<T*>(p_result);
   }
@@ -241,10 +242,10 @@ class SoaArrayField_ {
 #endif  // __CUDACC__
     {
       // Cannot constant fold dynamically allocated storage.
-      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+      auto p_base = Owner::storage().data_reference();
       return reinterpret_cast<T*>(
-          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-          p_base + Capacity*(Offset + pos*sizeof(T)));
+          p_base + Capacity*(Offset + pos*sizeof(T)) +
+          reinterpret_cast<uintptr_t>(this)*sizeof(T));
     }
   }
 
