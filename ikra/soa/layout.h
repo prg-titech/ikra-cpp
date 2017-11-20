@@ -108,10 +108,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Create multiple new instances of this class. Data will be allocated inside
   // storage.data.
-  __ikra_device__ void* operator new[](size_t count) {
-    check_sizeof_class();
-    // "count" is the number of new instances.
-    return get_uninitialized(Self::storage().increase_size(count/AddressMode));
+  __ikra_device__ void* operator new[](size_t /*count*/) {
+    // check_sizeof_class();
+    // "count" is the number of bytes.
+    // return get_uninitialized(Self::storage().increase_size(count/AddressMode));
+    assert(false);    // TODO: Implement.
   }
 
   // Return the number of instances of this class.

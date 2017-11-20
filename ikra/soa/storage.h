@@ -189,7 +189,7 @@ class DynamicStorage_
 
  private:
   template<typename StorageClass>
-  friend class StorageDataOffset;
+  friend struct StorageDataOffset;
 
   // The base pointer (start) of the arena.
   void* arena_base_;
@@ -237,7 +237,7 @@ class StaticStorage_
 
  private:
   template<typename StorageClass>
-  friend class StorageDataOffset;
+  friend struct StorageDataOffset;
 
   // Statically allocated data storage for the arena.
   char arena_base_[ArenaSize];
