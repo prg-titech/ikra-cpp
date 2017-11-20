@@ -63,10 +63,10 @@
 #endif  // __CUDACC__
     {
       // Cannot constant fold dynamically allocated storage.
-      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
+      auto p_base = Owner::storage().data_reference();
       return reinterpret_cast<T*>(
-          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-          p_base + Capacity*Offset);
+          p_base + Capacity*Offset +
+          reinterpret_cast<uintptr_t>(this)*sizeof(T));
     }
   }
 

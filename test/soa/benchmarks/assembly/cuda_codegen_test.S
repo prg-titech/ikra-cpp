@@ -417,16 +417,15 @@ compressed
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<6>;
+.reg .b64 %rd<5>;
 
 
 ld.param.u64 %rd1, [_Z12write_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-cvta.global.u64 %rd4, %rd3;
-add.s64 %rd5, %rd4, %rd2;
+add.s64 %rd4, %rd3, %rd2;
 mov.u32 %r1, 30583;
-st.u32 [%rd5+16], %r1;
+st.global.u32 [%rd4+16], %r1;
 ret;
 }
 
@@ -436,15 +435,14 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<6>;
+.reg .b64 %rd<5>;
 
 
 ld.param.u64 %rd1, [_Z11read_field0P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-cvta.global.u64 %rd4, %rd3;
-add.s64 %rd5, %rd4, %rd2;
-ld.u32 %r1, [%rd5+16];
+add.s64 %rd4, %rd3, %rd2;
+ld.global.u32 %r1, [%rd4+16];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -455,16 +453,15 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<6>;
+.reg .b64 %rd<5>;
 
 
 ld.param.u64 %rd1, [_Z12write_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-cvta.global.u64 %rd4, %rd3;
-add.s64 %rd5, %rd4, %rd2;
+add.s64 %rd4, %rd2, %rd3;
 mov.u32 %r1, 30583;
-st.u32 [%rd5+4016], %r1;
+st.global.u32 [%rd4+4016], %r1;
 ret;
 }
 
@@ -474,15 +471,14 @@ ret;
 )
 {
 .reg .b32 %r<2>;
-.reg .b64 %rd<6>;
+.reg .b64 %rd<5>;
 
 
 ld.param.u64 %rd1, [_Z11read_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
-cvta.global.u64 %rd4, %rd3;
-add.s64 %rd5, %rd4, %rd2;
-ld.u32 %r1, [%rd5+4016];
+add.s64 %rd4, %rd2, %rd3;
+ld.global.u32 %r1, [%rd4+4016];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -574,7 +570,7 @@ ret;
 {
 .reg .pred %p<2>;
 .reg .b32 %r<10>;
-.reg .b64 %rd<12>;
+.reg .b64 %rd<11>;
 
 
 ld.param.u64 %rd3, [_ZN4ikra8executor4cuda18kernel_call_lambdaIZZ4mainENKUlvE_clEvEUlPT_DpT0_E_JP9TestClassiEEEvS4_mS7__param_0];
@@ -591,16 +587,15 @@ setp.ge.u64	%p1, %rd1, %rd3;
 add.s64 %rd4, %rd1, %rd2;
 shl.b64 %rd5, %rd4, 2;
 mov.u64 %rd6, __TestClassdata_buffer;
-cvta.global.u64 %rd7, %rd6;
-add.s64 %rd8, %rd7, %rd5;
-ld.u32 %r6, [%rd8+16];
+add.s64 %rd7, %rd6, %rd5;
+ld.global.u32 %r6, [%rd7+16];
 add.s32 %r7, %r6, %r1;
-ld.u32 %r8, [%rd8+4016];
+ld.global.u32 %r8, [%rd7+4016];
 add.s32 %r9, %r7, %r8;
-cvt.u64.u32	%rd9, %r9;
-add.s64 %rd10, %rd4, %rd9;
-add.s64 %rd11, %rd10, 30582;
-st.u32 [%rd8+16], %rd11;
+cvt.u64.u32	%rd8, %r9;
+add.s64 %rd9, %rd4, %rd8;
+add.s64 %rd10, %rd9, 30582;
+st.global.u32 [%rd7+16], %rd10;
 
 BB8_2:
 ret;
@@ -633,7 +628,7 @@ ret;
 {
 .reg .pred %p<2>;
 .reg .b32 %r<7>;
-.reg .b64 %rd<9>;
+.reg .b64 %rd<8>;
 
 
 ld.param.u64 %rd2, [_ZN4ikra8executor4cuda16construct_kernelI9TestClassJiiEEEvmDpT0__param_0];
@@ -651,10 +646,9 @@ setp.eq.s64	%p1, %rd1, 0;
 
 shl.b64 %rd5, %rd1, 2;
 mov.u64 %rd6, __TestClassdata_buffer;
-cvta.global.u64 %rd7, %rd6;
-add.s64 %rd8, %rd7, %rd5;
-st.u32 [%rd8+16], %r1;
-st.u32 [%rd8+4016], %r2;
+add.s64 %rd7, %rd6, %rd5;
+st.global.u32 [%rd7+16], %r1;
+st.global.u32 [%rd7+4016], %r2;
 
 BB10_2:
 ret;
