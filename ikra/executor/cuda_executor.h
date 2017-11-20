@@ -97,17 +97,16 @@ IndexType cuda_threads_1d(IndexType length) {
 // types from member function that is passed as a template argument.
 template<typename T, T> struct ExecuteKernelProxy;
 
+// Note: The function "func" is a compile-time template parameter.
+// This is crucial since taking the address of a device function is forbidden
+// in host code when used as an expression.
 template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
 struct ExecuteKernelProxy<R (T::*)(Args...), func>
 {
-  // Invoke a CUDA kernel. Note: The function "func" is a compile-time template
-  // parameter. This is crucial since taking the address of a device function
-  // is forbidden in host code when used as an expression.
+  // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
+  // from object "first".
   static void call(T* first, IndexType num_objects, Args... args)
   {
-    static_assert(T::kAddressMode == ikra::soa::kAddressModeZero,
-                  "Not implemented: Valid addressing mode.");
-
     IndexType num_blocks = cuda_blocks_1d(num_objects);
     IndexType num_threads = cuda_threads_1d(num_objects);
 
@@ -123,7 +122,26 @@ struct ExecuteKernelProxy<R (T::*)(Args...), func>
     kernel_call_lambda<<<num_blocks, num_threads>>>(
         invoke_function, first, num_objects, args...);
     cudaDeviceSynchronize();
-    gpuErrchk(cudaPeekAtLastError());
+    assert(cudaPeekAtLastError() == cudaSuccess);
+  }
+
+  // Invoke CUDA kenrel on all objects.
+  static void call(Args... args) {
+    IndexType num_objects = T::size();
+    IndexType num_blocks = cuda_blocks_1d(num_objects);
+    IndexType num_threads = cuda_threads_1d(num_objects);
+
+    auto invoke_function = [] __device__ (Args... args) {
+      int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      if (tid < T::size()) {
+        auto* object = T::get(tid);
+        return (object->*func)(args...);
+      }
+    };
+
+    kernel_call_lambda<<<num_blocks, num_threads>>>(invoke_function, args...);
+    cudaDeviceSynchronize();
+    assert(cudaPeekAtLastError() == cudaSuccess);
   }
 };
 
