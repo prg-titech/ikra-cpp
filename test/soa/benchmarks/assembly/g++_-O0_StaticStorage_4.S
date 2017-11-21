@@ -151,12 +151,12 @@ Disassembly of section .text:
   4005da:	48 83 c0 04          	add    $0x4,%rax
   4005de:	be 77 77 00 00       	mov    $0x7777,%esi
   4005e3:	48 89 c7             	mov    %rax,%rdi
-  4005e6:	e8 1f 04 00 00       	callq  400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEaSEi>
+  4005e6:	e8 1f 04 00 00       	callq  400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEaSEi>
   4005eb:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   4005f0:	48 83 c0 04          	add    $0x4,%rax
   4005f4:	be 88 88 00 00       	mov    $0x8888,%esi
   4005f9:	48 89 c7             	mov    %rax,%rdi
-  4005fc:	e8 37 04 00 00       	callq  400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEaSEi>
+  4005fc:	e8 37 04 00 00       	callq  400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEaSEi>
   400601:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400606:	48 89 c7             	mov    %rax,%rdi
   400609:	e8 ce 01 00 00       	callq  4007dc <_ZN9TestClass15increase_field0Ev>
@@ -166,29 +166,29 @@ Disassembly of section .text:
   40061b:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400620:	48 83 c0 04          	add    $0x4,%rax
   400624:	48 89 c7             	mov    %rax,%rdi
-  400627:	e8 56 04 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEcvRiEv>
+  400627:	e8 56 04 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEcvRiEv>
   40062c:	8b 18                	mov    (%rax),%ebx
   40062e:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400633:	48 83 c0 04          	add    $0x4,%rax
   400637:	48 89 c7             	mov    %rax,%rdi
-  40063a:	e8 27 04 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEcvRiEv>
+  40063a:	e8 27 04 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEcvRiEv>
   40063f:	8b 00                	mov    (%rax),%eax
   400641:	89 da                	mov    %ebx,%edx
   400643:	89 c6                	mov    %eax,%esi
-  400645:	bf e4 0c 40 00       	mov    $0x400ce4,%edi
+  400645:	bf ec 0c 40 00       	mov    $0x400cec,%edi
   40064a:	b8 00 00 00 00       	mov    $0x0,%eax
   40064f:	e8 1c fe ff ff       	callq  400470 <printf@plt>
   400654:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400659:	48 83 c0 04          	add    $0x4,%rax
   40065d:	48 89 c7             	mov    %rax,%rdi
-  400660:	e8 01 04 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEcvRiEv>
+  400660:	e8 01 04 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEcvRiEv>
   400665:	8b 00                	mov    (%rax),%eax
   400667:	3d 83 2d d2 27       	cmp    $0x27d22d83,%eax
   40066c:	75 1a                	jne    400688 <main+0xec>
   40066e:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400673:	48 83 c0 04          	add    $0x4,%rax
   400677:	48 89 c7             	mov    %rax,%rdi
-  40067a:	e8 03 04 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEcvRiEv>
+  40067a:	e8 03 04 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEcvRiEv>
   40067f:	8b 00                	mov    (%rax),%eax
   400681:	3d 20 64 68 24       	cmp    $0x24686420,%eax
   400686:	74 07                	je     40068f <main+0xf3>
@@ -224,7 +224,7 @@ Disassembly of section .text:
   4006db:	48 83 c0 04          	add    $0x4,%rax
   4006df:	be 77 77 00 00       	mov    $0x7777,%esi
   4006e4:	48 89 c7             	mov    %rax,%rdi
-  4006e7:	e8 1e 03 00 00       	callq  400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEaSEi>
+  4006e7:	e8 1e 03 00 00       	callq  400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEaSEi>
   4006ec:	90                   	nop
   4006ed:	48 83 c4 18          	add    $0x18,%rsp
   4006f1:	c3                   	retq   
@@ -235,7 +235,7 @@ Disassembly of section .text:
   4006fb:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400700:	48 83 c0 04          	add    $0x4,%rax
   400704:	48 89 c7             	mov    %rax,%rdi
-  400707:	e8 5a 03 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEcvRiEv>
+  400707:	e8 5a 03 00 00       	callq  400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEcvRiEv>
   40070c:	8b 00                	mov    (%rax),%eax
   40070e:	48 83 c4 18          	add    $0x18,%rsp
   400712:	c3                   	retq   
@@ -247,7 +247,7 @@ Disassembly of section .text:
   400721:	48 83 c0 04          	add    $0x4,%rax
   400725:	be 77 77 00 00       	mov    $0x7777,%esi
   40072a:	48 89 c7             	mov    %rax,%rdi
-  40072d:	e8 06 03 00 00       	callq  400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEaSEi>
+  40072d:	e8 06 03 00 00       	callq  400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEaSEi>
   400732:	90                   	nop
   400733:	48 83 c4 18          	add    $0x18,%rsp
   400737:	c3                   	retq   
@@ -258,7 +258,7 @@ Disassembly of section .text:
   400741:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400746:	48 83 c0 04          	add    $0x4,%rax
   40074a:	48 89 c7             	mov    %rax,%rdi
-  40074d:	e8 30 03 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEcvRiEv>
+  40074d:	e8 30 03 00 00       	callq  400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEcvRiEv>
   400752:	8b 00                	mov    (%rax),%eax
   400754:	48 83 c4 18          	add    $0x18,%rsp
   400758:	c3                   	retq   
@@ -326,7 +326,7 @@ Disassembly of section .text:
   400812:	ba 55 55 00 00       	mov    $0x5555,%edx
   400817:	48 89 ce             	mov    %rcx,%rsi
   40081a:	48 89 c7             	mov    %rax,%rdi
-  40081d:	e8 ec 00 00 00       	callq  40090e <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEmLEi>
+  40081d:	e8 ec 00 00 00       	callq  40090e <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEmLEi>
   400822:	90                   	nop
   400823:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
   400827:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
@@ -359,7 +359,7 @@ Disassembly of section .text:
   40087a:	ba 44 44 00 00       	mov    $0x4444,%edx
   40087f:	48 89 ce             	mov    %rcx,%rsi
   400882:	48 89 c7             	mov    %rax,%rdi
-  400885:	e8 cc 00 00 00       	callq  400956 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEmLEi>
+  400885:	e8 cc 00 00 00       	callq  400956 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEmLEi>
   40088a:	90                   	nop
   40088b:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
   40088f:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
@@ -398,23 +398,23 @@ Disassembly of section .text:
   4008e6:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   4008eb:	48 83 c0 04          	add    $0x4,%rax
   4008ef:	48 89 c7             	mov    %rax,%rdi
-  4008f2:	e8 fd 00 00 00       	callq  4009f4 <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEC1Ev>
+  4008f2:	e8 fd 00 00 00       	callq  4009f4 <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEC1Ev>
   4008f7:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   4008fc:	48 83 c0 04          	add    $0x4,%rax
   400900:	48 89 c7             	mov    %rax,%rdi
-  400903:	e8 f4 00 00 00       	callq  4009fc <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEC1Ev>
+  400903:	e8 f4 00 00 00       	callq  4009fc <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEC1Ev>
   400908:	90                   	nop
   400909:	48 83 c4 18          	add    $0x18,%rsp
   40090d:	c3                   	retq   
 
-000000000040090e <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEmLEi>:
+000000000040090e <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEmLEi>:
   40090e:	48 83 ec 28          	sub    $0x28,%rsp
   400912:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
   400917:	48 89 74 24 10       	mov    %rsi,0x10(%rsp)
   40091c:	89 54 24 0c          	mov    %edx,0xc(%rsp)
   400920:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
   400925:	48 89 c7             	mov    %rax,%rdi
-  400928:	e8 71 01 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400928:	e8 71 01 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   40092d:	8b 10                	mov    (%rax),%edx
   40092f:	0f af 54 24 0c       	imul   0xc(%rsp),%edx
   400934:	89 10                	mov    %edx,(%rax)
@@ -422,20 +422,20 @@ Disassembly of section .text:
   40093b:	48 8b 44 24 18       	mov    0x18(%rsp),%rax
   400940:	48 89 d6             	mov    %rdx,%rsi
   400943:	48 89 c7             	mov    %rax,%rdi
-  400946:	e8 6f 01 00 00       	callq  400aba <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEC1ERKS3_>
+  400946:	e8 6f 01 00 00       	callq  400aba <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEC1ERKS3_>
   40094b:	48 8b 44 24 18       	mov    0x18(%rsp),%rax
   400950:	48 83 c4 28          	add    $0x28,%rsp
   400954:	c3                   	retq   
   400955:	90                   	nop
 
-0000000000400956 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEmLEi>:
+0000000000400956 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEmLEi>:
   400956:	48 83 ec 28          	sub    $0x28,%rsp
   40095a:	48 89 7c 24 18       	mov    %rdi,0x18(%rsp)
   40095f:	48 89 74 24 10       	mov    %rsi,0x10(%rsp)
   400964:	89 54 24 0c          	mov    %edx,0xc(%rsp)
   400968:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
   40096d:	48 89 c7             	mov    %rax,%rdi
-  400970:	e8 51 01 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400970:	e8 51 01 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400975:	8b 10                	mov    (%rax),%edx
   400977:	0f af 54 24 0c       	imul   0xc(%rsp),%edx
   40097c:	89 10                	mov    %edx,(%rax)
@@ -443,7 +443,7 @@ Disassembly of section .text:
   400983:	48 8b 44 24 18       	mov    0x18(%rsp),%rax
   400988:	48 89 d6             	mov    %rdx,%rsi
   40098b:	48 89 c7             	mov    %rax,%rdi
-  40098e:	e8 4f 01 00 00       	callq  400ae2 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEC1ERKS3_>
+  40098e:	e8 4f 01 00 00       	callq  400ae2 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEC1ERKS3_>
   400993:	48 8b 44 24 18       	mov    0x18(%rsp),%rax
   400998:	48 83 c4 28          	add    $0x28,%rsp
   40099c:	c3                   	retq   
@@ -476,13 +476,13 @@ Disassembly of section .text:
   4009f2:	c3                   	retq   
   4009f3:	90                   	nop
 
-00000000004009f4 <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEC1Ev>:
+00000000004009f4 <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEC1Ev>:
   4009f4:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
   4009f9:	90                   	nop
   4009fa:	c3                   	retq   
   4009fb:	90                   	nop
 
-00000000004009fc <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEC1Ev>:
+00000000004009fc <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEC1Ev>:
   4009fc:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
   400a01:	90                   	nop
   400a02:	c3                   	retq   
@@ -492,13 +492,13 @@ Disassembly of section .text:
   400a08:	90                   	nop
   400a09:	c3                   	retq   
 
-0000000000400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEaSEi>:
+0000000000400a0a <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEaSEi>:
   400a0a:	48 83 ec 18          	sub    $0x18,%rsp
   400a0e:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400a13:	89 74 24 04          	mov    %esi,0x4(%rsp)
   400a17:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400a1c:	48 89 c7             	mov    %rax,%rdi
-  400a1f:	e8 7a 00 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400a1f:	e8 7a 00 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400a24:	48 89 c2             	mov    %rax,%rdx
   400a27:	8b 44 24 04          	mov    0x4(%rsp),%eax
   400a2b:	89 02                	mov    %eax,(%rdx)
@@ -507,13 +507,13 @@ Disassembly of section .text:
   400a36:	c3                   	retq   
   400a37:	90                   	nop
 
-0000000000400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEaSEi>:
+0000000000400a38 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEaSEi>:
   400a38:	48 83 ec 18          	sub    $0x18,%rsp
   400a3c:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400a41:	89 74 24 04          	mov    %esi,0x4(%rsp)
   400a45:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400a4a:	48 89 c7             	mov    %rax,%rdi
-  400a4d:	e8 74 00 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400a4d:	e8 74 00 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400a52:	48 89 c2             	mov    %rax,%rdx
   400a55:	8b 44 24 04          	mov    0x4(%rsp),%eax
   400a59:	89 02                	mov    %eax,(%rdx)
@@ -522,53 +522,53 @@ Disassembly of section .text:
   400a64:	c3                   	retq   
   400a65:	90                   	nop
 
-0000000000400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEcvRiEv>:
+0000000000400a66 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEcvRiEv>:
   400a66:	48 83 ec 18          	sub    $0x18,%rsp
   400a6a:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400a6f:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400a74:	48 89 c7             	mov    %rax,%rdi
-  400a77:	e8 22 00 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400a77:	e8 22 00 00 00       	callq  400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400a7c:	48 83 c4 18          	add    $0x18,%rsp
   400a80:	c3                   	retq   
   400a81:	90                   	nop
 
-0000000000400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEcvRiEv>:
+0000000000400a82 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEcvRiEv>:
   400a82:	48 83 ec 18          	sub    $0x18,%rsp
   400a86:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400a8b:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400a90:	48 89 c7             	mov    %rax,%rdi
-  400a93:	e8 2e 00 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400a93:	e8 2e 00 00 00       	callq  400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400a98:	48 83 c4 18          	add    $0x18,%rsp
   400a9c:	c3                   	retq   
   400a9d:	90                   	nop
 
-0000000000400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
+0000000000400a9e <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
   400a9e:	48 83 ec 18          	sub    $0x18,%rsp
   400aa2:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400aa7:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400aac:	48 89 c7             	mov    %rax,%rdi
-  400aaf:	e8 a0 00 00 00       	callq  400b54 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400aaf:	e8 a0 00 00 00       	callq  400b54 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400ab4:	48 83 c4 18          	add    $0x18,%rsp
   400ab8:	c3                   	retq   
   400ab9:	90                   	nop
 
-0000000000400aba <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassEC1ERKS3_>:
+0000000000400aba <_ZN4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassEC1ERKS3_>:
   400aba:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
   400abf:	48 89 74 24 f0       	mov    %rsi,-0x10(%rsp)
   400ac4:	90                   	nop
   400ac5:	c3                   	retq   
 
-0000000000400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
+0000000000400ac6 <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE8data_ptrILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
   400ac6:	48 83 ec 18          	sub    $0x18,%rsp
   400aca:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400acf:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400ad4:	48 89 c7             	mov    %rax,%rdi
-  400ad7:	e8 ce 00 00 00       	callq  400baa <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
+  400ad7:	e8 ce 00 00 00       	callq  400baa <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>
   400adc:	48 83 c4 18          	add    $0x18,%rsp
   400ae0:	c3                   	retq   
   400ae1:	90                   	nop
 
-0000000000400ae2 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassEC1ERKS3_>:
+0000000000400ae2 <_ZN4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassEC1ERKS3_>:
   400ae2:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
   400ae7:	48 89 74 24 f0       	mov    %rsi,-0x10(%rsp)
   400aec:	90                   	nop
@@ -611,7 +611,7 @@ Disassembly of section .text:
   400b4f:	48 83 c4 18          	add    $0x18,%rsp
   400b53:	c3                   	retq   
 
-0000000000400b54 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
+0000000000400b54 <_ZNK4ikra3soa6Field_IiLm4660ELj0ELi4ELi0E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
   400b54:	48 83 ec 38          	sub    $0x38,%rsp
   400b58:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400b5d:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
@@ -633,7 +633,7 @@ Disassembly of section .text:
   400ba5:	48 83 c4 38          	add    $0x38,%rsp
   400ba9:	c3                   	retq   
 
-0000000000400baa <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
+0000000000400baa <_ZNK4ikra3soa6Field_IiLm4660ELj4ELi4ELi0E9TestClassE22data_ptr_uninitializedILi4EEENSt9enable_ifIXneT_L_ZNS0_L16kAddressModeZeroEEEPiE4typeEv>:
   400baa:	48 83 ec 38          	sub    $0x38,%rsp
   400bae:	48 89 7c 24 08       	mov    %rdi,0x8(%rsp)
   400bb3:	48 8b 44 24 08       	mov    0x8(%rsp),%rax

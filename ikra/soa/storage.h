@@ -11,8 +11,8 @@ __device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
 __host__ __device__ class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
 } \
-constexpr void* class_name::storage_buffer() { \
-  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
+constexpr char* class_name::storage_buffer() { \
+  return __ ## class_name ## data_buffer; \
 }
 
 #define IKRA_HOST_STORAGE(class_name) \
@@ -21,13 +21,16 @@ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
 class_name::Storage& class_name::storage() { \
   return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
 } \
-constexpr void* class_name::storage_buffer() { \
-  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
+constexpr char* class_name::storage_buffer() { \
+  return __ ## class_name ## data_buffer; \
 }
 
 
 namespace ikra {
 namespace soa {
+
+static const int kStorageModeStatic = 0;
+static const int kStorageModeDynamic = 1;
 
 #ifdef __CUDACC__
 __device__ IndexType d_previous_storage_size;
@@ -141,6 +144,8 @@ template<class OwnerT, size_t ArenaSize>
 class DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  public:
+  static const int kStorageMode = kStorageModeDynamic;
+
   using Owner = OwnerT;
 
   // Allocate data on the heap.
@@ -213,6 +218,8 @@ template<class OwnerT, size_t ArenaSize>
 class StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  public:
+  static const int kStorageMode = kStorageModeStatic;
+
   using Owner = OwnerT;
 
   __ikra_device__ StaticStorage_() {

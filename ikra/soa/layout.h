@@ -1,6 +1,8 @@
 #ifndef SOA_LAYOUT_H
 #define SOA_LAYOUT_H
 
+#include <type_traits>
+
 #include "soa/array_field.h"
 #include "soa/class_initialization.h"
 #include "soa/constants.h"
@@ -42,8 +44,14 @@ template<class Self,
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = typename StorageStrategy::template type<Self>;
-  const static IndexType kCapacity = Capacity;
-  const static bool kIsSoaClass = true;
+  static const IndexType kCapacity = Capacity;
+  static const bool kIsSoaClass = true;
+
+  // Cannot access members of Storge in here because Storage depends on this
+  // class and must not be instantiated yet.
+  static constexpr int kStorageMode =
+      std::is_same<StorageStrategy, StaticStorage>::value
+          ? kStorageModeStatic : kStorageModeDynamic;
 
   // Check if the compiler supports this address mode.
   static_assert(
@@ -52,7 +60,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
-  using Field = Field_<T, Capacity, Offset, AddressMode, Self>;
+  using Field = Field_<T, Capacity, Offset, AddressMode,
+                       kStorageMode, Self>;
 
   // Generate field types. Implement more types as necessary.
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool)
@@ -65,15 +74,18 @@ class SoaLayout : SizeNDummy<AddressMode> {
   struct array {
     template<typename T, size_t N, int Offset>
     using aos = ikra::soa::AosArrayField_<std::array<T, N>, Capacity,
-                                          Offset, AddressMode, Self>;
+                                          Offset, AddressMode,
+                                          Storage::kStorageMode, Self>;
 
     template<typename T, size_t N, int Offset>
     using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
-                                          Offset, AddressMode, Self>;
+                                          Offset, AddressMode,
+                                          Storage::kStorageMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
     using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
-        T, InlineSize, Capacity, Offset, AddressMode, Self>;
+        T, InlineSize, Capacity, Offset, AddressMode,
+        Storage::kStorageMode, Self>;
   };
 
   static const int kAddressMode = AddressMode;
