@@ -5,7 +5,7 @@ project(ikra-cpp)
 # TODO: -gencode arch=compute_52,code=sm_52
 # TODO: This should be CUDA 9.0 but the version check is broken on my machine.
 find_package(CUDA 8.0 REQUIRED)
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -std=c++14 --expt-extended-lambda)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -std=c++11 --expt-extended-lambda)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
