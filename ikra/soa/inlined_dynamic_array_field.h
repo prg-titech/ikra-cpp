@@ -21,13 +21,15 @@ template<typename T,
          IndexType Capacity,
          uint32_t Offset,
          int AddressMode,
+         int StorageMode,
          class Owner,
          class ArraySizeT = IndexType>
 class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
-                                                   AddressMode, Owner> {
+                                                   AddressMode, StorageMode,
+                                                   Owner> {
  private:
   using Self = SoaInlinedDynamicArrayField_<T, InlinedSize, Capacity, Offset,
-                                            AddressMode, Owner>;
+                                            AddressMode, StorageMode, Owner>;
 
  public:
   static const int kSize = InlinedSize*sizeof(T) + sizeof(T**);

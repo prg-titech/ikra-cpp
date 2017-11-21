@@ -12,6 +12,8 @@ struct NvccWorkaroundIdentityClassHolder {
   using type = T;
 };
 
+// This helper macro can be used to allow reinterpret_casts in constexpr.
+// Only needed for clang.
 #define IKRA_fold(x) (__builtin_constant_p(x) ? (x) : (x))
 
 // This class is used to check if the compiler supports the selected addressing
