@@ -34,7 +34,9 @@ void run_test_construct_and_execute() {
   EXPECT_EQ(Vertex::size(), 0UL);
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
-  cuda_execute(Vertex, add_fields, kTestSize, first, 10);
+  gpuErrchk(cudaPeekAtLastError());
+
+  cuda_execute(&Vertex::add_fields, first, 12, 10);
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
@@ -55,7 +57,7 @@ void run_test_host_side_assignment() {
   EXPECT_EQ(Vertex::size(), 0UL);
 
   Vertex* first = construct<Vertex>(kTestSize, 5, 6);
-  cuda_execute(Vertex, add_fields, kTestSize, first, 10);
+  cuda_execute(&Vertex::add_fields, first, kTestSize, 10);
 
   for (int i = 0; i < kTestSize; ++i) {
     Vertex::get(i)->field0 = Vertex::get(i)->field0*Vertex::get(i)->field0;
@@ -86,7 +88,7 @@ void run_test_host_side_new() {
     EXPECT_EQ(vertices[i]->id(), static_cast<IndexType>(i));
   }
 
-  cuda_execute(Vertex, add_fields, kTestSize, vertices[0], 10);
+  cuda_execute(&Vertex::add_fields, vertices[0], kTestSize, 10);
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {

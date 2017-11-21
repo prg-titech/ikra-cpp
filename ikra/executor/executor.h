@@ -7,21 +7,13 @@
 #include <cstdint>
 #include <type_traits>
 
+#include "executor/util.h"
 #include "soa/constants.h"
 
 namespace ikra {
 namespace executor {
 
 using ikra::soa::IndexType;
-
-template<class F>
-struct FunctionTypeHelper;
-
-template<typename R, typename C, typename... Args>
-struct FunctionTypeHelper<R (C::*)(Args...)> {
-  using return_type = R;
-  using class_type = C;
-};
 
 // A convenience class storing two iterators, i.e., a range of SOA objects.
 template<typename T>

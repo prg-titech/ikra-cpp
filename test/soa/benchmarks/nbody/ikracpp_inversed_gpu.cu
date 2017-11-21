@@ -111,20 +111,19 @@ void instantiation() {
 void run_simulation() {
   for (int i = 0; i < kIterations; ++i) {
     // Reset forces.
-    cuda_execute(Body, reset_force, kNumBodies, Body::get(0));
+    cuda_execute(&Body::reset_force);
 
     // Update forces.
-    cuda_execute(Body, add_all_forces_to_this, kNumBodies, Body::get(0));
+    cuda_execute(&Body::add_all_forces_to_this);
 
     // Update velocities and positions.
-    cuda_execute(Body, update, kNumBodies, Body::get(0), kTimeInterval);
+    cuda_execute(&Body::update, kTimeInterval);
   }
 }
 
 void run_simple() {
   for (int i = 0; i < kIterations*100; ++i) {
-    cuda_execute(Body, codengen_simple_update, kNumBodies,
-                 Body::get(0), kTimeInterval);
+    cuda_execute(&Body::codengen_simple_update, kTimeInterval);
   }
 }
 
