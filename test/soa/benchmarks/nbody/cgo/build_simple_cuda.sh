@@ -6,12 +6,12 @@ rm -f result_simple_cuda.txt
 
 runs_aos=4
 runs=12
-echo "v_size: irka, soa, aos}"
+echo "v_size: irka*${runs}, soa*${runs}, aos*${runs_aos}"
 
 for v_size in `./size_generator_cuda.py`
 do
   /usr/local/cuda/bin/nvcc \
-      -std=c++14 \
+      -std=c++11 \
       --expt-extended-lambda \
       -O3 \
       -DkNumBodies=${v_size} \
@@ -21,7 +21,7 @@ do
   echo -n "."
 
   /usr/local/cuda/bin/nvcc \
-      -std=c++14 \
+      -std=c++11 \
       --expt-extended-lambda \
       -O3 \
       -DkNumBodies=${v_size} \
@@ -31,7 +31,7 @@ do
   echo -n "."
 
   /usr/local/cuda/bin/nvcc \
-      -std=c++14 \
+      -std=c++11 \
       --expt-extended-lambda \
       -O3 \
       -DkNumBodies=${v_size} \

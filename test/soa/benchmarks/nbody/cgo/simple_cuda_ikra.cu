@@ -76,8 +76,12 @@ void instantiation() {
 
 void run_simple() {
   for (int i = 0; i < kIterations*100; ++i) {
-    cuda_execute(Body, codengen_simple_update, kNumBodies,
-                 Body::get(0), kTimeInterval);
+    // In cuda_execute_fixed_size, the number of objects is a compile-time
+    // constant. Similar to the SOA and AOS baseline benchmarks.
+    // Alternatively, we could also use cuda_execute here, but the generated
+    // assembly code will be slightly less efficient.
+    cuda_execute_fixed_size(&Body::codengen_simple_update,
+                            kNumBodies, kTimeInterval);
   }
 }
 
