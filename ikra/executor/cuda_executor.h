@@ -1,11 +1,6 @@
 #ifndef EXECUTOR_CUDA_EXECUTOR_H
 #define EXECUTOR_CUDA_EXECUTOR_H
 
-#if __cplusplus < 201402L
-  // Use CUDA Toolkit 9.0 or higher.
-  #error GPU support requires at least a C++14 compliant compiler.
-#endif
-
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
 #include <functional>
@@ -149,12 +144,38 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
+
+  // Invoke CUDA kernel on all objects. This is an optimized version where the
+  // number of objects is a compile-time constant.
+  template<IndexType num_objects>
+  static void call_fixed_size(Args... args) {
+    IndexType num_blocks = cuda_blocks_1d(num_objects);
+    IndexType num_threads = cuda_threads_1d(num_objects);
+
+    auto invoke_function = [] __device__ (Args... args) {
+      int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      if (tid < num_objects) {
+        auto* object = T::get(tid);
+        return (object->*func)(args...);
+      } else {
+        // This branch is never reached.
+        assert(false);
+      }
+    };
+
+    kernel_call_lambda<<<num_blocks, num_threads>>>(invoke_function, args...);
+    cudaDeviceSynchronize();
+    assert(cudaPeekAtLastError() == cudaSuccess);
+  }
 };
 
 #define cuda_execute(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
       ::call(__VA_ARGS__)
 
+#define cuda_execute_fixed_size(func, size, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
+      ::call_fixed_size<size>(__VA_ARGS__)
 
 template<typename T, T> class ExecuteAndReturnKernelProxy;
 

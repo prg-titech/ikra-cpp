@@ -31,7 +31,7 @@ done
 
 # CUDA test
 /usr/local/cuda/bin/nvcc \
-    -std=c++14 \
+    -std=c++11 \
     --expt-extended-lambda \
     -O3 \
     -I../../../ikra \
@@ -77,7 +77,7 @@ do
 done
 
 /usr/local/cuda/bin/nvcc \
-    -std=c++14 \
+    -std=c++11 \
     --expt-extended-lambda \
     -O3 \
     -I../../../ikra \
@@ -88,7 +88,7 @@ done
 echo -n "."
 
 /usr/local/cuda/bin/nvcc \
-    -std=c++14 \
+    -std=c++11 \
     --expt-extended-lambda \
     -O3 \
     -I../../../ikra \
