@@ -91,18 +91,18 @@ IndexType cuda_threads_1d(IndexType length) {
 }
 
 // Proxy idea based on:
-// https://stackoverflow.com/questions/9779105/
-// generic-member-function-pointer-as-a-template-parameter
-// This struct is used to extract the class name, return type and argument
+// https://stackoverflow.com/questions/9779105/generic-member-function-pointer-as-a-template-parameter
+// This class is used to extract the class name, return type and argument
 // types from member function that is passed as a template argument.
-template<typename T, T> struct ExecuteKernelProxy;
+template<typename T, T> class ExecuteKernelProxy;
 
 // Note: The function "func" is a compile-time template parameter.
 // This is crucial since taking the address of a device function is forbidden
 // in host code when used as an expression.
 template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
-struct ExecuteKernelProxy<R (T::*)(Args...), func>
+class ExecuteKernelProxy<R (T::*)(Args...), func>
 {
+ public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
   static void call(T* first, IndexType num_objects, Args... args)
@@ -116,6 +116,9 @@ struct ExecuteKernelProxy<R (T::*)(Args...), func>
       if (tid < num_objects) {
         auto* object = T::get(first->id() + tid);
         return (object->*func)(args...);
+      } else {
+        // This branch is never reached.
+        assert(false);
       }
     };
     
@@ -125,7 +128,7 @@ struct ExecuteKernelProxy<R (T::*)(Args...), func>
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
-  // Invoke CUDA kenrel on all objects.
+  // Invoke CUDA kernel on all objects.
   static void call(Args... args) {
     IndexType num_objects = T::size();
     IndexType num_blocks = cuda_blocks_1d(num_objects);
@@ -136,6 +139,9 @@ struct ExecuteKernelProxy<R (T::*)(Args...), func>
       if (tid < T::size()) {
         auto* object = T::get(tid);
         return (object->*func)(args...);
+      } else {
+        // This branch is never reached.
+        assert(false);
       }
     };
 
@@ -149,44 +155,141 @@ struct ExecuteKernelProxy<R (T::*)(Args...), func>
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
       ::call(__VA_ARGS__)
 
-#define IKRA_ALL_BUT_FIRST(first, ...) __VA_ARGS__
 
-// TODO: Reduce in parallel.
-// TODO: Rewrite with proxy.
-#define cuda_execute_and_reduce(class_name, method_name, \
-                                reduce_function, length, ...) \
-  /* TODO: Support length > 1024 */ \
-  [&] { \
-    auto reducer = reduce_function; \
-    /* Infer return type of method. Nvcc does not let us use call the */ \
-    /* method from within a decltype() token because it is a dev. method. */ \
-    /* As a workaround, wrap it within std::bind. */ \
-    using return_type = decltype(std::bind(&class_name::method_name, \
-        reinterpret_cast<class_name*>(0), IKRA_ALL_BUT_FIRST(__VA_ARGS__))());\
-    return_type* d_result; \
-    cudaMalloc(&d_result, sizeof(return_type)*(length)); \
-    ikra::executor::cuda::kernel_call_lambda_collect_result<<<1, length>>>( \
-        [] __device__ (auto* base, auto... args) { \
-            /* TODO: Assuming zero addressing mode. */ \
-            static_assert(class_name::kAddressMode \
-                == ikra::soa::kAddressModeZero, \
-                "Not implemented: Valid addressing mode."); \
-            int tid = threadIdx.x + blockIdx.x * blockDim.x; \
-            return class_name::get(base->id() + tid)->method_name(args...); \
-        }, d_result, __VA_ARGS__); \
-    return_type* h_result = reinterpret_cast<return_type*>( \
-        malloc(sizeof(return_type)*(length))); \
-    cudaMemcpy(h_result, d_result, sizeof(return_type)*(length), \
-               cudaMemcpyDeviceToHost); \
-    return_type reduced_value = h_result[0]; \
-    for (uintptr_t i = 1; i < (length); ++i) { \
-      reduced_value = reducer(reduced_value, h_result[i]); \
-    } \
-    cudaFree(d_result); \
-    free(h_result); \
-    assert(cudaPeekAtLastError() == cudaSuccess); \
-    return reduced_value; \
-  } ()
+template<typename T, T> class ExecuteAndReturnKernelProxy;
+
+template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
+class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
+{
+ public:
+  // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
+  // from object "first".
+  static R* call(T* first, IndexType num_objects, Args... args)
+  {
+    // Allocate memory for result of kernel run.
+    R* d_result;
+    cudaMalloc(&d_result, sizeof(R)*num_objects);
+
+    // Kernel configuration.
+    IndexType num_blocks = cuda_blocks_1d(num_objects);
+    IndexType num_threads = cuda_threads_1d(num_objects);
+
+    auto invoke_function = [] __device__ (T* first, IndexType num_objects,
+                                          Args... args) {
+      int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      if (tid < num_objects) {
+        auto* object = T::get(first->id() + tid);
+        return (object->*func)(args...);
+      } else {
+        // This branch is never reached.
+        assert(false);
+        return (T::get(0)->*func)(args...);
+      }
+    };
+
+    kernel_call_lambda_collect_result<<<num_blocks, num_threads>>>(
+        invoke_function, d_result, first, num_objects, args...);
+    cudaDeviceSynchronize();
+    assert(cudaPeekAtLastError() == cudaSuccess);
+
+    return d_result;
+  }
+
+  // Invoke CUDA kernel on all objects.
+  static R* call(Args... args) {
+    // Kernel configuration.
+    IndexType num_objects = T::size();
+    IndexType num_blocks = cuda_blocks_1d(num_objects);
+    IndexType num_threads = cuda_threads_1d(num_objects);
+
+    // Allocate memory for result of kernel run.
+    R* d_result;
+    cudaMalloc(&d_result, sizeof(R)*num_objects);
+
+    auto invoke_function = [] __device__ (Args... args) {
+      int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      if (tid < T::size()) {
+        auto* object = T::get(tid);
+        return (object->*func)(args...);
+      } else {
+        // This branch is never reached.
+        assert(false);
+        return (T::get(0)->*func)(args...);
+      }
+    };
+
+    kernel_call_lambda_collect_result<<<num_blocks, num_threads>>>(
+        invoke_function, d_result, args...);
+    cudaDeviceSynchronize();
+    assert(cudaPeekAtLastError() == cudaSuccess);
+
+    return d_result;
+  }
+};
+
+#define cuda_execute_and_return(func, ...) \
+  ikra::executor::cuda::ExecuteAndReturnKernelProxy<decltype(func), func> \
+      ::call(__VA_ARGS__)
+
+
+template<typename T, T> class ExecuteAndReduceKernelProxy;
+
+template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
+class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
+{
+ public:
+  // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
+  // from object "first".
+  template<typename Reducer>
+  static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
+    R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
+        ::call(first, num_objects, args...);
+
+    R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*num_objects));
+    cudaMemcpy(h_result, d_result, sizeof(R)*num_objects,
+               cudaMemcpyDeviceToHost);
+    cudaFree(d_result);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+
+    // TODO: Not sure why but Reducer does work when code is moved to a
+    // separate method.
+    R accumulator = h_result[0];
+    for (IndexType i = 1; i < num_objects; ++i) {
+      accumulator = red(accumulator, h_result[i]);
+    }
+
+    free(h_result);
+    return accumulator;
+  }
+
+  // Invoke CUDA kernel on all objects.
+  template<typename Reducer>
+  static R call(Reducer red, Args... args) {
+    R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
+        ::call(args...);
+    IndexType num_objects = T::size();
+
+    R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*num_objects));
+    cudaMemcpy(h_result, d_result, sizeof(R)*num_objects,
+               cudaMemcpyDeviceToHost);
+    cudaFree(d_result);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+
+    // TODO: Not sure why but Reducer does work when code is moved to a
+    // separate method.
+    R accumulator = h_result[0];
+    for (IndexType i = 1; i < num_objects; ++i) {
+      accumulator = red(accumulator, h_result[i]);
+    }
+
+    free(h_result);
+    return accumulator;
+  }
+};
+
+#define cuda_execute_and_reduce(func, ...) \
+  ikra::executor::cuda::ExecuteAndReduceKernelProxy<decltype(func), func> \
+      ::call(__VA_ARGS__)
 
 }  // cuda
 }  // executor
