@@ -35,7 +35,7 @@ class ArrayTest : public testing::Test {};
 
 TYPED_TEST_CASE_P(ArrayTest);
 
-TYPED_TEST_P(ArrayTest, ArrayOperations) {
+TYPED_TEST_P(ArrayTest, ArrayOperationsA) {
   TypeParam::initialize_storage();
   TypeParam** instances = new TypeParam*[kTestSize];
   std::array<std::array<int, 3>, kTestSize> arrays;
@@ -62,7 +62,7 @@ TYPED_TEST_P(ArrayTest, ArrayOperations) {
     EXPECT_EQ(array_sum(subtraction), 0);
   }
 
-  // Test operations between std::array and AOS array fields
+  // Test operations between std::arrays and AOS array fields
   for (int i = 0; i < kTestSize; ++i) {
     auto addition = arrays[i] + instances[i]->field1;
     EXPECT_EQ(array_sum(addition), 9*i - 3);
@@ -74,7 +74,7 @@ TYPED_TEST_P(ArrayTest, ArrayOperations) {
     EXPECT_EQ(array_sum(subtraction), -3*i + 3);
   }
 
-  // Test operations between std::array and SOA array fields
+  // Test operations between std::arrays and SOA array fields
   for (int i = 0; i < kTestSize; ++i) {
     auto addition = arrays[i] + instances[i]->field3;
     EXPECT_EQ(array_sum(addition), 6*i);
@@ -119,7 +119,53 @@ TYPED_TEST_P(ArrayTest, ArrayOperations) {
   }
 }
 
-REGISTER_TYPED_TEST_CASE_P(ArrayTest, ArrayOperations);
+TYPED_TEST_P(ArrayTest, ArrayOperationsM) {
+  TypeParam::initialize_storage();
+  TypeParam** instances = new TypeParam*[kTestSize];
+  std::array<std::array<int, 3>, kTestSize> arrays;
+
+  // Initialize array fields and std::arrays
+  for (int i = 0; i < kTestSize; ++i) {
+    instances[i] = new TypeParam();
+    for (int j = 0; j < 3; ++j) {
+      instances[i]->field1[j] = 2*i;
+      instances[i]->field3[j] = i + j;
+      arrays[i][j] = i - j;
+    }
+  }
+
+  // Test multiplications of std::arrays
+  for (int i = 0; i < kTestSize; ++i) {
+    auto mul1 = arrays[i] * 3;
+    EXPECT_EQ(array_sum(mul1), 9*i - 9);
+    auto mul2 = 3 * arrays[i];
+    EXPECT_EQ(array_sum(mul2), 9*i - 9);
+    arrays[i] *= 2;
+    EXPECT_EQ(array_sum(arrays[i]), 6*i - 6);
+  }
+
+  // Test multiplications of AOS array fields
+  for (int i = 0; i < kTestSize; ++i) {
+    auto mul1 = instances[i]->field1 * 3;
+    EXPECT_EQ(array_sum(mul1), 18*i);
+    auto mul2 = 3 * instances[i]->field1;
+    EXPECT_EQ(array_sum(mul2), 18*i);
+    instances[i]->field1 *= 2;
+    EXPECT_EQ(instances[i]->field1_sum(), 12*i);
+  }
+
+  // Test multiplications of AOS array fields
+  for (int i = 0; i < kTestSize; ++i) {
+    auto mul1 = instances[i]->field3 * 3;
+    EXPECT_EQ(array_sum(mul1), 9*i + 9);
+    auto mul2 = 3 * instances[i]->field3;
+    EXPECT_EQ(array_sum(mul2), 9*i + 9);
+    instances[i]->field3 *= 2;
+    EXPECT_EQ(instances[i]->field3_sum(), 6*i + 6);
+  }
+}
+
+REGISTER_TYPED_TEST_CASE_P(ArrayTest, ArrayOperationsA, ArrayOperationsM);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, ArrayTest, TestClassV);
 INSTANTIATE_TYPED_TEST_CASE_P(Zero, ArrayTest, TestClassZ);
