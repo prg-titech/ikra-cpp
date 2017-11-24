@@ -28,6 +28,10 @@ class AosArrayField_ : public Field_<T, Capacity, Offset,
     return this->data_ptr()->operator[](pos);
   }
 
+  operator T&() const {
+    return *this->data_ptr();
+  }
+
 #include "soa/field_shared.inc"
 };
 

@@ -14,6 +14,11 @@ struct NvccWorkaroundIdentityClassHolder {
 
 #define IKRA_fold(x) (__builtin_constant_p(x) ? (x) : (x))
 
+// This applies the macro to all the arithmetic and bitwise operators.
+#define IKRA_DEFINE_ALL_OPERATORS(macro) \
+macro(+); macro(-); macro(*); macro(/); macro(%); \
+macro(&); macro(|); macro(^); macro(<<); macro(>>);
+
 }  // soa
 }  // ikra
 
