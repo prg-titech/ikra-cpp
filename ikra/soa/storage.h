@@ -8,26 +8,23 @@
 #define IKRA_DEVICE_STORAGE(class_name) \
 __device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
     __attribute__((aligned(8))); \
-__host__ __device__ class_name::Storage& class_name::storage() { \
-  return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
-} \
-constexpr void* class_name::storage_buffer() { \
-  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
+constexpr char* class_name::storage_buffer() { \
+  return __ ## class_name ## data_buffer; \
 }
 
 #define IKRA_HOST_STORAGE(class_name) \
 char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
     __attribute__((aligned(8))); \
-class_name::Storage& class_name::storage() { \
-  return *reinterpret_cast<Storage*>(__ ## class_name ## data_buffer); \
-} \
-constexpr void* class_name::storage_buffer() { \
-  return IKRA_fold(reinterpret_cast<void*>(__ ## class_name ## data_buffer)); \
+constexpr char* class_name::storage_buffer() { \
+  return __ ## class_name ## data_buffer; \
 }
 
 
 namespace ikra {
 namespace soa {
+
+static const int kStorageModeStatic = 0;
+static const int kStorageModeDynamic = 1;
 
 #ifdef __CUDACC__
 __device__ IndexType d_previous_storage_size;
@@ -42,8 +39,13 @@ __device__ IndexType d_previous_storage_size;
 // time.
 template<typename StorageClass>
 struct StorageDataOffset {
-  static constexpr uintptr_t value = IKRA_fold(
-      reinterpret_cast<uintptr_t>(&reinterpret_cast<StorageClass*>(0)->data_));
+  static constexpr uintptr_t value =
+#ifdef __clang__
+      IKRA_fold(reinterpret_cast<uintptr_t>(
+          &reinterpret_cast<StorageClass*>(0)->data_));
+#else
+      reinterpret_cast<uintptr_t>(&reinterpret_cast<StorageClass*>(0)->data_);
+#endif  // __clang__
 };
 
 class StorageStrategyBase {
@@ -141,6 +143,8 @@ template<class OwnerT, size_t ArenaSize>
 class DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  public:
+  static const int kStorageMode = kStorageModeDynamic;
+
   using Owner = OwnerT;
 
   // Allocate data on the heap.
@@ -185,6 +189,11 @@ class DynamicStorage_
     return data_;
   }
 
+  // Note: Returning as reference not supported in dynamic storage.
+  __ikra_device__ char* data_reference() {
+    return reinterpret_cast<char*>(data_ptr());
+  }
+
   static const bool kIsStaticStorage = false;
 
  private:
@@ -208,6 +217,8 @@ template<class OwnerT, size_t ArenaSize>
 class StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  public:
+  static const int kStorageMode = kStorageModeStatic;
+
   using Owner = OwnerT;
 
   __ikra_device__ StaticStorage_() {
@@ -248,6 +259,14 @@ class StaticStorage_
   // Statically allocated data storage for SOA columns.
   // Add one because first object has ID 0.
   char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
+
+ public:
+  // Returning the storage buffer data array as reference retains the
+  // (type) information that the storage is allocated in global device memory.
+  // (When running in device mode.)
+  __ikra_device__ auto data_reference() -> decltype(data_)& {
+    return data_;
+  }
 };
 
 // The following structs are public API types for storage strategies.

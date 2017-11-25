@@ -7,17 +7,17 @@
 #define TEMPLATE_ARRAY_FIELD \
   template<typename T, size_t ArraySize, \
            IndexType Capacity, uint32_t Offset, \
-           int AddressMode, typename Owner>
+           int AddressMode, int StorageMode, typename Owner>
 #define TEMPLATE_ARRAY_FIELD_W \
   template<typename T, size_t ArraySize, \
            IndexType Capacity1, uint32_t Offset1, \
-           int AddressMode1, typename Owner1, \
+           int AddressMode1, int StorageMode1, typename Owner1, \
            IndexType Capacity2, uint32_t Offset2, \
-           int AddressMode2, typename Owner2>
+           int AddressMode2, int StorageMode2, typename Owner2>
 #define AOS_ARRAY_FIELD(n) AosArrayField_<std::array<T, ArraySize>, \
-  Capacity ## n, Offset ## n, AddressMode ## n, Owner ## n>
+  Capacity ## n, Offset ## n, AddressMode ## n, StorageMode ## n, Owner ## n>
 #define SOA_ARRAY_FIELD(n) SoaArrayField_<T, ArraySize, \
-  Capacity ## n, Offset ## n, AddressMode ## n, Owner ## n>
+  Capacity ## n, Offset ## n, AddressMode ## n, StorageMode ## n, Owner ## n>
 #define STD_ARRAY std::array<T, ArraySize>
 
 #define IKRA_DEFINE_STD_ARRAY_OPERATORS_A(symbol) \

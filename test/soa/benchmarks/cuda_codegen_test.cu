@@ -33,7 +33,7 @@ int main() {
   TestClass::initialize_storage();
 
   TestClass* first = construct<TestClass>(kTestSize, 0x6666, 0x5555);
-  cuda_execute(TestClass, add_fields, kTestSize, first, 0x8888);
+  cuda_execute(&TestClass::add_fields, 0x8888);
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {

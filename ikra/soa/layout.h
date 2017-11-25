@@ -1,6 +1,8 @@
 #ifndef SOA_LAYOUT_H
 #define SOA_LAYOUT_H
 
+#include <type_traits>
+
 #include "soa/array_field.h"
 #include "soa/class_initialization.h"
 #include "soa/constants.h"
@@ -8,6 +10,7 @@
 #include "soa/field.h"
 #include "soa/inlined_dynamic_array_field.h"
 #include "soa/storage.h"
+#include "soa/util.h"
 
 namespace ikra {
 namespace soa {
@@ -41,12 +44,28 @@ template<class Self,
 class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = typename StorageStrategy::template type<Self>;
-  const static IndexType kCapacity = Capacity;
-  const static bool kIsSoaClass = true;
+  static const IndexType kCapacity = Capacity;
+  static const bool kIsSoaClass = true;
+
+  // Cannot access members of Storge in here because Storage depends on this
+  // class and must not be instantiated yet.
+  static constexpr int kStorageMode =
+      std::is_same<StorageStrategy, StaticStorage>::value
+          ? kStorageModeStatic : kStorageModeDynamic;
+
+  // Check if the compiler supports this address mode.
+  static_assert(
+      sizeof(AddressingModeCompilerCheck<AddressMode>) == AddressMode,
+      "Selected addressing mode not supported by compiler.");
+
+  __ikra_host_device__ static constexpr Storage& storage() {
+    return *reinterpret_cast<Storage*>(Self::storage_buffer()); 
+  }
 
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
-  using Field = Field_<T, Capacity, Offset, AddressMode, Self>;
+  using Field = Field_<T, Capacity, Offset, AddressMode,
+                       kStorageMode, Self>;
 
   // Generate field types. Implement more types as necessary.
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool)
@@ -59,15 +78,18 @@ class SoaLayout : SizeNDummy<AddressMode> {
   struct array {
     template<typename T, size_t N, int Offset>
     using aos = ikra::soa::AosArrayField_<std::array<T, N>, Capacity,
-                                          Offset, AddressMode, Self>;
+                                          Offset, AddressMode,
+                                          kStorageMode, Self>;
 
     template<typename T, size_t N, int Offset>
     using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
-                                          Offset, AddressMode, Self>;
+                                          Offset, AddressMode,
+                                          kStorageMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
     using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
-        T, InlineSize, Capacity, Offset, AddressMode, Self>;
+        T, InlineSize, Capacity, Offset, AddressMode,
+        kStorageMode, Self>;
   };
 
   static const int kAddressMode = AddressMode;
@@ -223,10 +245,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
   __ikra_device__
   static typename std::enable_if<A != kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDACC__   // TODO: Fix on GPU.
     static_assert(sizeof(Self) == AddressMode,
                   "SOA class must have only SOA fields.");
-#endif  // __CUDACC__
   }
 
   // Compile-time check for the size of this class. This check should fail

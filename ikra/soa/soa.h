@@ -1,6 +1,18 @@
 #ifndef SOA_SOA_H
 #define SOA_SOA_H
 
+#if __cplusplus < 201103L
+  #error This library needs at least a C++11 compliant compiler.
+#endif
+
+#if defined(__clang__)
+  #warning Loop vectorization is broken when using clang.
+#elif defined(__GNUC__) || defined(__GNUG__)
+  // Everything OK with gcc.
+#else
+  #warning ikra-cpp was not tested with this compiler.
+#endif
+
 #include <array>
 #include <cstddef>
 #include <cstdint>

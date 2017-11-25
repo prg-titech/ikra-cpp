@@ -40,34 +40,39 @@
     return data_ptr_uninitialized();
   }
 
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
+  template<int A = AddressMode, int S = StorageMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic, T*>::type
   data_ptr_uninitialized() const {
-#ifndef __CUDACC__
-    // No constant folding fix in CUDA mode.
-    if (Owner::Storage::kIsStaticStorage) {
-      // Use constant-folded value for address computation.
-      constexpr uintptr_t cptr_data_offset =
-          StorageDataOffset<typename Owner::Storage>::value;
-      constexpr char* cptr_storage_buffer =
-          IKRA_fold(reinterpret_cast<char*>(Owner::storage_buffer()));
-      constexpr char* array_location =
-          cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
-      constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
-      
-      // Check alignment.
-      assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<typename Owner::Storage>::value;
+    constexpr auto cptr_storage_buffer = Owner::storage_buffer();
+    constexpr auto array_location =
+        cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
 
-      return soa_array + reinterpret_cast<uintptr_t>(this);
-    } else
-#endif  // __CUDACC__
-    {
-      // Cannot constant fold dynamically allocated storage.
-      auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
-      return reinterpret_cast<T*>(
-          reinterpret_cast<uintptr_t>(this)*sizeof(T) +
-          p_base + Capacity*Offset);
-    }
+#ifdef __clang__
+    // Clang does not allow reinterpret_cast in constexprs.
+    constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+#else
+    constexpr T* soa_array = reinterpret_cast<T*>(array_location);
+#endif  // __clang__
+
+    // Check alignment.
+    assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
+
+    return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<int A = AddressMode, int S = StorageMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeDynamic, T*>::type
+  data_ptr_uninitialized() const {
+    // Cannot constant fold dynamically allocated storage.
+    auto p_base = Owner::storage().data_reference();
+    return reinterpret_cast<T*>(
+        p_base + Capacity*Offset +
+        reinterpret_cast<uintptr_t>(this)*sizeof(T));
   }
 
   template<int A = AddressMode>
