@@ -22,8 +22,8 @@
 
 #define IKRA_DEFINE_STD_ARRAY_OPERATORS_A(symbol) \
   template<typename T, size_t N> \
-  std::array<T, N> operator symbol (std::array<T, N>& left, \
-                                    std::array<T, N>& right) { \
+  std::array<T, N> operator symbol (std::array<T, N> left, \
+                                    std::array<T, N> right) { \
     std::array<T, N> result; \
     for (size_t i = 0; i < N; ++i) { \
       result[i] = left[i] symbol right[i]; \
@@ -31,7 +31,7 @@
     return result; \
   } \
   TEMPLATE_ARRAY_FIELD \
-  STD_ARRAY operator symbol (STD_ARRAY& left, \
+  STD_ARRAY operator symbol (STD_ARRAY left, \
                              AOS_ARRAY_FIELD()& right) { \
     STD_ARRAY result; \
     for (size_t i = 0; i < ArraySize; ++i) { \
@@ -40,7 +40,7 @@
     return result; \
   } \
   TEMPLATE_ARRAY_FIELD \
-  STD_ARRAY operator symbol (STD_ARRAY& left, \
+  STD_ARRAY operator symbol (STD_ARRAY left, \
                              SOA_ARRAY_FIELD()& right) { \
     STD_ARRAY result; \
     for (size_t i = 0; i < ArraySize; ++i) { \
@@ -50,7 +50,7 @@
   } \
   template<typename T, size_t N> \
   void operator symbol ## = (std::array<T, N>& left, \
-                             std::array<T, N>& right) { \
+                             std::array<T, N> right) { \
     for (size_t i = 0; i < N; ++i) { \
       left[i] symbol ## = right[i]; \
     } \
@@ -72,7 +72,7 @@
 
 #define IKRA_DEFINE_STD_ARRAY_OPERATORS_M(symbol) \
   template<typename T, size_t N> \
-  std::array<T, N> operator symbol (std::array<T, N>& left, T right) { \
+  std::array<T, N> operator symbol (std::array<T, N> left, T right) { \
     std::array<T, N> result; \
     for (size_t i = 0; i < N; ++i) { \
       result[i] = left[i] symbol right; \
@@ -80,7 +80,7 @@
     return result; \
   } \
   template<typename T, size_t N> \
-  std::array<T, N> operator symbol (T left, std::array<T, N>& right) { \
+  std::array<T, N> operator symbol (T left, std::array<T, N> right) { \
     std::array<T, N> result; \
     for (size_t i = 0; i < N; ++i) { \
       result[i] = left symbol right[i]; \
@@ -97,7 +97,7 @@
 #define IKRA_DEFINE_AOS_ARRAY_FIELD_OPERATORS_A(symbol) \
   TEMPLATE_ARRAY_FIELD \
   STD_ARRAY operator symbol (AOS_ARRAY_FIELD()& left, \
-                             STD_ARRAY& right) { \
+                             STD_ARRAY right) { \
     return (STD_ARRAY&)left symbol right; \
   } \
   TEMPLATE_ARRAY_FIELD_W \
@@ -112,7 +112,7 @@
   } \
   TEMPLATE_ARRAY_FIELD \
   void operator symbol ## = (AOS_ARRAY_FIELD()& left, \
-                             STD_ARRAY& right) { \
+                             STD_ARRAY right) { \
     (STD_ARRAY&)left symbol ## = right; \
   } \
   TEMPLATE_ARRAY_FIELD_W \
@@ -153,7 +153,7 @@
 #define IKRA_DEFINE_SOA_ARRAY_FIELD_OPERATORS_A(symbol) \
   TEMPLATE_ARRAY_FIELD \
   STD_ARRAY operator symbol (SOA_ARRAY_FIELD()& left, \
-                             STD_ARRAY& right) { \
+                             STD_ARRAY right) { \
     STD_ARRAY result; \
     for (size_t i = 0; i < ArraySize; ++i) { \
       result[i] = left[i] symbol right[i]; \
@@ -180,7 +180,7 @@
   } \
   TEMPLATE_ARRAY_FIELD \
   void operator symbol ## = (SOA_ARRAY_FIELD()& left, \
-                             STD_ARRAY& right) { \
+                             STD_ARRAY right) { \
     for (size_t i = 0; i < ArraySize; ++i) { \
       left[i] symbol ## = right[i]; \
     } \
@@ -230,14 +230,17 @@ namespace soa {
 IKRA_DEFINE_STD_ARRAY_OPERATORS_A(+)
 IKRA_DEFINE_STD_ARRAY_OPERATORS_A(-)
 IKRA_DEFINE_STD_ARRAY_OPERATORS_M(*)
+IKRA_DEFINE_STD_ARRAY_OPERATORS_M(/)
 
 IKRA_DEFINE_AOS_ARRAY_FIELD_OPERATORS_A(+)
 IKRA_DEFINE_AOS_ARRAY_FIELD_OPERATORS_A(-)
 IKRA_DEFINE_AOS_ARRAY_FIELD_OPERATORS_M(*)
+IKRA_DEFINE_AOS_ARRAY_FIELD_OPERATORS_M(/)
 
 IKRA_DEFINE_SOA_ARRAY_FIELD_OPERATORS_A(+)
 IKRA_DEFINE_SOA_ARRAY_FIELD_OPERATORS_A(-)
 IKRA_DEFINE_SOA_ARRAY_FIELD_OPERATORS_M(*)
+IKRA_DEFINE_SOA_ARRAY_FIELD_OPERATORS_M(/)
 
 }  // soa
 }  // ikra
