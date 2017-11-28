@@ -3078,23 +3078,23 @@ div.rn.f64 %fd6, %fd20, %fd18;
 mov.u32 %r4, -1000;
 
 BB6_1:
-add.f64 %fd21, %fd40, %fd5;
+add.f64 %fd21, %fd5, %fd40;
 fma.rn.f64 %fd22, %fd21, %fd15, %fd38;
 add.f64 %fd23, %fd39, %fd6;
 fma.rn.f64 %fd24, %fd23, %fd15, %fd37;
-add.f64 %fd25, %fd21, %fd5;
+add.f64 %fd25, %fd5, %fd21;
 add.f64 %fd26, %fd23, %fd6;
 fma.rn.f64 %fd27, %fd25, %fd15, %fd22;
 fma.rn.f64 %fd28, %fd26, %fd15, %fd24;
-add.f64 %fd29, %fd25, %fd5;
+add.f64 %fd29, %fd5, %fd25;
 add.f64 %fd30, %fd26, %fd6;
 fma.rn.f64 %fd31, %fd29, %fd15, %fd27;
 fma.rn.f64 %fd32, %fd30, %fd15, %fd28;
-add.f64 %fd33, %fd29, %fd5;
+add.f64 %fd33, %fd5, %fd29;
 add.f64 %fd34, %fd30, %fd6;
 fma.rn.f64 %fd35, %fd33, %fd15, %fd31;
 fma.rn.f64 %fd36, %fd34, %fd15, %fd32;
-add.f64 %fd40, %fd33, %fd5;
+add.f64 %fd40, %fd5, %fd33;
 add.f64 %fd39, %fd34, %fd6;
 fma.rn.f64 %fd38, %fd40, %fd15, %fd35;
 fma.rn.f64 %fd37, %fd39, %fd15, %fd36;

@@ -86,7 +86,9 @@ class Body : public SoaLayout<Body, kNumBodies> {
 
   __device__ void codengen_simple_update(double dt) {
     for (int i = 0; i < 1000; ++i) {
-      set_velocity0_(get_velocity0_() + get_force0_()*dt / get_mass_());
+      // Try changing the order of fields and take a look at the assembly code.
+      get_velocity0_() += get_force0_()*dt / mass_;
+      //set_velocity0_(get_velocity0_() + get_force0_()*dt / get_mass_());
       set_velocity1_(get_velocity1_() + get_force1_()*dt / get_mass_());
       set_position0_(get_position0_() + get_velocity0_()*dt);
       set_position1_(get_position1_() + get_velocity1_()*dt);
