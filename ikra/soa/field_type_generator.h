@@ -28,8 +28,8 @@
     static const bool kIsSpecialization = true; \
   }; \
   soa_ ## type<OffsetCounter<field_id>::value> name; \
-  __ikra_device__ type get_ ## name() { \
-    return name; \
+  __ikra_device__ type& get_ ## name() { \
+    return name.get(); \
   } \
   __ikra_device__ void set_ ## name(type value) { \
     name = value; \
