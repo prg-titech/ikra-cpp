@@ -31,15 +31,6 @@
     return reinterpret_cast<T*>(p_result);
   }
 
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
-  data_ptr() const {
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(id() < Owner::storage().size());
-    return data_ptr_uninitialized();
-  }
-
   template<int A = AddressMode, int S = StorageMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           S == kStorageModeStatic, T*>::type
@@ -64,6 +55,31 @@
     return soa_array + reinterpret_cast<uintptr_t>(this);
   }
 
+  // TODO: Refactor code to minimize code duplication.
+  template<int A = AddressMode, int S = StorageMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic, T*>::type
+  data_ptr_uninitialized(Owner* obj) const {
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<typename Owner::Storage>::value;
+    constexpr auto cptr_storage_buffer = Owner::storage_buffer();
+    constexpr auto array_location =
+        cptr_storage_buffer + cptr_data_offset + Capacity*Offset;
+
+#ifdef __clang__
+    // Clang does not allow reinterpret_cast in constexprs.
+    constexpr T* soa_array = IKRA_fold(reinterpret_cast<T*>(array_location));
+#else
+    constexpr T* soa_array = reinterpret_cast<T*>(array_location);
+#endif  // __clang__
+
+    // Check alignment.
+    assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
+
+    return soa_array + reinterpret_cast<uintptr_t>(obj);
+  }
+
   template<int A = AddressMode, int S = StorageMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           S == kStorageModeDynamic, T*>::type
@@ -75,13 +91,12 @@
         reinterpret_cast<uintptr_t>(this)*sizeof(T));
   }
 
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
-  data_ptr() const {
+  template<typename... Args>
+  __ikra_device__ T* data_ptr(Args... args) const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(id() < Owner::storage().size());
-    return data_ptr_uninitialized();
+    return data_ptr_uninitialized(args...);
   }
 
   // Force size of this class to be 0.

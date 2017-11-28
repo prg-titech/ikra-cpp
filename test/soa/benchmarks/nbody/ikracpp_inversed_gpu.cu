@@ -39,7 +39,7 @@ class Body : public SoaLayout<Body, kNumBodies> {
     this->reset_force();
   }
 
-  double_ mass_;
+  double_(mass_);
   array_(double, 2) position_;
   array_(double, 2) velocity_;
   array_(double, 2) force_;

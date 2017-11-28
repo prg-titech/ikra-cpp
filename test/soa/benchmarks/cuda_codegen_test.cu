@@ -16,8 +16,8 @@ class TestClass : public SoaLayout<TestClass, 1000> {
 
   __device__ TestClass(int f0, int f1) : field0(f0), field1(f1) {}
 
-  int_ field0;
-  int_ field1;
+  int_(field0);
+  int_(field1);
 
   __device__ void add_fields(int increment) {
     field0 = field0 + field1 + increment + this->id() + 0x7777;

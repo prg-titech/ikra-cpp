@@ -17,11 +17,11 @@ class Vertex : public SoaLayout<Vertex, 1000> {
 
   __host__ __device__ Vertex(int f0, int f1) : field0(f0), field1(f1) {}
 
-  int_ field0;
-  int_ field1;
+  int_(field0);
+  int_(field1);
 
   __device__ void add_fields(int increment) {
-    field0 = field0 + field1 + increment + this->id();
+    set_field0(get_field0() + get_field1() + increment + this->id());
   }
 };
 
@@ -40,7 +40,7 @@ void run_test_construct_and_execute() {
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
-    int actual = Vertex::get(i)->field0;
+    int actual = Vertex::get(i)->get_field0();
     int expected = 10 + 5 + 6 + i;
     EXPECT_EQ(actual, expected);
   }
@@ -60,12 +60,13 @@ void run_test_host_side_assignment() {
   cuda_execute(&Vertex::add_fields, first, kTestSize, 10);
 
   for (int i = 0; i < kTestSize; ++i) {
-    Vertex::get(i)->field0 = Vertex::get(i)->field0*Vertex::get(i)->field0;
+    Vertex::get(i)->set_field0(
+        Vertex::get(i)->get_field0()*Vertex::get(i)->get_field0());
   }
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
-    int actual = Vertex::get(i)->field0;
+    int actual = Vertex::get(i)->get_field0();
     int expected = (10 + 5 + 6 + i)*(10 + 5 + 6 + i);
     EXPECT_EQ(actual, expected);
   }
@@ -92,11 +93,11 @@ void run_test_host_side_new() {
 
   // Check result.
   for (int i = 0; i < kTestSize; ++i) {
-    int actual = Vertex::get(i)->field0;
+    int actual = Vertex::get(i)->get_field0();
     int expected = 10 + i + (i + 1) + (i*i);
     EXPECT_EQ(actual, expected);
 
-    actual = vertices[i]->field1;
+    actual = vertices[i]->get_field1();
     expected = i*i;
     EXPECT_EQ(actual, expected);
   }

@@ -39,13 +39,13 @@ class Body : public SoaLayout<Body, kNumBodies> {
     this->reset_force();
   }
 
-  double_ mass_;
-  double_ position0_;
-  double_ position1_;
-  double_ velocity0_;
-  double_ velocity1_;
-  double_ force0_;
-  double_ force1_;
+  double_(mass_);
+  double_(position0_);
+  double_(position1_);
+  double_(velocity0_);
+  double_(velocity1_);
+  double_(force0_);
+  double_(force1_);
 
   __device__ void add_force(Body* body) {
     if (this == body) return;
@@ -86,10 +86,10 @@ class Body : public SoaLayout<Body, kNumBodies> {
 
   __device__ void codengen_simple_update(double dt) {
     for (int i = 0; i < 1000; ++i) {
-      velocity0_ += force0_*dt / mass_;
-      velocity1_ += force1_*dt / mass_;
-      position0_ += velocity0_*dt;
-      position1_ += velocity1_*dt;
+      set_velocity0_(get_velocity0_() + get_force0_()*dt / get_mass_());
+      set_velocity1_(get_velocity1_() + get_force1_()*dt / get_mass_());
+      set_position0_(get_position0_() + get_velocity0_()*dt);
+      set_position1_(get_position1_() + get_velocity1_()*dt);
     }
   }
 };

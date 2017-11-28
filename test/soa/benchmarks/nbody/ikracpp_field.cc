@@ -38,13 +38,13 @@ class Body : public SoaLayout<Body, kNumBodies> {
     this->reset_force();
   }
 
-  double_ mass_;
-  double_ position0_;
-  double_ position1_;
-  double_ velocity0_;
-  double_ velocity1_;
-  double_ force0_;
-  double_ force1_;
+  double_(mass_);
+  double_(position0_);
+  double_(position1_);
+  double_(velocity0_);
+  double_(velocity1_);
+  double_(force0_);
+  double_(force1_);
 
   void add_force(Body* body) {
     if (this == body) return;
