@@ -18,8 +18,8 @@ struct NvccWorkaroundIdentityClassHolder {
 
 // This applies the macro to all the arithmetic and bitwise operators.
 #define IKRA_DEFINE_ALL_OPERATORS(macro) \
-macro(+); macro(-); macro(*); macro(/); macro(%); \
-macro(&); macro(|); macro(^); macro(<<); macro(>>);
+  macro(+); macro(-); macro(*); macro(/); macro(%); \
+  macro(&); macro(|); macro(^); macro(<<); macro(>>);
 
 // This class is used to check if the compiler supports the selected addressing
 // mode.
