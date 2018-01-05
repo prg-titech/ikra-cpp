@@ -45,8 +45,7 @@ TYPED_TEST_P(ArrayTest, AosArray) {
   for (int i = 0; i < kTestSize; ++i) {
     instances[i]->field1[0] = 1*i + 1;
     instances[i]->field1[1] = 2*i + 2;
-    // TODO: Should use "." for consistency.
-    instances[i]->field1->at(2) = 3*i + 3;
+    instances[i]->field1[2] = 3*i + 3;
   }
 
   // Check result.
@@ -73,7 +72,7 @@ TYPED_TEST_P(ArrayTest, SoaArray) {
   for (int i = 0; i < kTestSize; ++i) {
     instances[i]->field3[0] = 1*i + 1;
     instances[i]->field3[1] = 2*i + 2;
-    instances[i]->field3->at(2) = 3*i + 3;
+    instances[i]->field3[2] = 3*i + 3;
   }
 
   // Check result.
