@@ -16,6 +16,11 @@ struct NvccWorkaroundIdentityClassHolder {
 // Only needed for clang.
 #define IKRA_fold(x) (__builtin_constant_p(x) ? (x) : (x))
 
+// This applies the macro to all the arithmetic and bitwise operators.
+#define IKRA_DEFINE_ALL_OPERATORS(macro) \
+  macro(+); macro(-); macro(*); macro(/); macro(%); \
+  macro(&); macro(|); macro(^); macro(<<); macro(>>);
+
 // This class is used to check if the compiler supports the selected addressing
 // mode.
 template<uintptr_t N>

@@ -18,15 +18,18 @@ template<typename T,
          int AddressMode,
          int StorageMode,
          class Owner>
-class AosArrayField_ : public Field_<T, Capacity, Offset,
-                                     AddressMode, StorageMode, Owner> {
+class AosArrayField_ {
  public:
   static const int kSize = sizeof(T);
 
   // This operator is just for convenience reasons. The correct way to use it
   // would be "this->operator[](pos)".
-  typename T::reference operator[](typename T::size_type pos) {
+  typename T::reference operator[](typename T::size_type pos) const {
     return this->data_ptr()->operator[](pos);
+  }
+
+  operator T&() const {
+    return *this->data_ptr();
   }
 
 #include "soa/field_shared.inc"

@@ -64,6 +64,12 @@ do
   objdump -S bin/${out_name} > assembly/${out_name}.S
   echo -n "."
 
+  out_name="${v_compiler}_nbody_ikracpp_operator"
+  ${v_compiler} -O3 ${extra_args} nbody/ikracpp_operator.cc -std=c++11 -I../../../ikra \
+      -o bin/${out_name}
+  objdump -S bin/${out_name} > assembly/${out_name}.S
+  echo -n "."
+
   # No vectorization with: -fno-tree-vectorize
   out_name="${v_compiler}_nbody_soa"
   ${v_compiler} -O3 ${extra_args} nbody/soa.cc -std=c++11 -o bin/${out_name}

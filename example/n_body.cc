@@ -11,9 +11,9 @@
 #include "soa/soa.h"
 
 using namespace std;
+using namespace ikra::soa;
 using ikra::executor::execute;
 using ikra::executor::Iterator;
-using ikra::soa::SoaLayout;
 
 static const int kNumBodies = 25;
 static const double kMaxMass = 1000;
@@ -27,7 +27,8 @@ static const int kMaxRect = 20;
 
 #define RAND (1.0 * rand() / RAND_MAX)
 
-static void render_rect(SDL_Renderer* renderer, double x, double y, double mass) {
+static void render_rect(SDL_Renderer* renderer,
+                        double x, double y, double mass) {
   SDL_Rect rect;
   rect.w = rect.h = mass / kMaxMass * kMaxRect;
   rect.x = (x/2 + 0.5) * kWindowWidth - rect.w/2;
@@ -57,12 +58,10 @@ class Body : public SoaLayout<Body, kNumBodies> {
     if (this == body) return;
 
     double EPS = 0.01;    // Softening parameter (just to avoid infinities).
-    double dx = body->position_[0] - position_[0];
-    double dy = body->position_[1] - position_[1];
-    double dist = sqrt(dx*dx + dy*dy);
+    auto d = body->position_ - position_;
+    double dist = sqrt(d[0]*d[0] + d[1]*d[1]);
     double F = kGravityConstant*mass_*body->mass_ / (dist*dist + EPS*EPS);
-    force_[0] += F*dx / dist;
-    force_[1] += F*dy / dist;
+    force_ += d * F / dist;
   }
 
   void add_force_to_all() {
@@ -75,10 +74,8 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   void update(double dt) {
-    velocity_[0] += force_[0]*dt / mass_;
-    velocity_[1] += force_[1]*dt / mass_;
-    position_[0] += velocity_[0]*dt;
-    position_[1] += velocity_[1]*dt;
+    velocity_ += force_ * (dt / mass_);
+    position_ += velocity_ * dt;
 
     if (position_[0] < -1 || position_[0] > 1) {
       velocity_[0] = -velocity_[0];

@@ -23,6 +23,7 @@
 
 #include "executor/iterator.h"
 #include "soa/array_field.h"
+#include "soa/array_operator.h"
 #include "soa/constants.h"
 #include "soa/field.h"
 #include "soa/field_type_generator.h"
