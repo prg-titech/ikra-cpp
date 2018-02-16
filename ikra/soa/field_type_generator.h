@@ -11,16 +11,17 @@
                                   sizeof(type); \
     static const bool kIsSpecialization = true; \
   }; \
-  soa_ ## type<OffsetCounter<field_id>::value>
+  soa_ ## type<field_id, OffsetCounter<field_id>::value>
 
 #define IKRA_ARRAY_FIELD_TYPE_GENERATOR(type, size, layout, field_id) \
   template<typename DummyT> \
   struct OffsetCounter<field_id + 1, DummyT> { \
     static const uint32_t value = OffsetCounter<field_id>::value + \
-        array::layout<type, size, OffsetCounter<field_id>::value>::kSize; \
+        array::layout<type, size, field_id, \
+                      OffsetCounter<field_id>::value>::kSize; \
     static const bool kIsSpecialization = true; \
   }; \
-  array::layout<type, size, OffsetCounter<field_id>::value>
+  array::layout<type, size, field_id, OffsetCounter<field_id>::value>
 
 #define IKRA_CUSTOM_FIELD_TYPE_GENERATOR(type, field_id) \
   template<typename DummyT> \
@@ -29,7 +30,7 @@
                                   sizeof(type); \
     static const bool kIsSpecialization = true; \
   }; \
-  Field<type, OffsetCounter<field_id>::value>
+  Field<type, field_id, OffsetCounter<field_id>::value>
 
 // Generate types that keep track of offsets by themselves. Add more types
 // as needed.

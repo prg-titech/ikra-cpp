@@ -19,8 +19,8 @@ namespace soa {
 // and generates alias types for SOA field declarations. For example:
 // int_<Offset> --> Field<int, Offset>
 #define IKRA_DEFINE_LAYOUT_FIELD_TYPE(type) \
-  template<int Offset> \
-  using soa_ ## type = Field<type, Offset>; \
+  template<int Index, int Offset> \
+  using soa_ ## type = Field<type, Index, Offset>; \
 
 // sizeof(SizeNDummy) = N;
 template<size_t N>
@@ -63,8 +63,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Define a Field_ alias as a shortcut.
-  template<typename T, int Offset>
-  using Field = Field_<T, Capacity, Offset, AddressMode,
+  template<typename T, int Index, int Offset>
+  using Field = Field_<T, Capacity, Index, Offset, AddressMode,
                        kStorageMode, Self>;
 
   // Generate field types. Implement more types as necessary.
@@ -76,19 +76,19 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // This struct serves as a namespace and contains array field types.
   struct array {
-    template<typename T, size_t N, int Offset>
+    template<typename T, size_t N, int Index, int Offset>
     using aos = ikra::soa::AosArrayField_<std::array<T, N>, Capacity,
-                                          Offset, AddressMode,
+                                          Index, Offset, AddressMode,
                                           kStorageMode, Self>;
 
-    template<typename T, size_t N, int Offset>
+    template<typename T, size_t N, int Index, int Offset>
     using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
-                                          Offset, AddressMode,
+                                          Index, Offset, AddressMode,
                                           kStorageMode, Self>;
 
-    template<typename T, size_t InlineSize, int Offset>
+    template<typename T, size_t InlineSize, int Index, int Offset>
     using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
-        T, InlineSize, Capacity, Offset, AddressMode,
+        T, InlineSize, Capacity, Index, Offset, AddressMode,
         kStorageMode, Self>;
   };
 

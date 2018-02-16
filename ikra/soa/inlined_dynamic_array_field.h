@@ -19,17 +19,19 @@ namespace soa {
 template<typename T,
          size_t InlinedSize,
          IndexType Capacity,
+         uint32_t Index,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner,
          class ArraySizeT = IndexType>
-class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
+class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Index, Offset,
                                                    AddressMode, StorageMode,
                                                    Owner> {
  private:
-  using Self = SoaInlinedDynamicArrayField_<T, InlinedSize, Capacity, Offset,
-                                            AddressMode, StorageMode, Owner>;
+  using Self = SoaInlinedDynamicArrayField_<T, InlinedSize, Capacity, Index,
+                                            Offset, AddressMode, StorageMode,
+                                            Owner>;
 
  public:
   static const int kSize = InlinedSize*sizeof(T) + sizeof(T**);

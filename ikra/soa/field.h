@@ -20,13 +20,15 @@ namespace soa {
 
 template<typename T,
          IndexType Capacity,
+         uint32_t Index,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner>
 class Field_ {
  private:
-  using Self = Field_<T, Capacity, Offset, AddressMode, StorageMode, Owner>;
+  using Self = Field_<T, Capacity, Index, Offset,
+                      AddressMode, StorageMode, Owner>;
 
  public:
   // This class may only be used to declare fields of classes.

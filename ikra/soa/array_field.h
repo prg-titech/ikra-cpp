@@ -14,11 +14,12 @@ namespace soa {
 // array object. The array is stored in AoS format.
 template<typename T,
          IndexType Capacity,
+         uint32_t Index,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner>
-class AosArrayField_ : public Field_<T, Capacity, Offset,
+class AosArrayField_ : public Field_<T, Capacity, Index, Offset,
                                      AddressMode, StorageMode, Owner> {
  public:
   static const int kSize = sizeof(T);
@@ -38,13 +39,14 @@ class AosArrayField_ : public Field_<T, Capacity, Offset,
 template<typename T,
          size_t ArraySize,
          IndexType Capacity,
+         uint32_t Index,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner>
 class SoaArrayField_ {
  private:
-  using Self = SoaArrayField_<T, ArraySize, Capacity, Offset,
+  using Self = SoaArrayField_<T, ArraySize, Capacity, Index, Offset,
                               AddressMode, StorageMode, Owner>;
 
  public:
