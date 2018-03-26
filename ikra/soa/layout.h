@@ -77,7 +77,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // This struct serves as a namespace and contains array field types.
   struct array {
     template<typename T, size_t N, int Offset>
-    using aos = ikra::soa::AosArrayField_<std::array<T, N>, Capacity,
+    using aos = ikra::soa::AosArrayField_<T, N, Capacity,
                                           Offset, AddressMode,
                                           kStorageMode, Self>;
 
