@@ -1,33 +1,45 @@
-#ifndef SOA_ARRAY_H
-#define SOA_ARRAY_H
+#ifndef SOA_ARRAY_FIELD_H
+#define SOA_ARRAY_FIELD_H
 
 #include <type_traits>
 
 #include "soa/constants.h"
 #include "soa/field.h"
+#include "soa/array_expression.h"
 
 namespace ikra {
 namespace soa {
 
-// Class for field declarations of type array. This class is intended to be
-// used with T = std::array and forwards all method invocations to the wrapped
-// array object. The array is stored in AoS format.
-template<typename T,
+// Class for field declarations of type array. This class is intended to
+// forwards all method invocations to the wrapped array object.
+// The array is stored in AoS format.
+template<typename ElementType,
+         size_t ArraySize,
          IndexType Capacity,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner>
-class AosArrayField_ : public Field_<T, Capacity, Offset,
-                                     AddressMode, StorageMode, Owner> {
+class AosArrayField_ : public ArrayExpression_<AosArrayField_<ElementType,
+    ArraySize, Capacity, Offset, AddressMode, StorageMode, Owner>> {
+ private:
+  using T = std::array<ElementType, ArraySize>;
+
  public:
   static const int kSize = sizeof(T);
 
   // This operator is just for convenience reasons. The correct way to use it
   // would be "this->operator[](pos)".
-  typename T::reference operator[](typename T::size_type pos) {
+  typename T::reference operator[](typename T::size_type pos) const {
     return this->data_ptr()->operator[](pos);
   }
+
+  // Define the assignment operator between AOS array fields and array expressions.
+  IKRA_DEFINE_ARRAY_ASSIGNMENT();
+  // Defines compound assignment operators between AOS array fields and array expressions.
+  IKRA_APPLY_TO_ALL_OPERATORS(IKRA_DEFINE_ARRAY_ASSIGNMENT);
+  // Defines compound assignment operators between AOS array fields and scalars.
+  IKRA_APPLY_TO_ALL_OPERATORS(IKRA_DEFINE_ARRAY_SCALAR_ASSIGNMENT);
 
 #include "soa/field_shared.inc"
 };
@@ -35,15 +47,17 @@ class AosArrayField_ : public Field_<T, Capacity, Offset,
 // Class for field declarations of type array. T is the base type of the array.
 // This class is the SoA counter part of AosArrayField_. Array slots are
 // layouted as if they were SoA fields (columns).
-template<typename T,
+template<typename ElementType,
          size_t ArraySize,
          IndexType Capacity,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
          class Owner>
-class SoaArrayField_ {
+class SoaArrayField_ : public ArrayExpression_<SoaArrayField_<ElementType,
+    ArraySize, Capacity, Offset, AddressMode, StorageMode, Owner>> {
  private:
+  using T = ElementType;
   using Self = SoaArrayField_<T, ArraySize, Capacity, Offset,
                               AddressMode, StorageMode, Owner>;
 
@@ -60,6 +74,13 @@ class SoaArrayField_ {
   T& get() const = delete;
 
   operator T&() const = delete;
+
+  // Define the assignment operator between SOA array fields and array expressions.
+  IKRA_DEFINE_ARRAY_ASSIGNMENT();
+  // Defines compound assignment operators between SOA array fields and array expressions.
+  IKRA_APPLY_TO_ALL_OPERATORS(IKRA_DEFINE_ARRAY_ASSIGNMENT);
+  // Defines compound assignment operators between SOA array fields and scalars.
+  IKRA_APPLY_TO_ALL_OPERATORS(IKRA_DEFINE_ARRAY_SCALAR_ASSIGNMENT);
 
   // Implement std::array interface.
 
@@ -90,6 +111,7 @@ class SoaArrayField_ {
   __ikra_device__ T& back() const {
     return at<ArraySize - 1>();
   }
+
 #else
 
   // A helper class with an overridden operator= method. This class allows
@@ -265,4 +287,4 @@ class SoaArrayField_ {
 }  // namespace soa
 }  // namespace ikra
 
-#endif  // SOA_ARRAY_H
+#endif  // SOA_ARRAY_FIELD_H
