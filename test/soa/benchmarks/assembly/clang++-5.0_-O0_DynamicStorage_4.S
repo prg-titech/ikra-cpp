@@ -598,7 +598,7 @@ Disassembly of section .text:
   400d43:	48 c1 e8 02          	shr    $0x2,%rax
   400d47:	48 c1 e0 02          	shl    $0x2,%rax
   400d4b:	48 03 44 24 10       	add    0x10(%rsp),%rax
-  400d50:	48 05 d0 48 00 00    	add    $0x48d0,%rax
+  400d50:	48 05 d4 48 00 00    	add    $0x48d4,%rax
   400d56:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
   400d5b:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
   400d60:	48 83 c4 28          	add    $0x28,%rsp

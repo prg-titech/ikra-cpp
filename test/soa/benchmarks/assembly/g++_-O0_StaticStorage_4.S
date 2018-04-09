@@ -656,7 +656,7 @@ Disassembly of section .text:
   400bf6:	00 
   400bf7:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
   400bfc:	48 01 d0             	add    %rdx,%rax
-  400bff:	48 05 d0 48 00 00    	add    $0x48d0,%rax
+  400bff:	48 05 d4 48 00 00    	add    $0x48d4,%rax
   400c05:	48 89 44 24 28       	mov    %rax,0x28(%rsp)
   400c0a:	48 8b 44 24 28       	mov    0x28(%rsp),%rax
   400c0f:	48 83 c4 38          	add    $0x38,%rsp

@@ -134,7 +134,7 @@ Disassembly of section .text:
   4005e4:	00 
   4005e5:	c7 05 75 0a 20 00 83 	movl   $0x27d22d83,0x200a75(%rip)        # 601064 <__TestClassdata_buffer+0x14>
   4005ec:	2d d2 27 
-  4005ef:	c7 05 3b 53 20 00 20 	movl   $0x24686420,0x20533b(%rip)        # 605934 <__TestClassdata_buffer+0x48e4>
+  4005ef:	c7 05 3f 53 20 00 20 	movl   $0x24686420,0x20533f(%rip)        # 605938 <__TestClassdata_buffer+0x48e8>
   4005f6:	64 68 24 
   4005f9:	bb 83 2d d2 27       	mov    $0x27d22d83,%ebx
   4005fe:	bd 20 64 68 24       	mov    $0x24686420,%ebp
@@ -144,7 +144,7 @@ Disassembly of section .text:
   400612:	31 c0                	xor    %eax,%eax
   400614:	e8 87 fe ff ff       	callq  4004a0 <printf@plt>
   400619:	33 1d 45 0a 20 00    	xor    0x200a45(%rip),%ebx        # 601064 <__TestClassdata_buffer+0x14>
-  40061f:	33 2d 0f 53 20 00    	xor    0x20530f(%rip),%ebp        # 605934 <__TestClassdata_buffer+0x48e4>
+  40061f:	33 2d 13 53 20 00    	xor    0x205313(%rip),%ebp        # 605938 <__TestClassdata_buffer+0x48e8>
   400625:	31 c0                	xor    %eax,%eax
   400627:	09 dd                	or     %ebx,%ebp
   400629:	0f 95 c0             	setne  %al
@@ -176,13 +176,13 @@ Disassembly of section .text:
   40067f:	00 
 
 0000000000400680 <_Z12write_field1P9TestClass>:
-  400680:	c7 04 bd 30 59 60 00 	movl   $0x7777,0x605930(,%rdi,4)
+  400680:	c7 04 bd 34 59 60 00 	movl   $0x7777,0x605934(,%rdi,4)
   400687:	77 77 00 00 
   40068b:	c3                   	retq   
   40068c:	0f 1f 40 00          	nopl   0x0(%rax)
 
 0000000000400690 <_Z11read_field1P9TestClass>:
-  400690:	8b 04 bd 30 59 60 00 	mov    0x605930(,%rdi,4),%eax
+  400690:	8b 04 bd 34 59 60 00 	mov    0x605934(,%rdi,4),%eax
   400697:	c3                   	retq   
   400698:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
   40069f:	00 

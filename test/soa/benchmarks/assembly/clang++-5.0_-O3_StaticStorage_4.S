@@ -139,14 +139,14 @@ Disassembly of section .text:
   4005fd:	48 83 e3 fc          	and    $0xfffffffffffffffc,%rbx
   400601:	c7 83 60 10 60 00 77 	movl   $0x7777,0x601060(%rbx)
   400608:	77 00 00 
-  40060b:	c7 83 30 59 60 00 88 	movl   $0x8888,0x605930(%rbx)
+  40060b:	c7 83 34 59 60 00 88 	movl   $0x8888,0x605934(%rbx)
   400612:	88 00 00 
   400615:	69 83 60 10 60 00 55 	imul   $0x5555,0x601060(%rbx),%eax
   40061c:	55 00 00 
   40061f:	89 83 60 10 60 00    	mov    %eax,0x601060(%rbx)
-  400625:	69 93 30 59 60 00 44 	imul   $0x4444,0x605930(%rbx),%edx
+  400625:	69 93 34 59 60 00 44 	imul   $0x4444,0x605934(%rbx),%edx
   40062c:	44 00 00 
-  40062f:	89 93 30 59 60 00    	mov    %edx,0x605930(%rbx)
+  40062f:	89 93 34 59 60 00    	mov    %edx,0x605934(%rbx)
   400635:	8b b3 60 10 60 00    	mov    0x601060(%rbx),%esi
   40063b:	bf d4 07 40 00       	mov    $0x4007d4,%edi
   400640:	31 c0                	xor    %eax,%eax
@@ -161,7 +161,7 @@ Disassembly of section .text:
   400667:	00 
   400668:	48 83 e1 fc          	and    $0xfffffffffffffffc,%rcx
   40066c:	31 c0                	xor    %eax,%eax
-  40066e:	81 b9 30 59 60 00 20 	cmpl   $0x24686420,0x605930(%rcx)
+  40066e:	81 b9 34 59 60 00 20 	cmpl   $0x24686420,0x605934(%rcx)
   400675:	64 68 24 
   400678:	0f 95 c0             	setne  %al
   40067b:	5b                   	pop    %rbx
@@ -203,7 +203,7 @@ Disassembly of section .text:
   4006f0:	b8 60 10 60 00       	mov    $0x601060,%eax
   4006f5:	48 29 c7             	sub    %rax,%rdi
   4006f8:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
-  4006fc:	c7 87 30 59 60 00 77 	movl   $0x7777,0x605930(%rdi)
+  4006fc:	c7 87 34 59 60 00 77 	movl   $0x7777,0x605934(%rdi)
   400703:	77 00 00 
   400706:	c3                   	retq   
   400707:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
@@ -213,7 +213,7 @@ Disassembly of section .text:
   400710:	b8 60 10 60 00       	mov    $0x601060,%eax
   400715:	48 29 c7             	sub    %rax,%rdi
   400718:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
-  40071c:	8b 87 30 59 60 00    	mov    0x605930(%rdi),%eax
+  40071c:	8b 87 34 59 60 00    	mov    0x605934(%rdi),%eax
   400722:	c3                   	retq   
   400723:	66 66 66 66 2e 0f 1f 	data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
   40072a:	84 00 00 00 00 00 

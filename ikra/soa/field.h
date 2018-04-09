@@ -29,10 +29,10 @@ class Field_ {
   using Self = Field_<T, Capacity, Offset, AddressMode, StorageMode, Owner>;
 
  public:
+  static const uint32_t DBG_OFFSET = Offset;  // For debugging.
+
   // This class may only be used to declare fields of classes.
   void* operator new(size_t count) = delete;
-
-#include "soa/addressable_field_shared.inc"
 
   // Define inplace assignment operators.
   IKRA_DEFINE_FIELD_ASSIGNMENT(+);
@@ -76,6 +76,7 @@ class Field_ {
 
 
 #include "soa/field_shared.inc"
+#include "soa/addressable_field_shared.inc"
 };
 
 }  // namespace soa

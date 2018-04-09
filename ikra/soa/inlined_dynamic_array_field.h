@@ -85,7 +85,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     auto p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                       Capacity*(Offset + InlinedSize*sizeof(T));
+                       (Capacity+1)*(Offset + InlinedSize*sizeof(T));
     *reinterpret_cast<T**>(p_external) = ptr;
   }
 
@@ -94,7 +94,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   set_external_pointer(T* ptr) {
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
-                      + Capacity*(Offset + InlinedSize*sizeof(T));
+                      + (Capacity+1)*(Offset + InlinedSize*sizeof(T));
     *reinterpret_cast<T**>(p_external) = ptr;
   }
 
@@ -106,7 +106,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     auto p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                      Capacity*(Offset + InlinedSize*sizeof(T));
+                      (Capacity+1)*(Offset + InlinedSize*sizeof(T));
     return *reinterpret_cast<T**>(p_external);
   }
 
@@ -117,7 +117,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
-                      + Capacity*(Offset + InlinedSize*sizeof(T));
+                      + (Capacity+1)*(Offset + InlinedSize*sizeof(T));
     return *reinterpret_cast<T**>(p_external);
   }
 
@@ -143,7 +143,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     if (Pos < InlinedSize) {
       // Within inlined storage.
       uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                           Capacity*(Offset + Pos*sizeof(T));
+                           (Capacity+1)*(Offset + Pos*sizeof(T));
       return reinterpret_cast<T*>(p_result);
     } else {
       // Within external storage. Pointer at position InlinedSize + 1.
@@ -164,7 +164,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     if (Pos < InlinedSize) {
       // Within inlined storage.
       return reinterpret_cast<T*>(p_this*sizeof(T) + p_base +
-                                  Capacity*(Offset + Pos*sizeof(T)));
+                                  (Capacity+1)*(Offset + Pos*sizeof(T)));
     } else {
       // Within external storage.
       T* p_external = this->get_external_pointer();
@@ -186,7 +186,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     if (pos < InlinedSize) {
       // Within inlined storage.
       uintptr_t p_result = (p_this - p_base - A)/A*sizeof(T) + p_base +
-                           Capacity*(Offset + pos*sizeof(T));
+                           (Capacity+1)*(Offset + pos*sizeof(T));
       return reinterpret_cast<T*>(p_result);
     } else {
       // Within external storage. Pointer at position InlinedSize + 1.
@@ -207,7 +207,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
     if (pos < InlinedSize) {
       // Within inlined storage.
       return reinterpret_cast<T*>(p_this*sizeof(T) + p_base +
-                                  Capacity*(Offset + pos*sizeof(T)));
+                                  (Capacity+1)*(Offset + pos*sizeof(T)));
     } else {
       // Within external storage.
       T* p_external = this->get_external_pointer();

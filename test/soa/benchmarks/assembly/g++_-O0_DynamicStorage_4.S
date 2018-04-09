@@ -670,7 +670,7 @@ Disassembly of section .text:
   400c5e:	00 
   400c5f:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
   400c64:	48 01 d0             	add    %rdx,%rax
-  400c67:	48 05 d0 48 00 00    	add    $0x48d0,%rax
+  400c67:	48 05 d4 48 00 00    	add    $0x48d4,%rax
   400c6d:	48 89 44 24 28       	mov    %rax,0x28(%rsp)
   400c72:	48 8b 44 24 28       	mov    0x28(%rsp),%rax
   400c77:	48 83 c4 38          	add    $0x38,%rsp

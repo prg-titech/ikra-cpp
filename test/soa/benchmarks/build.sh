@@ -41,6 +41,16 @@ bin/cuda_codegen_test
 /usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
     > assembly/cuda_codegen_test.S
 
+/usr/local/cuda/bin/nvcc \
+    -std=c++11 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_array_aos_style \
+    array/aos_style.cu
+bin/cuda_array_aos_style
+/usr/local/cuda/bin/cuobjdump bin/cuda_array_aos_style -ptx -sass -res-usage \
+    > assembly/cuda_array_aos_style.S
 
 extra_args="-march=native -fomit-frame-pointer -Ofast"
 for v_compiler in "g++" "${clang_bin}"

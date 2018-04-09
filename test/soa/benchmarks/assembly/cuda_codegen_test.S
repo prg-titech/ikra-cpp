@@ -120,7 +120,7 @@ Resource usage:
         /*00c8*/                   MOV R2, R7;                             /* 0x280000001c009de4 */
         /*00d0*/                   IADD.X R3, R0, R6;                      /* 0x480000001800dc43 */
         /*00d8*/                   LD.E R0, [R2+0x14];                     /* 0x8400000050201c85 */
-        /*00e0*/                   LD.E R5, [R2+0xfb4];                    /* 0x8400003ed0215c85 */
+        /*00e0*/                   LD.E R5, [R2+0xfb8];                    /* 0x8400003ee0215c85 */
         /*00e8*/                   IADD R0, R0, c[0x0][0x144];             /* 0x4800400510001c03 */
         /*00f0*/                   IADD R0, R0, R5;                        /* 0x4800000014001c03 */
         /*00f8*/                   IADD R0, R4, R0;                        /* 0x4800000000401c03 */
@@ -168,7 +168,7 @@ Resource usage:
         /*00e0*/                   MOV R4, c[0x0][0x14c];                /* 0x2800400530011de4 */
         /*00e8*/                   IADD.X R3, R0, R3;                    /* 0x480000000c00dc43 */
         /*00f0*/                   ST.E [R2+0x10], R5;                   /* 0x9400000040215c85 */
-        /*00f8*/                   ST.E [R2+0xfb0], R4;                  /* 0x9400003ec0211c85 */
+        /*00f8*/                   ST.E [R2+0xfb4], R4;                  /* 0x9400003ed0211c85 */
                                                                          /* 0x20000000000002f7 */
         /*0108*/                   EXIT;                                 /* 0x8000000000001de7 */
         /*0110*/                   BRA 0x110;                            /* 0x4003ffffe0001de7 */
@@ -286,7 +286,7 @@ Resource usage:
         /*0070*/               @P0 IADD R0, R2, R3;                  /* 0x480000000c200003 */
         /*0078*/                   IADD.X R5, R5, R0;                /* 0x4800000000515c43 */
                                                                      /* 0x200002f043f20047 */
-        /*0088*/                   LD.E R4, [R4+0xfb0];              /* 0x8400003ec0411c85 */
+        /*0088*/                   LD.E R4, [R4+0xfb4];              /* 0x8400003ed0411c85 */
         /*0090*/                   MOV32I R2, 0x0;                   /* 0x1800000000009de2 */
         /*0098*/                   MOV32I R3, 0x0;                   /* 0x180000000000dde2 */
         /*00a0*/                   ST.E [R2], R4;                    /* 0x9400000000211c85 */
@@ -316,7 +316,7 @@ Resource usage:
         /*0078*/                   MOV32I R4, 0x7777;                /* 0x180001dddc011de2 */
                                                                      /* 0x2000000002f04287 */
         /*0088*/                   IADD.X R3, R3, R0;                /* 0x480000000030dc43 */
-        /*0090*/                   ST.E [R2+0xfb0], R4;              /* 0x9400003ec0211c85 */
+        /*0090*/                   ST.E [R2+0xfb4], R4;              /* 0x9400003ed0211c85 */
         /*0098*/                   EXIT;                             /* 0x8000000000001de7 */
         /*00a0*/                   BRA 0xa0;                         /* 0x4003ffffe0001de7 */
         /*00a8*/                   NOP;                              /* 0x4000000000001de4 */
@@ -461,7 +461,7 @@ shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd3, %rd2;
 mov.u32 %r1, 30583;
-st.global.u32 [%rd4+4016], %r1;
+st.global.u32 [%rd4+4020], %r1;
 ret;
 }
 
@@ -478,7 +478,7 @@ ld.param.u64 %rd1, [_Z11read_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd3, %rd2;
-ld.global.u32 %r1, [%rd4+4016];
+ld.global.u32 %r1, [%rd4+4020];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -566,7 +566,7 @@ shl.b64 %rd5, %rd1, 2;
 mov.u64 %rd6, __TestClassdata_buffer;
 add.s64 %rd7, %rd6, %rd5;
 st.global.u32 [%rd7+16], %r1;
-st.global.u32 [%rd7+4016], %r2;
+st.global.u32 [%rd7+4020], %r2;
 
 BB7_2:
 ret;
@@ -599,7 +599,7 @@ mov.u64 %rd4, __TestClassdata_buffer;
 add.s64 %rd5, %rd4, %rd3;
 ld.global.u32 %r7, [%rd5+20];
 add.s32 %r8, %r7, %r1;
-ld.global.u32 %r9, [%rd5+4020];
+ld.global.u32 %r9, [%rd5+4024];
 add.s32 %r10, %r8, %r9;
 add.s32 %r11, %r6, %r10;
 add.s32 %r12, %r11, 30583;

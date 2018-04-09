@@ -59,7 +59,7 @@ Disassembly of section .text:
   4004df:	48 c7 05 06 0d 20 00 	movq   $0x1,0x200d06(%rip)        # 6011f0 <__TestClassdata_buffer>
   4004e6:	01 00 00 00 
   4004ea:	c7 40 04 83 2d d2 27 	movl   $0x27d22d83,0x4(%rax)
-  4004f1:	c7 80 d4 48 00 00 20 	movl   $0x24686420,0x48d4(%rax)
+  4004f1:	c7 80 d8 48 00 00 20 	movl   $0x24686420,0x48d8(%rax)
   4004f8:	64 68 24 
   4004fb:	31 c0                	xor    %eax,%eax
   4004fd:	e8 7e ff ff ff       	callq  400480 <__printf_chk@plt>
@@ -67,7 +67,7 @@ Disassembly of section .text:
   400509:	b8 01 00 00 00       	mov    $0x1,%eax
   40050e:	81 7a 04 83 2d d2 27 	cmpl   $0x27d22d83,0x4(%rdx)
   400515:	75 0d                	jne    400524 <main+0x84>
-  400517:	81 ba d4 48 00 00 20 	cmpl   $0x24686420,0x48d4(%rdx)
+  400517:	81 ba d8 48 00 00 20 	cmpl   $0x24686420,0x48d8(%rdx)
   40051e:	64 68 24 
   400521:	0f 95 c0             	setne  %al
   400524:	0f b6 c0             	movzbl %al,%eax
@@ -184,7 +184,7 @@ Disassembly of section .text:
 
 0000000000400670 <_Z12write_field1P9TestClass>:
   400670:	48 8b 05 91 0b 20 00 	mov    0x200b91(%rip),%rax        # 601208 <__TestClassdata_buffer+0x18>
-  400677:	c7 84 b8 d0 48 00 00 	movl   $0x7777,0x48d0(%rax,%rdi,4)
+  400677:	c7 84 b8 d4 48 00 00 	movl   $0x7777,0x48d4(%rax,%rdi,4)
   40067e:	77 77 00 00 
   400682:	c3                   	retq   
   400683:	0f 1f 00             	nopl   (%rax)
@@ -193,7 +193,7 @@ Disassembly of section .text:
 
 0000000000400690 <_Z11read_field1P9TestClass>:
   400690:	48 8b 05 71 0b 20 00 	mov    0x200b71(%rip),%rax        # 601208 <__TestClassdata_buffer+0x18>
-  400697:	8b 84 b8 d0 48 00 00 	mov    0x48d0(%rax,%rdi,4),%eax
+  400697:	8b 84 b8 d4 48 00 00 	mov    0x48d4(%rax,%rdi,4),%eax
   40069e:	c3                   	retq   
   40069f:	90                   	nop
 

@@ -567,7 +567,7 @@ Disassembly of section .text:
   400cba:	e8 31 ff ff ff       	callq  400bf0 <_ZN4ikra3soa15DynamicStorage_I9TestClassLm0EE14data_referenceEv>
   400cbf:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
   400cc4:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
-  400cc9:	48 05 d0 48 00 00    	add    $0x48d0,%rax
+  400cc9:	48 05 d4 48 00 00    	add    $0x48d4,%rax
   400ccf:	48 8b 3c 24          	mov    (%rsp),%rdi
   400cd3:	48 c1 e7 02          	shl    $0x2,%rdi
   400cd7:	48 01 f8             	add    %rdi,%rax

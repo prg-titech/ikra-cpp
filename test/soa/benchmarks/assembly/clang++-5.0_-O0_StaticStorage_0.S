@@ -531,7 +531,7 @@ Disassembly of section .text:
   400c20:	48 b8 60 20 60 00 00 	movabs $0x602060,%rax
   400c27:	00 00 00 
   400c2a:	48 89 c1             	mov    %rax,%rcx
-  400c2d:	48 81 c1 e0 48 00 00 	add    $0x48e0,%rcx
+  400c2d:	48 81 c1 e4 48 00 00 	add    $0x48e4,%rcx
   400c34:	48 89 ca             	mov    %rcx,%rdx
   400c37:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
   400c3c:	48 8b 7c 24 f8       	mov    -0x8(%rsp),%rdi

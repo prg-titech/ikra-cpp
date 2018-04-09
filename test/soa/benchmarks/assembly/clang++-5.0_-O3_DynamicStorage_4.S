@@ -147,7 +147,7 @@ Disassembly of section .text:
   400651:	48 29 c1             	sub    %rax,%rcx
   400654:	48 83 e1 fc          	and    $0xfffffffffffffffc,%rcx
   400658:	c7 04 01 83 2d d2 27 	movl   $0x27d22d83,(%rcx,%rax,1)
-  40065f:	c7 84 01 d0 48 00 00 	movl   $0x24686420,0x48d0(%rcx,%rax,1)
+  40065f:	c7 84 01 d4 48 00 00 	movl   $0x24686420,0x48d4(%rcx,%rax,1)
   400666:	20 64 68 24 
   40066a:	bf 04 08 40 00       	mov    $0x400804,%edi
   40066f:	be 83 2d d2 27       	mov    $0x27d22d83,%esi
@@ -161,7 +161,7 @@ Disassembly of section .text:
   400693:	81 3c 0b 83 2d d2 27 	cmpl   $0x27d22d83,(%rbx,%rcx,1)
   40069a:	75 10                	jne    4006ac <main+0x9c>
   40069c:	31 c0                	xor    %eax,%eax
-  40069e:	81 bc 19 d0 48 00 00 	cmpl   $0x24686420,0x48d0(%rcx,%rbx,1)
+  40069e:	81 bc 19 d4 48 00 00 	cmpl   $0x24686420,0x48d4(%rcx,%rbx,1)
   4006a5:	20 64 68 24 
   4006a9:	0f 95 c0             	setne  %al
   4006ac:	5b                   	pop    %rbx
@@ -202,7 +202,7 @@ Disassembly of section .text:
   400720:	48 8b 05 41 09 20 00 	mov    0x200941(%rip),%rax        # 601068 <__TestClassdata_buffer+0x18>
   400727:	48 29 c7             	sub    %rax,%rdi
   40072a:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
-  40072e:	c7 84 38 d0 48 00 00 	movl   $0x7777,0x48d0(%rax,%rdi,1)
+  40072e:	c7 84 38 d4 48 00 00 	movl   $0x7777,0x48d4(%rax,%rdi,1)
   400735:	77 77 00 00 
   400739:	c3                   	retq   
   40073a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
@@ -211,7 +211,7 @@ Disassembly of section .text:
   400740:	48 8b 05 21 09 20 00 	mov    0x200921(%rip),%rax        # 601068 <__TestClassdata_buffer+0x18>
   400747:	48 29 c7             	sub    %rax,%rdi
   40074a:	48 83 e7 fc          	and    $0xfffffffffffffffc,%rdi
-  40074e:	8b 84 38 d0 48 00 00 	mov    0x48d0(%rax,%rdi,1),%eax
+  40074e:	8b 84 38 d4 48 00 00 	mov    0x48d4(%rax,%rdi,1),%eax
   400755:	c3                   	retq   
   400756:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   40075d:	00 00 00 
