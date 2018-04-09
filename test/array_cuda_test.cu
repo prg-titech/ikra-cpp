@@ -60,7 +60,7 @@ void run_test_set_from_host_and_read() {
   gpuErrchk(cudaPeekAtLastError());
 }
 
-TEST(MinimumCudaTest, SetFromHostAndRead) {
+TEST(ArrayCudaTest, SetFromHostAndRead) {
   // This test ensures that address computation for array fields is done
   // correctly.
   run_test_set_from_host_and_read();

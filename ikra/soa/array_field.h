@@ -18,17 +18,28 @@ template<typename T,
          int AddressMode,
          int StorageMode,
          class Owner>
-class AosArrayField_ : public Field_<T, Capacity, Offset,
-                                     AddressMode, StorageMode, Owner> {
+class AosArrayField_ {
+ private:
+  using Self = AosArrayField_<T, Capacity, Offset, AddressMode,
+                              StorageMode, Owner>;
+  static const size_t ArraySize = std::tuple_size<T>::value;
+
  public:
   static const int kSize = sizeof(T);
 
-  // This operator is just for convenience reasons. The correct way to use it
-  // would be "this->operator[](pos)".
-  typename T::reference operator[](typename T::size_type pos) {
-    return this->data_ptr()->operator[](pos);
-  }
+using B = typename T::value_type;
+#include "soa/addressable_field_shared.inc"
 
+template<size_t Pos>
+__ikra_device__ B* array_data_ptr() const {
+  return reinterpret_cast<B*>(data_ptr()) + Pos;
+}
+
+__ikra_device__ B* array_data_ptr(size_t pos) const {
+  return reinterpret_cast<B*>(data_ptr()) + pos;
+}
+
+#include "soa/array_shared.inc"
 #include "soa/field_shared.inc"
 };
 
@@ -61,102 +72,8 @@ class SoaArrayField_ {
 
   operator T&() const = delete;
 
-  // Implement std::array interface.
-
-#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
-  // Not running in CUDA mode or running on device: Can return a reference to
-  // array values.
-
-  __ikra_device__ T& operator[](size_t pos) const {
-    return *this->array_data_ptr(pos);
-  }
-
-  __ikra_device__ T& at(size_t pos) const {
-    // TODO: This function should throw an exception.
-    assert(pos < ArraySize);
-    return this->operator[](pos);
-  }
-
-  template<size_t Pos>
-  __ikra_device__ T& at() const {
-    static_assert(Pos < ArraySize, "Index out of bounds.");
-    return *array_data_ptr<Pos>();
-  }
-
-  __ikra_device__ T& front() const {
-    return at<0>();
-  }
-
-  __ikra_device__ T& back() const {
-    return at<ArraySize - 1>();
-  }
-#else
-
-  // A helper class with an overridden operator= method. This class allows
-  // clients to the "[]=" syntax for array assignment, even if the array is
-  // physically located on the device.
-  // Addresses of instances point to host data locations.
-  class AssignmentHelper {
-   public:
-    // TODO: Assuming zero addressing mode. Must translate addresses in valid
-    // addressing mode.
-    void copy_from_device(T* target) {
-      cudaMemcpy(target, device_ptr(), sizeof(T), cudaMemcpyDeviceToHost);
-      assert(cudaPeekAtLastError() == cudaSuccess);
-    }
-
-    T copy_from_device() {
-      T host_data;
-      copy_from_device(&host_data);
-      return host_data;
-    }
-
-    // Implicit conversion: Copy from device.
-    operator T() {
-      return copy_from_device();
-    }
-
-    // TODO: Assuming zero addressing mode.
-    AssignmentHelper& operator=(T value) {
-      cudaMemcpy(device_ptr(), &value, sizeof(T), cudaMemcpyHostToDevice);
-      assert(cudaPeekAtLastError() == cudaSuccess);
-      return *this;
-    }
-
-    AssignmentHelper& operator+=(T value) {
-      // TODO: Implement.
-      printf("Warning: Calling unimplemented function AssignmentHelper+=.\n");
-      assert(false);
-    }
-
-    T operator->() {
-      return copy_from_device();
-    }
-
-   private:
-    T* device_ptr() {
-      auto h_data_ptr = reinterpret_cast<uintptr_t>(this);
-      auto h_storage_ptr = reinterpret_cast<uintptr_t>(&Owner::storage());
-      assert(h_data_ptr >= h_storage_ptr);
-      auto data_offset = h_data_ptr - h_storage_ptr;
-      auto d_storage_ptr = reinterpret_cast<uintptr_t>(
-          Owner::storage().device_ptr());
-      return reinterpret_cast<T*>(d_storage_ptr + data_offset);
-    }
-  };
-
-  AssignmentHelper& operator[](size_t pos) const {
-    return *reinterpret_cast<AssignmentHelper*>(array_data_ptr(pos));
-  }
-
-  AssignmentHelper& at(size_t pos) const {
-    // TODO: This function should throw an exception.
-    assert(pos < ArraySize);
-    return this->operator[](pos);
-  }
-
-  // TODO: Implement template-based accessor methods.
-#endif
+using B = T;
+#include "soa/array_shared.inc"
 
   // TODO: Implement iterator and other methods.
 
