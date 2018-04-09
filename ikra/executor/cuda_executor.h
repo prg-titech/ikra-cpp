@@ -16,6 +16,14 @@ namespace cuda {
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
 
+IndexType cuda_blocks_1d(IndexType length) {
+  return (length + 256 - 1) / 256;
+}
+
+IndexType cuda_threads_1d(IndexType length) {
+  return length < 256 ? length : 256;
+}
+
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
 __device__ IndexType d_storage_size;
@@ -34,12 +42,15 @@ __global__ void increment_class_size_kernel(IndexType increment) {
 
 // TODO: Assuming zero addressing mode.
 template<typename T, typename... Args>
-__global__ void construct_kernel(IndexType base_id, Args... args) {
+__global__ void construct_kernel(IndexType base_id, IndexType num_objects,
+                                 Args... args) {
   static_assert(T::kAddressMode == kAddressModeZero,
       "Not implemented: Valid addressing mode.");
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  // Use placement new to avoid atomic increment of ID.
-  new (T::get_uninitialized(base_id + tid)) T(args...);
+  
+  if (tid < num_objects) {
+    new (T::get_uninitialized(base_id + tid)) T(args...);
+  }
 }
 
 template<typename T, typename... Args>
@@ -57,8 +68,10 @@ T* construct(size_t count, Args... args) {
                        sizeof(h_storage_data_head), 0, cudaMemcpyDeviceToHost);
   cudaThreadSynchronize();
 
-  // TODO: Support more than 1024 elements.
-  construct_kernel<T><<<1, count>>>(h_storage_size, args...);
+  IndexType num_blocks = cuda_blocks_1d(count);
+  IndexType num_threads = cuda_threads_1d(count);
+  construct_kernel<T><<<num_blocks, num_threads>>>(h_storage_size, count,
+                                                   args...);
   cudaThreadSynchronize();
 
   return h_storage_data_head;
@@ -75,14 +88,6 @@ __global__ void kernel_call_lambda_collect_result(
     F func, R* result, Args... args) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   result[tid] = func(args...);
-}
-
-IndexType cuda_blocks_1d(IndexType length) {
-  return (length + 256 - 1) / 256;
-}
-
-IndexType cuda_threads_1d(IndexType length) {
-  return length < 256 ? length : 256;
 }
 
 // Proxy idea based on:
@@ -111,9 +116,6 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       if (tid < num_objects) {
         auto* object = T::get(first->id() + tid);
         return (object->*func)(args...);
-      } else {
-        // This branch is never reached.
-        assert(false);
       }
     };
     
@@ -134,9 +136,6 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       if (tid < T::size()) {
         auto* object = T::get(tid);
         return (object->*func)(args...);
-      } else {
-        // This branch is never reached.
-        assert(false);
       }
     };
 
@@ -157,9 +156,6 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       if (tid < num_objects) {
         auto* object = T::get(tid);
         return (object->*func)(args...);
-      } else {
-        // This branch is never reached.
-        assert(false);
       }
     };
 
@@ -201,10 +197,6 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
       if (tid < num_objects) {
         auto* object = T::get(first->id() + tid);
         return (object->*func)(args...);
-      } else {
-        // This branch is never reached.
-        assert(false);
-        return (T::get(0)->*func)(args...);
       }
     };
 
@@ -232,10 +224,6 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
       if (tid < T::size()) {
         auto* object = T::get(tid);
         return (object->*func)(args...);
-      } else {
-        // This branch is never reached.
-        assert(false);
-        return (T::get(0)->*func)(args...);
       }
     };
 

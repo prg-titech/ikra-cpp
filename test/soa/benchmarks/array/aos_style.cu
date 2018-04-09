@@ -1,10 +1,12 @@
-//#define NDEBUG
+#define NDEBUG
 
-#define NUM_INST 2
-#define ARRAY_SIZE 3
+#define NUM_INST 524288
+#define ARRAY_SIZE 48
 
 #include "executor/cuda_executor.h"
 #include "soa/soa.h"
+
+#include "benchmark.h"
 
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
@@ -25,7 +27,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
   int_ field0;
 
   // Array has size 12 bytes.
-  array_(int, ARRAY_SIZE, aos) field1;
+  array_(int, ARRAY_SIZE, soa) field1;
 
   int_ field2;
 
@@ -39,8 +41,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
 IKRA_DEVICE_STORAGE(DummyClass);
 
 
-// Cannot run "cuda_execute" inside gtest case.
-void run_test_construct_and_execute() {
+void action() {
   DummyClass::initialize_storage();
   DummyClass* first = construct<DummyClass>(NUM_INST, 29, 1357);
   gpuErrchk(cudaPeekAtLastError());
@@ -48,8 +49,17 @@ void run_test_construct_and_execute() {
   cuda_execute(&DummyClass::update_field1, first, NUM_INST, 19);
   gpuErrchk(cudaPeekAtLastError());
 
-  // Check result.
-  for (int i = 0; i < NUM_INST; ++i) {
+  cudaDeviceSynchronize();
+}
+
+void run_test_construct_and_execute() {
+  uint64_t time_action = measure<>::execution(action);
+  printf("Time for action: %lu\n", time_action);
+
+#ifndef NDEBUG
+  // Check result (some samples).
+  for (int k = 0; k < 100; ++k) {
+    int i = rand() % NUM_INST;
     for (int j = 0; j < ARRAY_SIZE; ++j) {
       int actual1 = DummyClass::get(i)->field1[j];
       int expected1 = i*17 + j + 19 + 29 + 1357;
@@ -60,6 +70,7 @@ void run_test_construct_and_execute() {
       }
     }
   }
+#endif  // NDEBUG
 }
 
 int main() {
