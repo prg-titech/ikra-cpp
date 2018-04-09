@@ -34,11 +34,11 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
  public:
   static const int kSize = InlinedSize*sizeof(T) + sizeof(T**);
 
-  SoaInlinedDynamicArrayField_(T* external_storage) {
+  __ikra_device__ SoaInlinedDynamicArrayField_(T* external_storage) {
     this->set_external_pointer(external_storage);
   }
 
-  SoaInlinedDynamicArrayField_(size_t num_elements) {
+  __ikra_device__ SoaInlinedDynamicArrayField_(size_t num_elements) {
     // Allocate memory in arena if necessary.
     if (num_elements > InlinedSize) {
       void* mem = Owner::storage().allocate_in_arena(
@@ -81,7 +81,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, void>::type
-  set_external_pointer(T* ptr) {
+  __ikra_device__ set_external_pointer(T* ptr) {
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
     auto p_external = (p_this - p_base - A)/A*sizeof(T) + p_base +
@@ -91,7 +91,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, void>::type
-  set_external_pointer(T* ptr) {
+  __ikra_device__ set_external_pointer(T* ptr) {
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
                       + (Capacity+1)*(Offset + InlinedSize*sizeof(T));
@@ -100,7 +100,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, T*>::type
-  get_external_pointer() const {
+  __ikra_device__ get_external_pointer() const {
     assert(this->id() < Owner::storage().size());
 
     auto p_this = reinterpret_cast<uintptr_t>(this);
@@ -112,7 +112,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
-  get_external_pointer() const {
+  __ikra_device__ get_external_pointer() const {
     assert(this->id() < Owner::storage().size());
 
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(T) +
@@ -124,7 +124,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   // TODO: Implement iterator and other methods.
 
  protected:
-  SoaInlinedDynamicArrayField_() {
+  __ikra_device__ SoaInlinedDynamicArrayField_() {
     this->set_external_pointer(nullptr);
   }
 
@@ -132,7 +132,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
   // of data_ptr in Field_.
   template<size_t Pos, int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, T*>::type
-  array_data_ptr() const {
+  __ikra_device__ array_data_ptr() const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(this->id() < Owner::storage().size());
@@ -155,7 +155,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<size_t Pos, int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
-  array_data_ptr() const {
+  __ikra_device__ array_data_ptr() const {
     assert(this->id() < Owner::storage().size());
 
     auto p_this = reinterpret_cast<uintptr_t>(this);
@@ -175,7 +175,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A != kAddressModeZero, T*>::type
-  array_data_ptr(size_t pos) const {
+  __ikra_device__ array_data_ptr(size_t pos) const {
     // Ensure that this is a valid pointer: Only those objects may be accessed
     // which were created with the "new" keyword and are thus initialized.
     assert(this->id() < Owner::storage().size());
@@ -198,7 +198,7 @@ class SoaInlinedDynamicArrayField_ : public Field_<T, Capacity, Offset,
 
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, T*>::type
-  array_data_ptr(size_t pos) const {
+  __ikra_device__ array_data_ptr(size_t pos) const {
     assert(this->id() < Owner::storage().size());
 
     auto p_this = reinterpret_cast<uintptr_t>(this);

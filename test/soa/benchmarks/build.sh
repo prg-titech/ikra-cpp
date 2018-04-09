@@ -52,6 +52,28 @@ bin/cuda_array_aos_style
 /usr/local/cuda/bin/cuobjdump bin/cuda_array_aos_style -ptx -sass -res-usage \
     > assembly/cuda_array_aos_style.S
 
+/usr/local/cuda/bin/nvcc \
+    -std=c++11 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_array_soa_style \
+    array/soa_style.cu
+bin/cuda_array_soa_style
+/usr/local/cuda/bin/cuobjdump bin/cuda_array_soa_style -ptx -sass -res-usage \
+    > assembly/cuda_array_soa_style.S
+
+/usr/local/cuda/bin/nvcc \
+    -std=c++11 \
+    --expt-extended-lambda \
+    -O3 \
+    -I../../../ikra \
+    -o bin/cuda_array_inlined_soa_style \
+    array/inlined_soa_style.cu
+bin/cuda_array_inlined_soa_style
+/usr/local/cuda/bin/cuobjdump bin/cuda_array_inlined_soa_style -ptx -sass -res-usage \
+    > assembly/cuda_array_inlined_soa_style.S
+
 extra_args="-march=native -fomit-frame-pointer -Ofast"
 for v_compiler in "g++" "${clang_bin}"
 do

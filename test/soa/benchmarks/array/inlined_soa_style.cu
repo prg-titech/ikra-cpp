@@ -7,14 +7,21 @@
 using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::executor::cuda::construct;
+using ikra::soa::StaticStorageWithArena;
+using ikra::soa::kAddressModeZero;
+
+#define EXTRA_BYTES (16*sizeof(int)*NUM_INST)
+#define INLINE_ARR_SIZE (ARRAY_SIZE - 16)
 
 #define CUDA_THREAD_ID (threadIdx.x + blockIdx.x * blockDim.x)
 
-class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
+class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
+    StaticStorageWithArena<EXTRA_BYTES>> {
  public:
   IKRA_INITIALIZE_CLASS
 
-  __device__ DummyClass(int f0, int f2): field0(f0), field2(f2) {
+  __device__ DummyClass(int f0, int f2): field0(f0), field2(f2),
+                                         field1(INLINE_ARR_SIZE) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
       field1[i] = CUDA_THREAD_ID*17 + i;
     }
@@ -22,7 +29,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
 
   int_ field0;
 
-  array_(int, ARRAY_SIZE, aos) field1;
+  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
 
   int_ field2;
 
@@ -49,7 +56,8 @@ void action() {
 
 void run_test_construct_and_execute() {
   uint64_t time_action = measure<>::execution(action);
-  printf("[AOS] Time for action: %lu\n", time_action);
+  printf("[INLINE-%i/%i SOA] Time for action: %lu\n",
+         INLINE_ARR_SIZE, ARRAY_SIZE, time_action);
 
 #ifndef NDEBUG
   // Check result (some samples).
