@@ -42,11 +42,11 @@ Disassembly of section .text:
   400450:	48 83 ec 08          	sub    $0x8,%rsp
   400454:	31 c0                	xor    %eax,%eax
   400456:	b9 20 64 68 24       	mov    $0x24686420,%ecx
-  40045b:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
-  400460:	be 14 07 40 00       	mov    $0x400714,%esi
-  400465:	bf 01 00 00 00       	mov    $0x1,%edi
-  40046a:	48 c7 05 83 0d 20 00 	movq   $0x0,0x200d83(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
-  400471:	00 00 00 00 
+  40045b:	48 c7 05 92 0d 20 00 	movq   $0x0,0x200d92(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
+  400462:	00 00 00 00 
+  400466:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
+  40046b:	be 14 07 40 00       	mov    $0x400714,%esi
+  400470:	bf 01 00 00 00       	mov    $0x1,%edi
   400475:	48 c7 05 70 0d 20 00 	movq   $0x1,0x200d70(%rip)        # 6011f0 <__TestClassdata_buffer>
   40047c:	01 00 00 00 
   400480:	c7 05 7a 0d 20 00 83 	movl   $0x27d22d83,0x200d7a(%rip)        # 601204 <__TestClassdata_buffer+0x14>
@@ -54,9 +54,9 @@ Disassembly of section .text:
   40048a:	c7 05 40 56 20 00 20 	movl   $0x24686420,0x205640(%rip)        # 605ad4 <__TestClassdata_buffer+0x48e4>
   400491:	64 68 24 
   400494:	e8 97 ff ff ff       	callq  400430 <__printf_chk@plt>
-  400499:	81 3d 61 0d 20 00 83 	cmpl   $0x27d22d83,0x200d61(%rip)        # 601204 <__TestClassdata_buffer+0x14>
-  4004a0:	2d d2 27 
-  4004a3:	b8 01 00 00 00       	mov    $0x1,%eax
+  400499:	b8 01 00 00 00       	mov    $0x1,%eax
+  40049e:	81 3d 5c 0d 20 00 83 	cmpl   $0x27d22d83,0x200d5c(%rip)        # 601204 <__TestClassdata_buffer+0x14>
+  4004a5:	2d d2 27 
   4004a8:	75 0d                	jne    4004b7 <main+0x67>
   4004aa:	81 3d 20 56 20 00 20 	cmpl   $0x24686420,0x205620(%rip)        # 605ad4 <__TestClassdata_buffer+0x48e4>
   4004b1:	64 68 24 
@@ -125,13 +125,13 @@ Disassembly of section .text:
   40056a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
 
 0000000000400570 <__do_global_dtors_aux>:
-  400570:	80 3d c9 0a 20 00 00 	cmpb   $0x0,0x200ac9(%rip)        # 601040 <completed.7585>
+  400570:	80 3d c9 0a 20 00 00 	cmpb   $0x0,0x200ac9(%rip)        # 601040 <completed.7594>
   400577:	75 11                	jne    40058a <__do_global_dtors_aux+0x1a>
   400579:	55                   	push   %rbp
   40057a:	48 89 e5             	mov    %rsp,%rbp
   40057d:	e8 6e ff ff ff       	callq  4004f0 <deregister_tm_clones>
   400582:	5d                   	pop    %rbp
-  400583:	c6 05 b6 0a 20 00 01 	movb   $0x1,0x200ab6(%rip)        # 601040 <completed.7585>
+  400583:	c6 05 b6 0a 20 00 01 	movb   $0x1,0x200ab6(%rip)        # 601040 <completed.7594>
   40058a:	f3 c3                	repz retq 
   40058c:	0f 1f 40 00          	nopl   0x0(%rax)
 

@@ -2,7 +2,7 @@
 set -e
 echo "Script will stop on error or incorrect result."
 extra_args="-march=native -fomit-frame-pointer"
-clang_bin="clang++-3.8"
+clang_bin="clang++-5.0"
 
 mkdir -p bin
 mkdir -p assembly

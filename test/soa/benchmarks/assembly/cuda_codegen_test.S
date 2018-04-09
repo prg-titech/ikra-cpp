@@ -387,7 +387,7 @@ Resource usage:
 Fatbin ptx code:
 ================
 arch = sm_30
-code version = [6,0]
+code version = [6,1]
 producer = cuda
 host = linux
 compile_size = 64bit
@@ -400,7 +400,7 @@ compressed
 
 
 
-.version 6.0
+.version 6.1
 .target sm_30
 .address_size 64
 
