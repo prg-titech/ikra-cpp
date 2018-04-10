@@ -14,8 +14,6 @@ using ikra::soa::kAddressModeZero;
 #define EXTRA_BYTES (READ_FROM_ARENA_ELEMENTS*sizeof(int)*NUM_INST)
 #define INLINE_ARR_SIZE (ARRAY_SIZE - READ_FROM_ARENA_ELEMENTS)
 
-#define CUDA_THREAD_ID (threadIdx.x + blockIdx.x * blockDim.x)
-
 class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
     StaticStorageWithArena<EXTRA_BYTES>> {
  public:
@@ -24,7 +22,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
   __device__ DummyClass(int f0, int f2): field0(f0), field2(f2),
                                          field1(ARRAY_SIZE) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
-      field1[i] = CUDA_THREAD_ID*17 + i;
+      field1[i] = id()*17 + i;
     }
   }
 
@@ -68,8 +66,8 @@ void run_test_construct_and_execute() {
       int actual1 = DummyClass::get(i)->field1[j];
       int expected1 = i*17 + j + 19 + 29 + 1357;
       if (actual1 != expected1) {
-        printf("Wrong result! Expected %i, but found %i\n",
-               expected1, actual1);
+        printf("[INLINE] Dummy[%i].field1[%i]: Expected %i, but found %i\n",
+               i, j, expected1, actual1);
         exit(1);
       }
     }

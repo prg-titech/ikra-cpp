@@ -262,14 +262,15 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Compile-time check for the size of this class. This check should fail
   // if this class contains fields that are not declared with the SOA DSL.
-  // Assuming zero addressing mode.
   template<int A = AddressMode>
   __ikra_device__
   static typename std::enable_if<A == kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDACC__   // TODO: Fix on GPU.
+#ifndef __CUDACC__
     static_assert(sizeof(Self) == 0,
                   "SOA class must have only SOA fields.");
+#else
+    // GPU does not do zero initialization, so it's fine.
 #endif  // __CUDACC__
   }
 };

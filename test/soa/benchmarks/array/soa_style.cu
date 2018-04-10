@@ -8,15 +8,13 @@ using ikra::soa::IndexType;
 using ikra::soa::SoaLayout;
 using ikra::executor::cuda::construct;
 
-#define CUDA_THREAD_ID (threadIdx.x + blockIdx.x * blockDim.x)
-
 class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
  public:
   IKRA_INITIALIZE_CLASS
 
   __device__ DummyClass(int f0, int f2): field0(f0), field2(f2) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
-      field1[i] = CUDA_THREAD_ID*17 + i;
+      field1[i] = id()*17 + i;
     }
   }
 
@@ -59,8 +57,8 @@ void run_test_construct_and_execute() {
       int actual1 = DummyClass::get(i)->field1[j];
       int expected1 = i*17 + j + 19 + 29 + 1357;
       if (actual1 != expected1) {
-        printf("Wrong result! Expected %i, but found %i\n",
-               expected1, actual1);
+        printf("[SOA] Dummy[%i].field1[%i]: Expected %i, but found %i\n",
+               i, j, expected1, actual1);
         exit(1);
       }
     }

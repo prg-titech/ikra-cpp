@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 echo "Script will stop on error or incorrect result."
+: '
 extra_args="-march=native -fomit-frame-pointer"
 clang_bin="clang++-5.0"
 
@@ -40,6 +41,10 @@ done
 bin/cuda_codegen_test
 /usr/local/cuda/bin/cuobjdump bin/cuda_codegen_test -ptx -sass -res-usage \
     > assembly/cuda_codegen_test.S
+'
+
+g++ -std=c++11 -O3 -I../../../ikra -o bin/cuda_aos_style_cpu array/aos_style_cpu.cc
+bin/cuda_aos_style_cpu
 
 /usr/local/cuda/bin/nvcc \
     -std=c++11 \

@@ -1,4 +1,4 @@
 //#define NDEBUG
 
-#define NUM_INST 524288
-#define ARRAY_SIZE 256
+#define NUM_INST 1024
+#define ARRAY_SIZE 16
