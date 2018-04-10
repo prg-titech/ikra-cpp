@@ -131,34 +131,34 @@ Disassembly of section .text:
 
 0000000000400610 <main>:
   400610:	50                   	push   %rax
-  400611:	bf a8 91 00 00       	mov    $0x91a8,%edi
+  400611:	bf c0 91 00 00       	mov    $0x91c0,%edi
   400616:	e8 c5 fe ff ff       	callq  4004e0 <malloc@plt>
   40061b:	48 89 05 46 0a 20 00 	mov    %rax,0x200a46(%rip)        # 601068 <__TestClassdata_buffer+0x18>
-  400622:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
-  400626:	c5 f8 11 05 2a 0a 20 	vmovups %xmm0,0x200a2a(%rip)        # 601058 <__TestClassdata_buffer+0x8>
-  40062d:	00 
-  40062e:	48 c7 05 17 0a 20 00 	movq   $0x1,0x200a17(%rip)        # 601050 <__TestClassdata_buffer>
-  400635:	01 00 00 00 
-  400639:	c7 40 04 83 2d d2 27 	movl   $0x27d22d83,0x4(%rax)
-  400640:	c7 80 d8 48 00 00 20 	movl   $0x24686420,0x48d8(%rax)
-  400647:	64 68 24 
-  40064a:	bf a4 07 40 00       	mov    $0x4007a4,%edi
-  40064f:	be 83 2d d2 27       	mov    $0x27d22d83,%esi
-  400654:	ba 20 64 68 24       	mov    $0x24686420,%edx
-  400659:	31 c0                	xor    %eax,%eax
-  40065b:	e8 70 fe ff ff       	callq  4004d0 <printf@plt>
-  400660:	48 8b 0d 01 0a 20 00 	mov    0x200a01(%rip),%rcx        # 601068 <__TestClassdata_buffer+0x18>
-  400667:	b8 01 00 00 00       	mov    $0x1,%eax
-  40066c:	81 79 04 83 2d d2 27 	cmpl   $0x27d22d83,0x4(%rcx)
-  400673:	75 0f                	jne    400684 <main+0x74>
-  400675:	31 c0                	xor    %eax,%eax
-  400677:	81 b9 d8 48 00 00 20 	cmpl   $0x24686420,0x48d8(%rcx)
-  40067e:	64 68 24 
-  400681:	0f 95 c0             	setne  %al
-  400684:	59                   	pop    %rcx
-  400685:	c3                   	retq   
-  400686:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  40068d:	00 00 00 
+  400622:	c7 05 34 0a 20 00 00 	movl   $0x0,0x200a34(%rip)        # 601060 <__TestClassdata_buffer+0x10>
+  400629:	00 00 00 
+  40062c:	48 c7 05 21 0a 20 00 	movq   $0x0,0x200a21(%rip)        # 601058 <__TestClassdata_buffer+0x8>
+  400633:	00 00 00 00 
+  400637:	48 c7 05 0e 0a 20 00 	movq   $0x1,0x200a0e(%rip)        # 601050 <__TestClassdata_buffer>
+  40063e:	01 00 00 00 
+  400642:	c7 40 04 83 2d d2 27 	movl   $0x27d22d83,0x4(%rax)
+  400649:	c7 80 e4 48 00 00 20 	movl   $0x24686420,0x48e4(%rax)
+  400650:	64 68 24 
+  400653:	bf a4 07 40 00       	mov    $0x4007a4,%edi
+  400658:	be 83 2d d2 27       	mov    $0x27d22d83,%esi
+  40065d:	ba 20 64 68 24       	mov    $0x24686420,%edx
+  400662:	31 c0                	xor    %eax,%eax
+  400664:	e8 67 fe ff ff       	callq  4004d0 <printf@plt>
+  400669:	48 8b 0d f8 09 20 00 	mov    0x2009f8(%rip),%rcx        # 601068 <__TestClassdata_buffer+0x18>
+  400670:	b8 01 00 00 00       	mov    $0x1,%eax
+  400675:	81 79 04 83 2d d2 27 	cmpl   $0x27d22d83,0x4(%rcx)
+  40067c:	75 0f                	jne    40068d <main+0x7d>
+  40067e:	31 c0                	xor    %eax,%eax
+  400680:	81 b9 e4 48 00 00 20 	cmpl   $0x24686420,0x48e4(%rcx)
+  400687:	64 68 24 
+  40068a:	0f 95 c0             	setne  %al
+  40068d:	59                   	pop    %rcx
+  40068e:	c3                   	retq   
+  40068f:	90                   	nop
 
 0000000000400690 <_Z12new_instancev>:
   400690:	48 8b 05 b9 09 20 00 	mov    0x2009b9(%rip),%rax        # 601050 <__TestClassdata_buffer>
@@ -182,7 +182,7 @@ Disassembly of section .text:
 
 00000000004006d0 <_Z12write_field1P9TestClass>:
   4006d0:	48 8b 05 91 09 20 00 	mov    0x200991(%rip),%rax        # 601068 <__TestClassdata_buffer+0x18>
-  4006d7:	c7 84 b8 d4 48 00 00 	movl   $0x7777,0x48d4(%rax,%rdi,4)
+  4006d7:	c7 84 b8 e0 48 00 00 	movl   $0x7777,0x48e0(%rax,%rdi,4)
   4006de:	77 77 00 00 
   4006e2:	c3                   	retq   
   4006e3:	66 66 66 66 2e 0f 1f 	data16 data16 data16 nopw %cs:0x0(%rax,%rax,1)
@@ -190,7 +190,7 @@ Disassembly of section .text:
 
 00000000004006f0 <_Z11read_field1P9TestClass>:
   4006f0:	48 8b 05 71 09 20 00 	mov    0x200971(%rip),%rax        # 601068 <__TestClassdata_buffer+0x18>
-  4006f7:	8b 84 b8 d4 48 00 00 	mov    0x48d4(%rax,%rdi,4),%eax
+  4006f7:	8b 84 b8 e0 48 00 00 	mov    0x48e0(%rax,%rdi,4),%eax
   4006fe:	c3                   	retq   
   4006ff:	90                   	nop
 

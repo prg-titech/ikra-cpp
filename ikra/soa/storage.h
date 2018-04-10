@@ -6,15 +6,15 @@
 #include "soa/util.h"
 
 #define IKRA_DEVICE_STORAGE(class_name) \
-__device__ char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
-    __attribute__((aligned(8))); \
+__device__ alignas(8) char \
+    __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
 constexpr char* class_name::storage_buffer() { \
   return __ ## class_name ## data_buffer; \
 }
 
 #define IKRA_HOST_STORAGE(class_name) \
-char __ ## class_name ## data_buffer[sizeof(class_name::Storage)] \
-    __attribute__((aligned(8))); \
+alignas(8) char \
+    __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
 constexpr char* class_name::storage_buffer() { \
   return __ ## class_name ## data_buffer; \
 }
@@ -23,6 +23,7 @@ constexpr char* class_name::storage_buffer() { \
 namespace ikra {
 namespace soa {
 
+using ArenaIndexType = unsigned int;
 static const int kStorageModeStatic = 0;
 static const int kStorageModeDynamic = 1;
 
@@ -90,6 +91,22 @@ class StorageStrategyBase {
   IndexType increase_size(IndexType increment);
 #endif
 
+ protected:
+#ifdef __CUDA_ARCH__
+  static __device__ ArenaIndexType atomic_add(ArenaIndexType* addr,
+                                              ArenaIndexType increment) {
+    return atomicAdd(addr, increment);
+  }
+#else
+  static ArenaIndexType atomic_add(ArenaIndexType* addr,
+                                   ArenaIndexType increment) {
+    // TODO: Make atomic for thread pool execution
+    ArenaIndexType r = *addr;
+    *addr += increment;
+    return r;
+  }
+#endif  // __CUDA_ARCH__
+
  private:
   // The number of instances of Owner.
   IndexType size_;
@@ -140,7 +157,7 @@ IndexType StorageStrategyBase::increase_size(IndexType increment) {
 // a SOA class is still a compile-time constant.
 // TODO: Use cudaMalloc for device storage (?).
 template<class OwnerT, size_t ArenaSize>
-class DynamicStorage_
+class alignas(8) DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  public:
   static const int kStorageMode = kStorageModeDynamic;
@@ -151,39 +168,42 @@ class DynamicStorage_
   __ikra_device__ DynamicStorage_() {
     // Note: ObjectSize is accessed within a function here.
     // Add one because first object has ID 0.
-    data_ = malloc(Owner::ObjectSize::value * (Owner::kCapacity + 1));
+    data_ = reinterpret_cast<char*>(
+        malloc(Owner::ObjectSize::value * (Owner::kCapacity + 1)));
 
     if (ArenaSize > 0) {
-      arena_head_ = arena_base_ = malloc(ArenaSize);
+      arena_head_ = 0;
+      arena_base_ = reinterpret_cast<char*>(malloc(ArenaSize));
     } else {
-      arena_head_ = arena_base_ = nullptr;
+      arena_head_ = 0;
+      arena_base_ = nullptr;
     }
   }
 
   // Use existing data allocation.
   __ikra_device__
-  explicit DynamicStorage_(void* ptr, void* arena_ptr = nullptr) {
+  explicit DynamicStorage_(char* ptr, char* arena_ptr = nullptr) {
+    assert(ptr != nullptr);
     data_ = ptr;
 
-    if (ArenaSize != 0 && arena_ptr == nullptr) {
-      arena_head_ = arena_base_ = malloc(ArenaSize);
-    } else {
-      arena_head_ = arena_base_ = arena_ptr;
+    if (ArenaSize != 0) {
+      assert(arena_ptr != nullptr);
+      arena_head_ = 0;
+      arena_base_ = arena_ptr;
     }
   }
 
   // Allocate arena storage, i.e., storage that is not used for a SOA column.
   // For example, inlined dynamic arrays require arena storage for all elements
   // beyond InlineSize.
-  __ikra_device__ void* allocate_in_arena(size_t bytes) {
-    assert(arena_head_ != nullptr);
-    void* result = arena_head_;
-    arena_head_ = reinterpret_cast<void*>(
-        reinterpret_cast<uintptr_t>(arena_head_) + bytes);
-    return result;
+  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+    assert(arena_base_ != nullptr);
+    assert(arena_head_ + bytes < ArenaSize);
+    auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);
+    return arena_base_ + new_head;
   }
 
-  __ikra_device__ void* data_ptr() {
+  __ikra_device__ char* data_ptr() {
     // Check alignment.
     assert(reinterpret_cast<uintptr_t>(data_) % 8 == 0);
     return data_;
@@ -201,20 +221,20 @@ class DynamicStorage_
   friend class StorageDataOffset;
 
   // The base pointer (start) of the arena.
-  void* arena_base_;
+  char* arena_base_;
 
-  // The current head of the arena. To be increased after allocation (bump
-  // pointer allocation).
-  void* arena_head_;
+  // The current head of the arena (offset in bytes).
+  // To be increased after allocation (bump pointer allocation).
+  ArenaIndexType arena_head_;
 
   // A pointer to the memory where SOA columns are stored.
-  void* data_;
+  char* data_;
 };
 
 // This class defines the data/memory (char array) for the Owner class.
 // Memory is allocated statically, allowing for efficient code generation.
 template<class OwnerT, size_t ArenaSize>
-class StaticStorage_
+class alignas(8) StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  public:
   static const int kStorageMode = kStorageModeStatic;
@@ -222,26 +242,20 @@ class StaticStorage_
   using Owner = OwnerT;
 
   __ikra_device__ StaticStorage_() {
-    if (ArenaSize == 0) {
-      arena_head_ = nullptr;
-    } else {
-      arena_head_ = arena_base_;
-    }
+    arena_head_ = 0;
   }
 
-  __ikra_device__ void* allocate_in_arena(size_t bytes) {
-    assert(arena_head_ != nullptr);
-    // Assert that arena is not full.
-    assert(arena_head_ + bytes < arena_base_ + ArenaSize);
-    void* result = reinterpret_cast<void*>(arena_head_);
-    arena_head_ += bytes;
-    return result;
+  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+    assert(arena_base_ != nullptr);
+    assert(arena_head_ + bytes < ArenaSize);
+    auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);
+    return arena_base_ + new_head;
   }
 
-  __ikra_device__ void* data_ptr() {
+  __ikra_device__ char* data_ptr() {
     // Check alignment.
     assert(reinterpret_cast<uintptr_t>(data_) % 8 == 0);
-    return reinterpret_cast<void*>(&data_[0]);
+    return &data_[0];
   }
 
   static const bool kIsStaticStorage = true;
@@ -251,14 +265,14 @@ class StaticStorage_
   friend class StorageDataOffset;
 
   // Statically allocated data storage for the arena.
-  char arena_base_[ArenaSize];
+  alignas(8) char arena_base_[ArenaSize];
 
   // Current head pointer of the arena.
-  char* arena_head_;
+  ArenaIndexType arena_head_;
 
   // Statically allocated data storage for SOA columns.
   // Add one because first object has ID 0.
-  char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
+  alignas(8) char data_[Owner::ObjectSize::value * (Owner::kCapacity + 1)];
 
  public:
   // Returning the storage buffer data array as reference retains the

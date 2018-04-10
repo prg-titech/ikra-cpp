@@ -121,7 +121,7 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     
     kernel_call_lambda<<<num_blocks, num_threads>>>(
         invoke_function, first, num_objects, args...);
-    cudaDeviceSynchronize();
+    gpuErrchk(cudaDeviceSynchronize());
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
