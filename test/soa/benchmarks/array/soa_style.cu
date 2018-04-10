@@ -20,7 +20,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
 
   int_ field0;
 
-  array_(int, ARRAY_SIZE, aos) field1;
+  array_(int, ARRAY_SIZE, soa) field1;
 
   int_ field2;
 
@@ -47,7 +47,7 @@ void action() {
 
 void run_test_construct_and_execute() {
   uint64_t time_action = measure<>::execution(action);
-  printf("[AOS] Time for action: %lu\n", time_action);
+  printf("[SOA] Time for action: %lu\n", time_action);
 
 #ifndef NDEBUG
   // Check result (some samples).
@@ -57,7 +57,7 @@ void run_test_construct_and_execute() {
       int actual1 = DummyClass::get(i)->field1[j];
       int expected1 = i*17 + j + 19 + 29 + 1357;
       if (actual1 != expected1) {
-        printf("[AOS] Dummy[%i].field1[%i]: Expected %i, but found %i\n",
+        printf("[SOA] Dummy[%i].field1[%i]: Expected %i, but found %i\n",
                i, j, expected1, actual1);
         exit(1);
       }

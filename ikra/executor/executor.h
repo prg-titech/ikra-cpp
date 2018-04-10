@@ -3,6 +3,7 @@
 
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
+#include <cstdlib>
 
 #include <cstdint>
 #include <type_traits>

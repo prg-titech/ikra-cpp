@@ -33,15 +33,27 @@ struct SizeNDummy {
 // of this class will be 0. In valid addressing mode, the size of this class
 // will be the size of first field.
 // Self is the type of the subclass being defined (see also F-bound
-// polymorphism or "Curiously Recurring Template Pattern"). Capacity is
+// polymorphism or "Curiously Recurring Template Pattern"). UserCapacity is
 // the maximum number of instances this class can have. It is a compile-time
 // constant to allow for efficient field address computation. AddressMode can
 // be either "Zero Addressing Mode" or "Valid Addressing Mode".
+// The real capacity of a SOA class is chosen such that `UserCapacity + 1` is
+// a multiple of 8 (for alignment reasons).
 template<class Self,
-         IndexType Capacity,
+         IndexType UserCapacity,
          int AddressMode = kAddressModeZero,
          class StorageStrategy = StaticStorage>
 class SoaLayout : SizeNDummy<AddressMode> {
+ private:
+  // Calculate real capacity of the container, such that its size is a multiple
+  // of 8 bytes.
+  static constexpr IndexType calculate_capacity() {
+    // C++11 constexpr must have only one return statement.
+    return ((UserCapacity + 8) / 8) * 8 - 1;
+  }
+
+  static const IndexType Capacity = calculate_capacity();
+
  public:
   using Storage = typename StorageStrategy::template type<Self>;
   static const IndexType kCapacity = Capacity;
@@ -49,9 +61,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Cannot access members of Storge in here because Storage depends on this
   // class and must not be instantiated yet.
-  static constexpr int kStorageMode =
-      std::is_same<StorageStrategy, StaticStorage>::value
-          ? kStorageModeStatic : kStorageModeDynamic;
+  static constexpr int kStorageMode = storage_mode<StorageStrategy>::value;
 
   // Check if the compiler supports this address mode.
   static_assert(
@@ -250,14 +260,15 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Compile-time check for the size of this class. This check should fail
   // if this class contains fields that are not declared with the SOA DSL.
-  // Assuming zero addressing mode.
   template<int A = AddressMode>
   __ikra_device__
   static typename std::enable_if<A == kAddressModeZero, void>::type
   check_sizeof_class() {
-#ifndef __CUDACC__   // TODO: Fix on GPU.
+#ifndef __CUDACC__
     static_assert(sizeof(Self) == 0,
                   "SOA class must have only SOA fields.");
+#else
+    // GPU does not do zero initialization, so it's fine.
 #endif  // __CUDACC__
   }
 };

@@ -16,8 +16,11 @@ template<int A = AddressMode>
 __ikra_device__
 typename std::enable_if<A == kAddressModeZero, IndexType>::type
 id() const {
+  static_assert(sizeof(Self) == 0,
+                "Zero addressing mode not supported by compiler.");
   return reinterpret_cast<uintptr_t>(this) - 1;
 }
 
 // Force size of this class to be 0.
 char dummy_[0];
+

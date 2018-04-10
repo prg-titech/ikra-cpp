@@ -23,7 +23,7 @@ compile_size = 64bit
 
 Resource usage:
  Common:
-  GLOBAL:8452
+  GLOBAL:8508
  Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I9TestClassLm0EEEJEEEvPT_DpT0_:
   REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
@@ -59,7 +59,7 @@ Resource usage:
         /*0030*/                   MOV R3, c[0x0][0x144];                         /* 0x280040051000dde4 */
         /*0038*/                   ST.E.64 [R2], RZ;                              /* 0x94000000002fdca5 */
                                                                                   /* 0x200000000002f047 */
-        /*0048*/                   ST.E.64 [R2+0x8], RZ;                          /* 0x94000000202fdca5 */
+        /*0048*/                   ST.E [R2+0x8], RZ;                             /* 0x94000000202fdc85 */
         /*0050*/                   EXIT;                                          /* 0x8000000000001de7 */
         /*0058*/                   BRA 0x58;                                      /* 0x4003ffffe0001de7 */
         /*0060*/                   NOP;                                           /* 0x4000000000001de4 */
@@ -120,7 +120,7 @@ Resource usage:
         /*00c8*/                   MOV R2, R7;                             /* 0x280000001c009de4 */
         /*00d0*/                   IADD.X R3, R0, R6;                      /* 0x480000001800dc43 */
         /*00d8*/                   LD.E R0, [R2+0x14];                     /* 0x8400000050201c85 */
-        /*00e0*/                   LD.E R5, [R2+0xfb8];                    /* 0x8400003ee0215c85 */
+        /*00e0*/                   LD.E R5, [R2+0xfd4];                    /* 0x8400003f50215c85 */
         /*00e8*/                   IADD R0, R0, c[0x0][0x144];             /* 0x4800400510001c03 */
         /*00f0*/                   IADD R0, R0, R5;                        /* 0x4800000014001c03 */
         /*00f8*/                   IADD R0, R4, R0;                        /* 0x4800000000401c03 */
@@ -172,7 +172,7 @@ Resource usage:
                                                                                       /* 0x20000002f042e287 */
         /*0108*/                   IADD.X R3, R0, R3;                                 /* 0x480000000c00dc43 */
         /*0110*/                   ST.E [R2+0x10], R5;                                /* 0x9400000040215c85 */
-        /*0118*/                   ST.E [R2+0xfb4], R4;                               /* 0x9400003ed0211c85 */
+        /*0118*/                   ST.E [R2+0xfd0], R4;                               /* 0x9400003f40211c85 */
         /*0120*/                   EXIT;                                              /* 0x8000000000001de7 */
         /*0128*/                   BRA 0x128;                                         /* 0x4003ffffe0001de7 */
         /*0130*/                   NOP;                                               /* 0x4000000000001de4 */
@@ -286,7 +286,7 @@ Resource usage:
         /*0070*/               @P0 IADD R0, R2, R3;                  /* 0x480000000c200003 */
         /*0078*/                   IADD.X R5, R5, R0;                /* 0x4800000000515c43 */
                                                                      /* 0x200002f043f20047 */
-        /*0088*/                   LD.E R4, [R4+0xfb4];              /* 0x8400003ed0411c85 */
+        /*0088*/                   LD.E R4, [R4+0xfd0];              /* 0x8400003f40411c85 */
         /*0090*/                   MOV32I R2, 0x0;                   /* 0x1800000000009de2 */
         /*0098*/                   MOV32I R3, 0x0;                   /* 0x180000000000dde2 */
         /*00a0*/                   ST.E [R2], R4;                    /* 0x9400000000211c85 */
@@ -316,7 +316,7 @@ Resource usage:
         /*0078*/                   MOV32I R4, 0x7777;                /* 0x180001dddc011de2 */
                                                                      /* 0x2000000002f04287 */
         /*0088*/                   IADD.X R3, R3, R0;                /* 0x480000000030dc43 */
-        /*0090*/                   ST.E [R2+0xfb4], R4;              /* 0x9400003ed0211c85 */
+        /*0090*/                   ST.E [R2+0xfd0], R4;              /* 0x9400003f40211c85 */
         /*0098*/                   EXIT;                             /* 0x8000000000001de7 */
         /*00a0*/                   BRA 0xa0;                         /* 0x4003ffffe0001de7 */
         /*00a8*/                   NOP;                              /* 0x4000000000001de4 */
@@ -405,7 +405,7 @@ compressed
 .address_size 64
 
 
-.global .align 16 .b8 __TestClassdata_buffer[8024];
+.global .align 16 .b8 __TestClassdata_buffer[8080];
 .global .align 4 .u32 int_result;
 .global .align 16 .b8 explicit_field0[400];
 .global .align 8 .u64 _ZN4ikra8executor4cuda14d_storage_sizeE;
@@ -461,7 +461,7 @@ shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd3, %rd2;
 mov.u32 %r1, 30583;
-st.global.u32 [%rd4+4020], %r1;
+st.global.u32 [%rd4+4048], %r1;
 ret;
 }
 
@@ -478,7 +478,7 @@ ld.param.u64 %rd1, [_Z11read_field1P9TestClass_param_0];
 shl.b64 %rd2, %rd1, 2;
 mov.u64 %rd3, __TestClassdata_buffer;
 add.s64 %rd4, %rd3, %rd2;
-ld.global.u32 %r1, [%rd4+4020];
+ld.global.u32 %r1, [%rd4+4048];
 st.global.u32 [int_result], %r1;
 ret;
 }
@@ -571,7 +571,7 @@ shl.b64 %rd6, %rd2, 2;
 mov.u64 %rd7, __TestClassdata_buffer;
 add.s64 %rd8, %rd7, %rd6;
 st.global.u32 [%rd8+16], %r1;
-st.global.u32 [%rd8+4020], %r2;
+st.global.u32 [%rd8+4048], %r2;
 
 BB7_3:
 ret;
@@ -604,7 +604,7 @@ mov.u64 %rd4, __TestClassdata_buffer;
 add.s64 %rd5, %rd4, %rd3;
 ld.global.u32 %r7, [%rd5+20];
 add.s32 %r8, %r7, %r1;
-ld.global.u32 %r9, [%rd5+4024];
+ld.global.u32 %r9, [%rd5+4052];
 add.s32 %r10, %r8, %r9;
 add.s32 %r11, %r6, %r10;
 add.s32 %r12, %r11, 30583;
@@ -639,6 +639,7 @@ ret;
 )
 {
 .reg .pred %p<2>;
+.reg .b32 %r<2>;
 .reg .b64 %rd<4>;
 
 
@@ -649,7 +650,8 @@ setp.eq.s64	%p1, %rd1, 0;
 cvta.to.global.u64 %rd2, %rd1;
 mov.u64 %rd3, 0;
 st.global.u64 [%rd2], %rd3;
-st.global.u64 [%rd2+8], %rd3;
+mov.u32 %r1, 0;
+st.global.u32 [%rd2+8], %r1;
 
 BB10_2:
 ret;

@@ -10,6 +10,10 @@
     static const uint32_t value = OffsetCounter<field_id>::value + \
                                   sizeof(type); \
     static const bool kIsSpecialization = true; \
+    static void DBG_print_offsets() { \
+      printf("OffsetCounter<%i>::value = %u\n", field_id + 1, value); \
+      OffsetCounter<field_id + 2>::DBG_print_offsets(); \
+    } \
   }; \
   soa_ ## type<OffsetCounter<field_id>::value>
 
@@ -19,6 +23,11 @@
     static const uint32_t value = OffsetCounter<field_id>::value + \
         array::layout<type, size, OffsetCounter<field_id>::value>::kSize; \
     static const bool kIsSpecialization = true; \
+    static void DBG_print_offsets() { \
+      printf("OffsetCounter<%i>::value = %u    [ ARRAY ]\n", \
+             field_id + 1, value); \
+      OffsetCounter<field_id + 2>::DBG_print_offsets(); \
+    } \
   }; \
   array::layout<type, size, OffsetCounter<field_id>::value>
 
@@ -28,6 +37,11 @@
     static const uint32_t value = OffsetCounter<field_id>::value + \
                                   sizeof(type); \
     static const bool kIsSpecialization = true; \
+    static void DBG_print_offsets() { \
+      printf("OffsetCounter<%i>::value = %u    [ CUSTOM ]\n", \
+             field_id + 1, value); \
+      OffsetCounter<field_id + 2>::DBG_print_offsets(); \
+    } \
   }; \
   Field<type, OffsetCounter<field_id>::value>
 
