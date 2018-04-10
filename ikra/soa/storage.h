@@ -58,10 +58,32 @@ class StorageStrategyBase {
 #ifdef __CUDACC__
   StorageStrategyBase* device_ptr() const {
     // Get device address of storage.
+    // TODO: This value should be cached.
     StorageStrategyBase* d_storage;
     cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
     assert(cudaPeekAtLastError() == cudaSuccess);
     return d_storage;
+  }
+
+  // Convert addresses between device and host.
+  template<typename T>
+  T* translate_address_host_to_device(T* h_addr) const {
+    auto h_data_ptr = reinterpret_cast<uintptr_t>(h_addr);
+    auto h_storage_ptr = reinterpret_cast<uintptr_t>(this);
+    assert(h_data_ptr >= h_storage_ptr);
+    auto data_offset = h_data_ptr - h_storage_ptr;
+    auto d_storage_ptr = reinterpret_cast<uintptr_t>(device_ptr());
+    return reinterpret_cast<T*>(d_storage_ptr + data_offset);
+  }
+
+  template<typename T>
+  T* translate_address_device_to_host(T* d_addr) const {
+    auto d_data_ptr = reinterpret_cast<uintptr_t>(d_addr);
+    auto d_storage_ptr = reinterpret_cast<uintptr_t>(device_ptr());
+    assert(d_data_ptr >= d_storage_ptr);
+    auto data_offset = d_data_ptr - d_storage_ptr;
+    auto h_storage_ptr = reinterpret_cast<uintptr_t>(this);
+    return reinterpret_cast<T*>(h_storage_ptr + data_offset);
   }
 #endif  // __CUDACC__
 
@@ -115,18 +137,7 @@ class StorageStrategyBase {
 };
 
 template<typename Self>
-class StorageStrategySelf : public StorageStrategyBase {
- public:
-#ifdef __CUDACC__
-  Self* device_ptr() const {
-    // Get device address of storage.
-    Self* d_storage;
-    cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
-    assert(cudaPeekAtLastError() == cudaSuccess);
-    return d_storage;
-  }
-#endif  // __CUDACC__
-};
+class StorageStrategySelf : public StorageStrategyBase {};
 
 #if defined(__CUDACC__)
 // Note: This kernel cannot be templatized because template expansion

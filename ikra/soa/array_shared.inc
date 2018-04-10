@@ -77,14 +77,9 @@ class AssignmentHelper {
   }
 
  private:
-  B* device_ptr() const {
-    auto h_data_ptr = reinterpret_cast<uintptr_t>(this);
-    auto h_storage_ptr = reinterpret_cast<uintptr_t>(&Owner::storage());
-    assert(h_data_ptr >= h_storage_ptr);
-    auto data_offset = h_data_ptr - h_storage_ptr;
-    auto d_storage_ptr = reinterpret_cast<uintptr_t>(
-        Owner::storage().device_ptr());
-    return reinterpret_cast<B*>(d_storage_ptr + data_offset);
+  B* device_ptr() {
+    return Owner::storage().translate_address_host_to_device(
+        reinterpret_cast<B*>(this));
   }
 };
 

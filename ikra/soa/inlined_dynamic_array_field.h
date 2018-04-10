@@ -62,11 +62,16 @@ class SoaInlinedDynamicArrayField_ {
 
   operator B&() const = delete;
 
-#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
-// Not running in CUDA mode or running on device.
+  // TODO: Implement iterator and other methods.
+
+ protected:
+  __ikra_device__ SoaInlinedDynamicArrayField_() {
+    this->set_external_pointer(nullptr);
+  }
+
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, void>::type
-  set_external_pointer(B* ptr) {
+  set_external_pointer_internal(B* ptr) {
     /*
     assert(reinterpret_cast<uintptr_t>(ptr) % 4 == 0);
     auto p_this = reinterpret_cast<uintptr_t>(this);
@@ -82,7 +87,7 @@ class SoaInlinedDynamicArrayField_ {
 
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, void>::type
-  set_external_pointer(B* ptr) {
+  set_external_pointer_internal(B* ptr) {
     assert(reinterpret_cast<uintptr_t>(ptr) % 4 == 0);
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
@@ -92,8 +97,8 @@ class SoaInlinedDynamicArrayField_ {
   }
 
   template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A != kAddressModeZero, B*>::type
-  get_external_pointer() const {
+  __ikra_device__ typename std::enable_if<A != kAddressModeZero, B**>::type
+  get_external_pointer_addr_internal() const {
     assert(this->id() < Owner::storage().size());
 
     /*
@@ -109,48 +114,42 @@ class SoaInlinedDynamicArrayField_ {
   }
 
   template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, B*>::type
-  get_external_pointer() const {
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero, B**>::type
+  get_external_pointer_addr_internal() const {
     assert(this->id() < Owner::storage().size());
 
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
                       + (Capacity+1)*(Offset + InlinedSize*sizeof(B));
     assert(p_external % sizeof(B**) == 0);
-    return *reinterpret_cast<B**>(p_external);
+    return reinterpret_cast<B**>(p_external);
+  }
+
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+// Not running in CUDA mode or running on device.
+  __ikra_device__ B* get_external_pointer() const {
+    return *get_external_pointer_addr_internal();
+  }
+
+  __ikra_device__ void set_external_pointer(B* ptr) {
+    set_external_pointer_internal(ptr);
   }
 #else
-  // Running on host, but data is located on GPU.
-  // TODO: Implement other addressing modes.
+// Running on host, but data is located on GPU.
   // TODO: This seems really inefficient. Use only for debugging at the moment!
   template<int A = AddressMode>
   typename std::enable_if<A == kAddressModeZero, B*>::type
   get_external_pointer() const {
-    assert(this->id() < Owner::storage().size());
-
-    auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
-                      reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
-                      + (Capacity+1)*(Offset + InlinedSize*sizeof(B));
-    assert(p_external % sizeof(B**) == 0);
-
     // Copy external pointer from GPU.
-    // TODO: Merge this code with functions in array_shared.inc.
-    auto h_data_ptr = p_external;
-    auto h_storage_ptr = reinterpret_cast<uintptr_t>(&Owner::storage());
-    assert(h_data_ptr >= h_storage_ptr);
-    auto data_offset = h_data_ptr - h_storage_ptr;
-    auto d_storage_ptr = reinterpret_cast<uintptr_t>(
-        Owner::storage().device_ptr());
-    B** dev_p_external = reinterpret_cast<B**>(d_storage_ptr + data_offset);
-
+    B** dev_p_external = Owner::storage().translate_address_host_to_device(
+        reinterpret_cast<B**>(get_external_pointer_addr_internal()));
     B* dev_result = nullptr;
     cudaMemcpy(&dev_result, dev_p_external, sizeof(B*),
                cudaMemcpyDeviceToHost);
     assert(cudaPeekAtLastError() == cudaSuccess);
 
     // Now convert the value back to host-relative address.
-    data_offset = reinterpret_cast<uintptr_t>(dev_result) - d_storage_ptr;
-    return reinterpret_cast<B*>(h_storage_ptr + data_offset);
+    return Owner::storage().translate_address_device_to_host(dev_result);
   }
 
   template<int A = AddressMode>
@@ -160,13 +159,6 @@ class SoaInlinedDynamicArrayField_ {
     assert(false);
   }
 #endif
-
-  // TODO: Implement iterator and other methods.
-
- protected:
-  __ikra_device__ SoaInlinedDynamicArrayField_() {
-    this->set_external_pointer(nullptr);
-  }
 
   // Calculate the address of an array element. For details, see comment
   // of data_ptr in Field_.
