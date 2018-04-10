@@ -47,21 +47,21 @@ Disassembly of section .text:
   4004a0:	48 83 ec 08          	sub    $0x8,%rsp
   4004a4:	bf a8 91 00 00       	mov    $0x91a8,%edi
   4004a9:	e8 c2 ff ff ff       	callq  400470 <malloc@plt>
-  4004ae:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
-  4004b3:	b9 20 64 68 24       	mov    $0x24686420,%ecx
-  4004b8:	48 c7 05 35 0d 20 00 	movq   $0x0,0x200d35(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
-  4004bf:	00 00 00 00 
-  4004c3:	48 89 05 3e 0d 20 00 	mov    %rax,0x200d3e(%rip)        # 601208 <__TestClassdata_buffer+0x18>
-  4004ca:	be 44 07 40 00       	mov    $0x400744,%esi
-  4004cf:	bf 01 00 00 00       	mov    $0x1,%edi
-  4004d4:	48 c7 05 21 0d 20 00 	movq   $0x0,0x200d21(%rip)        # 601200 <__TestClassdata_buffer+0x10>
-  4004db:	00 00 00 00 
-  4004df:	48 c7 05 06 0d 20 00 	movq   $0x1,0x200d06(%rip)        # 6011f0 <__TestClassdata_buffer>
-  4004e6:	01 00 00 00 
-  4004ea:	c7 40 04 83 2d d2 27 	movl   $0x27d22d83,0x4(%rax)
-  4004f1:	c7 80 d8 48 00 00 20 	movl   $0x24686420,0x48d8(%rax)
-  4004f8:	64 68 24 
-  4004fb:	31 c0                	xor    %eax,%eax
+  4004ae:	48 c7 05 3f 0d 20 00 	movq   $0x0,0x200d3f(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
+  4004b5:	00 00 00 00 
+  4004b9:	48 89 05 48 0d 20 00 	mov    %rax,0x200d48(%rip)        # 601208 <__TestClassdata_buffer+0x18>
+  4004c0:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
+  4004c5:	48 c7 05 30 0d 20 00 	movq   $0x0,0x200d30(%rip)        # 601200 <__TestClassdata_buffer+0x10>
+  4004cc:	00 00 00 00 
+  4004d0:	48 c7 05 15 0d 20 00 	movq   $0x1,0x200d15(%rip)        # 6011f0 <__TestClassdata_buffer>
+  4004d7:	01 00 00 00 
+  4004db:	b9 20 64 68 24       	mov    $0x24686420,%ecx
+  4004e0:	c7 40 04 83 2d d2 27 	movl   $0x27d22d83,0x4(%rax)
+  4004e7:	c7 80 d8 48 00 00 20 	movl   $0x24686420,0x48d8(%rax)
+  4004ee:	64 68 24 
+  4004f1:	be 44 07 40 00       	mov    $0x400744,%esi
+  4004f6:	31 c0                	xor    %eax,%eax
+  4004f8:	bf 01 00 00 00       	mov    $0x1,%edi
   4004fd:	e8 7e ff ff ff       	callq  400480 <__printf_chk@plt>
   400502:	48 8b 15 ff 0c 20 00 	mov    0x200cff(%rip),%rdx        # 601208 <__TestClassdata_buffer+0x18>
   400509:	b8 01 00 00 00       	mov    $0x1,%eax

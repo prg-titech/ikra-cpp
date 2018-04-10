@@ -21,7 +21,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
   IKRA_INITIALIZE_CLASS
 
   __device__ DummyClass(int f0, int f2): field0(f0), field2(f2),
-                                         field1(INLINE_ARR_SIZE) {
+                                         field1(ARRAY_SIZE) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
       field1[i] = CUDA_THREAD_ID*17 + i;
     }
