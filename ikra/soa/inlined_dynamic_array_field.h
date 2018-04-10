@@ -89,11 +89,7 @@ class SoaInlinedDynamicArrayField_ {
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, void>::type
   set_external_pointer_internal(B* ptr) {
     assert(reinterpret_cast<uintptr_t>(ptr) % 4 == 0);
-    auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
-                      reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
-                      + (Capacity+1)*(Offset + InlinedSize*sizeof(B));
-    assert(p_external % sizeof(B**) == 0);
-    *reinterpret_cast<B**>(p_external) = ptr;
+    *get_external_pointer_addr_internal() = ptr;
   }
 
   template<int A = AddressMode>
@@ -155,8 +151,13 @@ class SoaInlinedDynamicArrayField_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, void>::type
   set_external_pointer(B* ptr) {
-    // TODO: Not implemented.
-    assert(false);
+    // ptr is a pointer relative to host memory.
+    B* d_p_external = Owner::storage().translate_address_host_to_device(ptr);
+    B** d_p_external_addr = Owner::storage().translate_address_device_to_host(
+        get_external_pointer_addr_internal());
+    cudaMemcpy(d_p_external_addr, &d_p_external, sizeof(B*),
+               cudaMemcpyHostToDevice);
+    assert(cudaPeekAtLastError() == cudaSuccess);
   }
 #endif
 
