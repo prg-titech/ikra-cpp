@@ -43,7 +43,8 @@ class AssignmentHelper {
   // TODO: Assuming zero addressing mode. Must translate addresses in valid
   // addressing mode.
   void copy_from_device(B* target) {
-    cudaMemcpy(target, device_ptr(), sizeof(B), cudaMemcpyDeviceToHost);
+    auto dev_ptr = device_ptr();
+    cudaMemcpy(target, dev_ptr, sizeof(B), cudaMemcpyDeviceToHost);
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 

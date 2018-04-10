@@ -63,9 +63,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Cannot access members of Storge in here because Storage depends on this
   // class and must not be instantiated yet.
-  static constexpr int kStorageMode =
-      std::is_same<StorageStrategy, StaticStorage>::value
-          ? kStorageModeStatic : kStorageModeDynamic;
+  static constexpr int kStorageMode = storage_mode<StorageStrategy>::value;
 
   // Check if the compiler supports this address mode.
   static_assert(

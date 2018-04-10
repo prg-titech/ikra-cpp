@@ -1,6 +1,8 @@
 #ifndef SOA_STORAGE_H
 #define SOA_STORAGE_H
 
+#include <type_traits>
+
 #include "soa/constants.h"
 #include "soa/cuda.h"
 #include "soa/util.h"
@@ -305,6 +307,31 @@ template<size_t ArenaSize>
 struct StaticStorageWithArena {
   template<class Owner>
   using type = StaticStorage_<Owner, ArenaSize>;
+};
+
+// Helper structs for determining the mode of a storage strategy without
+// instantiating the template.
+template<typename T>
+struct storage_mode;
+
+template<>
+struct storage_mode<StaticStorage> {
+  static const int value = kStorageModeStatic;
+};
+
+template<size_t ArenaSize>
+struct storage_mode<StaticStorageWithArena<ArenaSize>> {
+  static const int value = kStorageModeStatic;
+};
+
+template<>
+struct storage_mode<DynamicStorage> {
+  static const int value = kStorageModeDynamic;
+};
+
+template<size_t ArenaSize>
+struct storage_mode<DynamicStorageWithArena<ArenaSize>> {
+  static const int value = kStorageModeDynamic;
 };
 
 #ifdef __CUDACC__

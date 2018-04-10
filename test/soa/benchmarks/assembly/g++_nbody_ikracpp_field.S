@@ -86,18 +86,18 @@ Disassembly of section .text:
   40079c:	48 83 ec 10          	sub    $0x10,%rsp
   4007a0:	48 c7 05 cd 18 20 00 	movq   $0x0,0x2018cd(%rip)        # 602078 <__Bodydata_buffer>
   4007a7:	00 00 00 00 
-  4007ab:	48 c7 05 ca 18 20 00 	movq   $0x0,0x2018ca(%rip)        # 602080 <__Bodydata_buffer+0x8>
-  4007b2:	00 00 00 00 
-  4007b6:	e8 25 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
-  4007bb:	bf 00 0c 40 00       	mov    $0x400c00,%edi
-  4007c0:	48 89 c3             	mov    %rax,%rbx
-  4007c3:	e8 18 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
-  4007c8:	bf 40 0b 40 00       	mov    $0x400b40,%edi
-  4007cd:	48 89 c5             	mov    %rax,%rbp
-  4007d0:	e8 0b 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
-  4007d5:	41 b9 0b 00 00 00    	mov    $0xb,%r9d
-  4007db:	49 89 c0             	mov    %rax,%r8
-  4007de:	66 90                	xchg   %ax,%ax
+  4007ab:	c7 05 cb 18 20 00 00 	movl   $0x0,0x2018cb(%rip)        # 602080 <__Bodydata_buffer+0x8>
+  4007b2:	00 00 00 
+  4007b5:	e8 26 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
+  4007ba:	bf 00 0c 40 00       	mov    $0x400c00,%edi
+  4007bf:	48 89 c3             	mov    %rax,%rbx
+  4007c2:	e8 19 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
+  4007c7:	bf 40 0b 40 00       	mov    $0x400b40,%edi
+  4007cc:	48 89 c5             	mov    %rax,%rbp
+  4007cf:	e8 0c 09 00 00       	callq  4010e0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>
+  4007d4:	41 b9 0b 00 00 00    	mov    $0xb,%r9d
+  4007da:	49 89 c0             	mov    %rax,%r8
+  4007dd:	0f 1f 00             	nopl   (%rax)
   4007e0:	c4 c1 7b 10 45 00    	vmovsd 0x0(%r13),%xmm0
   4007e6:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
   4007ea:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3

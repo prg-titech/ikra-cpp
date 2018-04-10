@@ -10,8 +10,9 @@ using ikra::executor::cuda::construct;
 using ikra::soa::StaticStorageWithArena;
 using ikra::soa::kAddressModeZero;
 
-#define EXTRA_BYTES (16*sizeof(int)*NUM_INST)
-#define INLINE_ARR_SIZE (ARRAY_SIZE - 16)
+#define READ_FROM_ARENA_ELEMENTS 128
+#define EXTRA_BYTES (READ_FROM_ARENA_ELEMENTS*sizeof(int)*NUM_INST)
+#define INLINE_ARR_SIZE (ARRAY_SIZE - READ_FROM_ARENA_ELEMENTS)
 
 #define CUDA_THREAD_ID (threadIdx.x + blockIdx.x * blockDim.x)
 
