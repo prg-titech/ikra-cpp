@@ -49,9 +49,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // of 8 bytes.
   static constexpr IndexType calculate_capacity() {
     // C++11 constexpr must have only one return statement.
-    return ((UserCapacity + 1) % 8) == 0
-      ? UserCapacity                              // correct alignment
-      : ((UserCapacity + 1 + 8/2) / 8) * 8 - 1;   // round to next mult. of 8
+    return ((UserCapacity + 8) / 8) * 8 - 1;
   }
 
   static const IndexType Capacity = calculate_capacity();

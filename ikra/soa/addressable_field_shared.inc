@@ -111,8 +111,7 @@ data_ptr_uninitialized() const {
 #endif  // __clang__
 
   // Check alignment.
-  // TODO: Make aligned!
-  // assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
+  assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
 
   return soa_array + reinterpret_cast<uintptr_t>(this);
 }

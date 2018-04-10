@@ -16,8 +16,6 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
       field1[i] = id()*17 + i;
     }
-
-    field2 = f2;
   }
 
   int_ field0;
@@ -41,15 +39,6 @@ void action() {
   DummyClass* first = construct<DummyClass>(NUM_INST, 29, 1357);
   gpuErrchk(cudaPeekAtLastError());
 
-#ifndef NDEBUG
-  // Check values (some samples).
-  for (int k = 0; k < 100; ++k) {
-    int i = rand() % NUM_INST;
-    assert((int) DummyClass::get(i)->field0 == 29);
-    assert((int) DummyClass::get(i)->field2 == 1357);
-  }
-#endif  // NDEBUG
-
   cuda_execute(&DummyClass::update_field1, first, NUM_INST, 19);
   gpuErrchk(cudaPeekAtLastError());
 
@@ -66,7 +55,7 @@ void run_test_construct_and_execute() {
     int i = rand() % NUM_INST;
     for (int j = 0; j < ARRAY_SIZE; ++j) {
       int actual1 = DummyClass::get(i)->field1[j];
-      int expected1 = i*17 + j + 19 + 29 + 1357;// + 19 + 29 + 1357;
+      int expected1 = i*17 + j + 19 + 29 + 1357;
       if (actual1 != expected1) {
         printf("[AOS] Dummy[%i].field1[%i]: Expected %i, but found %i\n",
                i, j, expected1, actual1);
