@@ -14,6 +14,7 @@ constexpr char* class_name::storage_buffer() { \
   return __ ## class_name ## data_buffer; \
 } \
 /* Force instantiation of storage-specific kernel templates. */ \
+/* TODO: Does not work if macro is used inside a namespace. */ \
 template __global__ void \
     ::ikra::soa::allocate_in_arena_kernel<class_name::Storage>( \
         class_name::Storage*, size_t); \

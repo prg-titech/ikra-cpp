@@ -78,11 +78,16 @@ class SoaLayout : SizeNDummy<AddressMode> {
                        kStorageMode, Self>;
 
   // Generate field types. Implement more types as necessary.
+  // TODO: Can this be merged with field_type_generator.h?
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(char)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(double)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(float)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(int)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint8_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint16_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint32_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint64_t)
 
   // This struct serves as a namespace and contains array field types.
   struct array {

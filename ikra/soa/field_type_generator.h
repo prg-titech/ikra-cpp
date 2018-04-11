@@ -52,6 +52,10 @@
 #define double__(field_id) IKRA_FIELD_TYPE_GENERATOR(double, field_id)
 #define float__(field_id) IKRA_FIELD_TYPE_GENERATOR(float, field_id)
 #define int__(field_id) IKRA_FIELD_TYPE_GENERATOR(int, field_id)
+#define uint8_t__(field_id) IKRA_FIELD_TYPE_GENERATOR(uint8_t, field_id)
+#define uint16_t__(field_id) IKRA_FIELD_TYPE_GENERATOR(uint16_t, field_id)
+#define uint32_t__(field_id) IKRA_FIELD_TYPE_GENERATOR(uint32_t, field_id)
+#define uint64_t__(field_id) IKRA_FIELD_TYPE_GENERATOR(uint64_t, field_id)
 
 #define array__(...) PP_CONCAT(ARRAY__, PP_NARG(__VA_ARGS__))(__VA_ARGS__)
 #define ARRAY__4(type, size, layout, field_id) \
@@ -75,6 +79,10 @@
 #define double_ IKRA_FIELD_TYPE_GENERATOR(double, IKRA_NEXT_FIELD_ID)
 #define float_ IKRA_FIELD_TYPE_GENERATOR(float, IKRA_NEXT_FIELD_ID)
 #define int_ IKRA_FIELD_TYPE_GENERATOR(int, IKRA_NEXT_FIELD_ID)
+#define uint8_t_ IKRA_FIELD_TYPE_GENERATOR(uint8_t, IKRA_NEXT_FIELD_ID)
+#define uint16_t_ IKRA_FIELD_TYPE_GENERATOR(uint16_t, IKRA_NEXT_FIELD_ID)
+#define uint32_t_ IKRA_FIELD_TYPE_GENERATOR(uint32_t, IKRA_NEXT_FIELD_ID)
+#define uint64_t_ IKRA_FIELD_TYPE_GENERATOR(uint64_t, IKRA_NEXT_FIELD_ID)
 
 #define array_(...) PP_CONCAT(ARRAY_, PP_NARG(__VA_ARGS__))(__VA_ARGS__)
 #define ARRAY_3(type, size, layout) \
