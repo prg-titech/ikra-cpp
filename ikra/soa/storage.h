@@ -15,8 +15,11 @@ constexpr char* class_name::storage_buffer() { \
 } \
 /* Force instantiation of storage-specific kernel templates. */ \
 template __global__ void \
-  ::ikra::soa::allocate_in_arena_kernel<class_name::Storage>( \
-      class_name::Storage*, size_t bytes);
+    ::ikra::soa::allocate_in_arena_kernel<class_name::Storage>( \
+        class_name::Storage*, size_t); \
+template __global__ void \
+    ::ikra::soa::storage_increase_size_kernel<class_name::Storage>( \
+        class_name::Storage*, IndexType);
 
 #define IKRA_HOST_STORAGE(class_name) \
 alignas(8) char \
@@ -58,15 +61,16 @@ struct StorageDataOffset {
 #endif  // __clang__
 };
 
-class StorageStrategyBase {
+template<typename Self>
+class StorageStrategySelf {
  public:
-  __ikra_device__ StorageStrategyBase() : size_(0) {}
+  __ikra_device__ StorageStrategySelf() : size_(0) {}
 
 #ifdef __CUDACC__
-  StorageStrategyBase* device_ptr() const {
+  Self* device_ptr() const {
     // Get device address of storage.
     // TODO: This value should be cached.
-    StorageStrategyBase* d_storage;
+    Self* d_storage;
     cudaGetSymbolAddress(reinterpret_cast<void**>(&d_storage), *this);
     assert(cudaPeekAtLastError() == cudaSuccess);
     return d_storage;
@@ -96,6 +100,10 @@ class StorageStrategyBase {
 
 #if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
   // Not running in CUDA mode or running on device.
+  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+    return reinterpret_cast<Self*>(this)->allocate_in_arena_internal(bytes);
+  }
+
   __ikra_device__ IndexType size() const {
     return size_;
   }
@@ -108,6 +116,8 @@ class StorageStrategyBase {
   }
 #else
   // Running in CUDA mode on host.
+  char* allocate_in_arena(size_t bytes);
+
   IndexType size() const {
     // Copy size to host and return.
     IndexType host_size;
@@ -143,26 +153,9 @@ class StorageStrategyBase {
   IndexType size_;
 };
 
-template<typename Self>
-class StorageStrategySelf : public StorageStrategyBase {
- public:
-#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
-  // Not running in CUDA mode or running on device.
-  __ikra_device__ char* allocate_in_arena(size_t bytes) {
-    return reinterpret_cast<Self*>(this)->allocate_in_arena_internal(bytes);
-  }
-#else
-  // Running in CUDA mode on host.
-  char* allocate_in_arena(size_t bytes);
-#endif
-};
-
 #if defined(__CUDACC__)
-// Note: This kernel cannot be templatized because template expansion
-// for code generation purposes is broken when invoked only through an
-// overridden operator new. This is the reason why StorageStrategyBase exists
-// in addition to StorageStrategySelf.
-__global__ void storage_increase_size_kernel(StorageStrategyBase* storage,
+template<typename Storage>
+__global__ void storage_increase_size_kernel(Storage* storage,
                                              IndexType increment) {
   d_previous_storage_size = storage->increase_size(increment);
 }
@@ -175,8 +168,9 @@ __global__ void allocate_in_arena_kernel(Storage* storage, size_t bytes) {
 #ifndef __CUDA_ARCH__
 // Running in host mode. Provide definition of method here because it depends
 // on the kernel above.
-IndexType StorageStrategyBase::increase_size(IndexType increment) {
-  storage_increase_size_kernel<<<1, 1>>>(device_ptr(), increment);
+template<typename Self>
+IndexType StorageStrategySelf<Self>::increase_size(IndexType increment) {
+  storage_increase_size_kernel<Self><<<1, 1>>>(device_ptr(), increment);
   IndexType h_result_value;
   cudaMemcpyFromSymbol(&h_result_value, d_previous_storage_size,
                        sizeof(h_result_value),
@@ -187,8 +181,7 @@ IndexType StorageStrategyBase::increase_size(IndexType increment) {
 
 template<typename Self>
 char* StorageStrategySelf<Self>::allocate_in_arena(size_t bytes) {
-  allocate_in_arena_kernel<Self><<<1, 1>>>(
-      reinterpret_cast<Self*>(device_ptr()), bytes);
+  allocate_in_arena_kernel<Self><<<1, 1>>>(device_ptr(), bytes);
   assert(cudaPeekAtLastError() == cudaSuccess);
   char* h_result_value;
   cudaMemcpyFromSymbol(&h_result_value, d_arena_allocation,
@@ -209,6 +202,8 @@ char* StorageStrategySelf<Self>::allocate_in_arena(size_t bytes) {
 template<class OwnerT, size_t ArenaSize>
 class alignas(8) DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
+ private:
+  using SuperT = StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>>;
  public:
   static const int kStorageMode = kStorageModeDynamic;
 
@@ -249,7 +244,7 @@ class alignas(8) DynamicStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
     return arena_base_ + new_head;
   }
 
@@ -286,6 +281,8 @@ class alignas(8) DynamicStorage_
 template<class OwnerT, size_t ArenaSize>
 class alignas(8) StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
+ private:
+  using SuperT = StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>>;
  public:
   static const int kStorageMode = kStorageModeStatic;
 
@@ -298,7 +295,7 @@ class alignas(8) StaticStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
     return arena_base_ + new_head;
   }
 

@@ -24,12 +24,12 @@ compile_size = 64bit
 Resource usage:
  Common:
   GLOBAL:8918919
- Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0_:
+ Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEJEEEvPT_DpT0_:
   REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m:
+  REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m:
   REG:18 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
- Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
-  REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM10DummyClassFviEXadL_ZNS4_13update_field1EiEEE4callEPS4_miEUlS8_miE_JS8_miEEEvT_DpT0_:
   REG:30 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:348 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda16construct_kernelI10DummyClassJiiEEEvmmDpT0_:
@@ -38,9 +38,9 @@ Resource usage:
   REG:18 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
 
 	code for sm_30
-		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0_
+		Function : _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEJEEEvPT_DpT0_
 	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                                                  /* 0x22028042e2c2c307 */
+                                                                                  /* 0x22e28042e2c2c307 */
         /*0008*/                   MOV R1, c[0x0][0x44];                          /* 0x2800400110005de4 */
         /*0010*/                   ISUB RZ.CC, c[0x0][0x140], RZ;                 /* 0x4801400503ffde03 */
         /*0018*/                   ISETP.EQ.X.AND P0, PT, RZ, c[0x0][0x144], PT;  /* 0x190e400513f1dc63 */
@@ -48,15 +48,36 @@ Resource usage:
         /*0028*/                   MOV R2, c[0x0][0x140];                         /* 0x2800400500009de4 */
         /*0030*/                   MOV R3, c[0x0][0x144];                         /* 0x280040051000dde4 */
         /*0038*/                   ST.E.64 [R2], RZ;                              /* 0x94000000002fdca5 */
-                                                                                  /* 0x20000000000002e7 */
-        /*0048*/                   EXIT;                                          /* 0x8000000000001de7 */
-        /*0050*/                   BRA 0x50;                                      /* 0x4003ffffe0001de7 */
-        /*0058*/                   NOP;                                           /* 0x4000000000001de4 */
+                                                                                  /* 0x200000000002f047 */
+        /*0048*/                   ST.E [R2+0x100008], RZ;                        /* 0x94004000202fdc85 */
+        /*0050*/                   EXIT;                                          /* 0x8000000000001de7 */
+        /*0058*/                   BRA 0x58;                                      /* 0x4003ffffe0001de7 */
         /*0060*/                   NOP;                                           /* 0x4000000000001de4 */
         /*0068*/                   NOP;                                           /* 0x4000000000001de4 */
         /*0070*/                   NOP;                                           /* 0x4000000000001de4 */
         /*0078*/                   NOP;                                           /* 0x4000000000001de4 */
-		...............................................................................................
+		..................................................................................................................
+
+
+		Function : _ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                   /* 0x22c3f20042804307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];           /* 0x2800400110005de4 */
+        /*0010*/                   MOV R2, c[0x0][0x140];          /* 0x2800400500009de4 */
+        /*0018*/                   MOV R3, c[0x0][0x144];          /* 0x280040051000dde4 */
+        /*0020*/                   LD.E.64 R4, [R2];               /* 0x8400000000211ca5 */
+        /*0028*/                   MOV32I R8, 0x0;                 /* 0x1800000000021de2 */
+        /*0030*/                   MOV32I R9, 0x0;                 /* 0x1800000000025de2 */
+        /*0038*/                   IADD R6.CC, R4, c[0x0][0x148];  /* 0x4801400520419c03 */
+                                                                   /* 0x20000002f042e287 */
+        /*0048*/                   IADD.X R7, R5, c[0x0][0x14c];   /* 0x480040053051dc43 */
+        /*0050*/                   ST.E.64 [R2], R6;               /* 0x9400000000219ca5 */
+        /*0058*/                   ST.E.64 [R8], R4;               /* 0x9400000000811ca5 */
+        /*0060*/                   EXIT;                           /* 0x8000000000001de7 */
+        /*0068*/                   BRA 0x68;                       /* 0x4003ffffe0001de7 */
+        /*0070*/                   NOP;                            /* 0x4000000000001de4 */
+        /*0078*/                   NOP;                            /* 0x4000000000001de4 */
+		..........................................................................................................
 
 
 		Function : _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m
@@ -74,7 +95,7 @@ Resource usage:
         /*0050*/                   ISETP.LT.U32.X.AND P0, PT, R2, RZ, PT;  /* 0x188e0000fc21dc43 */
         /*0058*/               @P0 BRA 0xb8;                               /* 0x40000001600001e7 */
         /*0060*/                   MOV32I R4, 0x0;                         /* 0x1800000000011de2 */
-        /*0068*/                   MOV32I R8, 0x12c;                       /* 0x18000004b0021de2 */
+        /*0068*/                   MOV32I R8, 0x129;                       /* 0x18000004a4021de2 */
         /*0070*/                   MOV32I R5, 0x0;                         /* 0x1800000000015de2 */
         /*0078*/                   MOV32I R12, 0x1;                        /* 0x1800000004031de2 */
                                                                            /* 0x2202f2f202020047 */
@@ -118,27 +139,6 @@ Resource usage:
         /*01b0*/                   NOP;                                    /* 0x4000000000001de4 */
         /*01b8*/                   NOP;                                    /* 0x4000000000001de4 */
 		......................................................................................................
-
-
-		Function : _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm
-	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
-                                                                   /* 0x22c3f20042804307 */
-        /*0008*/                   MOV R1, c[0x0][0x44];           /* 0x2800400110005de4 */
-        /*0010*/                   MOV R2, c[0x0][0x140];          /* 0x2800400500009de4 */
-        /*0018*/                   MOV R3, c[0x0][0x144];          /* 0x280040051000dde4 */
-        /*0020*/                   LD.E.64 R4, [R2];               /* 0x8400000000211ca5 */
-        /*0028*/                   MOV32I R8, 0x0;                 /* 0x1800000000021de2 */
-        /*0030*/                   MOV32I R9, 0x0;                 /* 0x1800000000025de2 */
-        /*0038*/                   IADD R6.CC, R4, c[0x0][0x148];  /* 0x4801400520419c03 */
-                                                                   /* 0x20000002f042e287 */
-        /*0048*/                   IADD.X R7, R5, c[0x0][0x14c];   /* 0x480040053051dc43 */
-        /*0050*/                   ST.E.64 [R2], R6;               /* 0x9400000000219ca5 */
-        /*0058*/                   ST.E.64 [R8], R4;               /* 0x9400000000811ca5 */
-        /*0060*/                   EXIT;                           /* 0x8000000000001de7 */
-        /*0068*/                   BRA 0x68;                       /* 0x4003ffffe0001de7 */
-        /*0070*/                   NOP;                            /* 0x4000000000001de4 */
-        /*0078*/                   NOP;                            /* 0x4000000000001de4 */
-		..................................................................................
 
 
 		Function : _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM10DummyClassFviEXadL_ZNS4_13update_field1EiEEE4callEPS4_miEUlS8_miE_JS8_miEEEvT_DpT0_
@@ -374,7 +374,7 @@ Resource usage:
         /*0720*/                   ISETP.EQ.X.AND P0, PT, RZ, RZ, PT;                  /* 0x190e0000fff1dc63 */
         /*0728*/               @P0 BRA 0x790;                                          /* 0x40000001800001e7 */
         /*0730*/                   MOV32I R4, 0x0;                                     /* 0x1800000000011de2 */
-        /*0738*/                   MOV32I R8, 0x133;                                   /* 0x18000004cc021de2 */
+        /*0738*/                   MOV32I R8, 0x130;                                   /* 0x18000004c0021de2 */
                                                                                        /* 0x22f2020200422047 */
         /*0748*/                   MOV32I R5, 0x0;                                     /* 0x1800000000015de2 */
         /*0750*/                   MOV32I R12, 0x1;                                    /* 0x1800000004031de2 */
@@ -578,7 +578,7 @@ Resource usage:
         /*0418*/                   ISETP.LT.U32.X.AND P0, PT, R4, RZ, PT;              /* 0x188e0000fc41dc43 */
         /*0420*/               @P0 BRA 0x480;                                          /* 0x40000001600001e7 */
         /*0428*/                   MOV32I R4, 0x0;                                     /* 0x1800000000011de2 */
-        /*0430*/                   MOV32I R8, 0x12c;                                   /* 0x18000004b0021de2 */
+        /*0430*/                   MOV32I R8, 0x129;                                   /* 0x18000004a4021de2 */
         /*0438*/                   MOV32I R5, 0x0;                                     /* 0x1800000000015de2 */
                                                                                        /* 0x22f2f20200421047 */
         /*0448*/                   MOV32I R6, 0x0;                                     /* 0x1800000000019de2 */
@@ -662,7 +662,7 @@ Resource usage:
         /*06b8*/               @P0 BRA 0x720;                                          /* 0x40000001800001e7 */
                                                                                        /* 0x2202004220420047 */
         /*06c8*/                   MOV32I R4, 0x0;                                     /* 0x1800000000011de2 */
-        /*06d0*/                   MOV32I R8, 0x133;                                   /* 0x18000004cc021de2 */
+        /*06d0*/                   MOV32I R8, 0x130;                                   /* 0x18000004c0021de2 */
         /*06d8*/                   MOV32I R5, 0x0;                                     /* 0x1800000000015de2 */
         /*06e0*/                   MOV32I R12, 0x1;                                    /* 0x1800000004031de2 */
         /*06e8*/                   MOV32I R6, 0x0;                                     /* 0x1800000000019de2 */
@@ -807,7 +807,7 @@ Resource usage:
                                                                                        /* 0x22004220420042f7 */
         /*0b48*/               @P6 BRA 0xba8;                                          /* 0x40000001600019e7 */
         /*0b50*/                   MOV32I R4, 0x0;                                     /* 0x1800000000011de2 */
-        /*0b58*/                   MOV32I R8, 0x133;                                   /* 0x18000004cc021de2 */
+        /*0b58*/                   MOV32I R8, 0x130;                                   /* 0x18000004c0021de2 */
         /*0b60*/                   MOV32I R5, 0x0;                                     /* 0x1800000000015de2 */
         /*0b68*/                   MOV32I R12, 0x1;                                    /* 0x1800000004031de2 */
         /*0b70*/                   MOV32I R6, 0x0;                                     /* 0x1800000000019de2 */
@@ -914,7 +914,7 @@ Resource usage:
         /*0e98*/                   ISETP.NE.AND P6, PT, R26, RZ, PT;                   /* 0x1a8e0000fdaddc23 */
         /*0ea0*/               @P6 BRA 0xf00;                                          /* 0x40000001600019e7 */
         /*0ea8*/                   MOV32I R4, 0x0;                                     /* 0x1800000000011de2 */
-        /*0eb0*/                   MOV32I R8, 0x133;                                   /* 0x18000004cc021de2 */
+        /*0eb0*/                   MOV32I R8, 0x130;                                   /* 0x18000004c0021de2 */
         /*0eb8*/                   MOV32I R5, 0x0;                                     /* 0x1800000000015de2 */
                                                                                        /* 0x22f2f20200421047 */
         /*0ec8*/                   MOV32I R6, 0x0;                                     /* 0x1800000000019de2 */
@@ -1452,7 +1452,7 @@ mov.u64 %rd71, $str5;
 cvta.global.u64 %rd72, %rd71;
 mov.u64 %rd73, __unnamed_5;
 cvta.global.u64 %rd74, %rd73;
-mov.u32 %r21, 300;
+mov.u32 %r21, 297;
 mov.u64 %rd75, 1;
 
 	{
@@ -1580,7 +1580,7 @@ mov.u64 %rd103, $str5;
 cvta.global.u64 %rd104, %rd103;
 mov.u64 %rd105, __unnamed_8;
 cvta.global.u64 %rd106, %rd105;
-mov.u32 %r25, 307;
+mov.u32 %r25, 304;
 mov.u64 %rd107, 1;
 
 	{
@@ -1841,7 +1841,7 @@ mov.u64 %rd171, $str5;
 cvta.global.u64 %rd172, %rd171;
 mov.u64 %rd173, __unnamed_8;
 cvta.global.u64 %rd174, %rd173;
-mov.u32 %r33, 307;
+mov.u32 %r33, 304;
 mov.u64 %rd175, 1;
 
 	{
@@ -2054,7 +2054,7 @@ mov.u64 %rd214, $str5;
 cvta.global.u64 %rd215, %rd214;
 mov.u64 %rd216, __unnamed_8;
 cvta.global.u64 %rd217, %rd216;
-mov.u32 %r39, 307;
+mov.u32 %r39, 304;
 mov.u64 %rd218, 1;
 
 	{
@@ -2604,7 +2604,7 @@ mov.u64 %rd115, $str5;
 cvta.global.u64 %rd116, %rd115;
 mov.u64 %rd117, __unnamed_8;
 cvta.global.u64 %rd118, %rd117;
-mov.u32 %r33, 307;
+mov.u32 %r33, 304;
 mov.u64 %rd119, 1;
 
 	{
@@ -2733,25 +2733,6 @@ ret;
 }
 
 
-.visible .entry _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm(
-.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0,
-.param .u64 _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1
-)
-{
-.reg .b64 %rd<6>;
-
-
-ld.param.u64 %rd1, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_0];
-ld.param.u64 %rd2, [_ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm_param_1];
-cvta.to.global.u64 %rd3, %rd1;
-ld.global.u64 %rd4, [%rd3];
-add.s64 %rd5, %rd4, %rd2;
-st.global.u64 [%rd3], %rd5;
-st.global.u64 [_ZN4ikra3soa23d_previous_storage_sizeE], %rd4;
-ret;
-}
-
-
 .visible .entry _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m(
 .param .u64 _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_0,
 .param .u64 _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_1
@@ -2769,7 +2750,7 @@ add.s64 %rd1, %rd4, 1048584;
 ld.global.u32 %rd5, [%rd4+1048584];
 add.s64 %rd6, %rd5, %rd3;
 setp.lt.u64	%p1, %rd6, 1048576;
-@%p1 bra BB4_2;
+@%p1 bra BB3_2;
 
 mov.u64 %rd7, $str4;
 cvta.global.u64 %rd8, %rd7;
@@ -2777,7 +2758,7 @@ mov.u64 %rd9, $str5;
 cvta.global.u64 %rd10, %rd9;
 mov.u64 %rd11, __unnamed_5;
 cvta.global.u64 %rd12, %rd11;
-mov.u32 %r1, 300;
+mov.u32 %r1, 297;
 mov.u64 %rd13, 1;
 
 	{
@@ -2806,7 +2787,7 @@ param4
 
 	}
 
-BB4_2:
+BB3_2:
 cvt.u32.u64	%r2, %rd3;
 atom.global.add.u32 %r3, [%rd1], %r2;
 cvt.u64.u32	%rd14, %r3;
@@ -2817,21 +2798,43 @@ ret;
 }
 
 
-.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0_(
-.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0__param_0
+.visible .entry _ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m(
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_0,
+.param .u64 _ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_1
+)
+{
+.reg .b64 %rd<6>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_0];
+ld.param.u64 %rd2, [_ZN4ikra3soa28storage_increase_size_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEEEvPT_m_param_1];
+cvta.to.global.u64 %rd3, %rd1;
+ld.global.u64 %rd4, [%rd3];
+add.s64 %rd5, %rd4, %rd2;
+st.global.u64 [%rd3], %rd5;
+st.global.u64 [_ZN4ikra3soa23d_previous_storage_sizeE], %rd4;
+ret;
+}
+
+
+.visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEJEEEvPT_DpT0_(
+.param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEJEEEvPT_DpT0__param_0
 )
 {
 .reg .pred %p<2>;
+.reg .b32 %r<2>;
 .reg .b64 %rd<4>;
 
 
-ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0__param_0];
+ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_14StaticStorage_I10DummyClassLm1048576EEEJEEEvPT_DpT0__param_0];
 setp.eq.s64	%p1, %rd1, 0;
 @%p1 bra BB5_2;
 
 cvta.to.global.u64 %rd2, %rd1;
 mov.u64 %rd3, 0;
 st.global.u64 [%rd2], %rd3;
+mov.u32 %r1, 0;
+st.global.u32 [%rd2+1048584], %r1;
 
 BB5_2:
 ret;

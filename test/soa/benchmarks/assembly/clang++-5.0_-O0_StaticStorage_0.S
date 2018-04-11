@@ -56,8 +56,8 @@ Disassembly of section .text:
   4005d9:	48 83 e4 f0          	and    $0xfffffffffffffff0,%rsp
   4005dd:	50                   	push   %rax
   4005de:	54                   	push   %rsp
-  4005df:	49 c7 c0 d0 0d 40 00 	mov    $0x400dd0,%r8
-  4005e6:	48 c7 c1 60 0d 40 00 	mov    $0x400d60,%rcx
+  4005df:	49 c7 c0 c0 0d 40 00 	mov    $0x400dc0,%r8
+  4005e6:	48 c7 c1 50 0d 40 00 	mov    $0x400d50,%rcx
   4005ed:	48 c7 c7 d0 06 40 00 	mov    $0x4006d0,%rdi
   4005f4:	e8 97 ff ff ff       	callq  400590 <__libc_start_main@plt>
   4005f9:	f4                   	hlt    
@@ -169,7 +169,7 @@ Disassembly of section .text:
   400759:	48 8b 7c 24 48       	mov    0x48(%rsp),%rdi
   40075e:	89 74 24 14          	mov    %esi,0x14(%rsp)
   400762:	e8 39 03 00 00       	callq  400aa0 <_ZNK4ikra3soa6Field_IiLm4663ELj4ELi0ELi0E9TestClassEcvRiEv>
-  400767:	48 bf e4 0d 40 00 00 	movabs $0x400de4,%rdi
+  400767:	48 bf d4 0d 40 00 00 	movabs $0x400dd4,%rdi
   40076e:	00 00 00 
   400771:	8b 10                	mov    (%rax),%edx
   400773:	8b 74 24 14          	mov    0x14(%rsp),%esi
@@ -304,14 +304,14 @@ Disassembly of section .text:
 0000000000400940 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEEnwEm>:
   400940:	50                   	push   %rax
   400941:	48 89 3c 24          	mov    %rdi,(%rsp)
-  400945:	e8 a6 03 00 00       	callq  400cf0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
+  400945:	e8 96 03 00 00       	callq  400ce0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>
   40094a:	e8 21 03 00 00       	callq  400c70 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE7storageEv>
   40094f:	b9 01 00 00 00       	mov    $0x1,%ecx
   400954:	89 ce                	mov    %ecx,%esi
   400956:	48 89 c7             	mov    %rax,%rdi
-  400959:	e8 c2 03 00 00       	callq  400d20 <_ZN4ikra3soa19StorageStrategyBase13increase_sizeEm>
+  400959:	e8 b2 03 00 00       	callq  400d10 <_ZN4ikra3soa19StorageStrategySelfINS0_14StaticStorage_I9TestClassLm0EEEE13increase_sizeEm>
   40095e:	48 89 c7             	mov    %rax,%rdi
-  400961:	e8 9a 03 00 00       	callq  400d00 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE3getEm>
+  400961:	e8 8a 03 00 00       	callq  400cf0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE3getEm>
   400966:	59                   	pop    %rcx
   400967:	c3                   	retq   
   400968:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
@@ -577,106 +577,98 @@ Disassembly of section .text:
   400cbb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
 
 0000000000400cc0 <_ZN4ikra3soa19StorageStrategySelfINS0_14StaticStorage_I9TestClassLm0EEEEC2Ev>:
-  400cc0:	50                   	push   %rax
-  400cc1:	48 89 3c 24          	mov    %rdi,(%rsp)
-  400cc5:	48 8b 3c 24          	mov    (%rsp),%rdi
-  400cc9:	e8 02 00 00 00       	callq  400cd0 <_ZN4ikra3soa19StorageStrategyBaseC2Ev>
-  400cce:	58                   	pop    %rax
-  400ccf:	c3                   	retq   
+  400cc0:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
+  400cc5:	48 8b 7c 24 f8       	mov    -0x8(%rsp),%rdi
+  400cca:	48 c7 07 00 00 00 00 	movq   $0x0,(%rdi)
+  400cd1:	c3                   	retq   
+  400cd2:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400cd9:	00 00 00 
+  400cdc:	0f 1f 40 00          	nopl   0x0(%rax)
 
-0000000000400cd0 <_ZN4ikra3soa19StorageStrategyBaseC2Ev>:
-  400cd0:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
-  400cd5:	48 8b 7c 24 f8       	mov    -0x8(%rsp),%rdi
-  400cda:	48 c7 07 00 00 00 00 	movq   $0x0,(%rdi)
-  400ce1:	c3                   	retq   
-  400ce2:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400ce9:	00 00 00 
-  400cec:	0f 1f 40 00          	nopl   0x0(%rax)
+0000000000400ce0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>:
+  400ce0:	c3                   	retq   
+  400ce1:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400ce8:	00 00 00 
+  400ceb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
 
-0000000000400cf0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE18check_sizeof_classILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEvE4typeEv>:
-  400cf0:	c3                   	retq   
-  400cf1:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400cf8:	00 00 00 
-  400cfb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+0000000000400cf0 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE3getEm>:
+  400cf0:	50                   	push   %rax
+  400cf1:	48 89 3c 24          	mov    %rdi,(%rsp)
+  400cf5:	48 8b 3c 24          	mov    (%rsp),%rdi
+  400cf9:	48 83 c7 01          	add    $0x1,%rdi
+  400cfd:	e8 3e 00 00 00       	callq  400d40 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
+  400d02:	59                   	pop    %rcx
+  400d03:	c3                   	retq   
+  400d04:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400d0b:	00 00 00 
+  400d0e:	66 90                	xchg   %ax,%ax
 
-0000000000400d00 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE3getEm>:
-  400d00:	50                   	push   %rax
-  400d01:	48 89 3c 24          	mov    %rdi,(%rsp)
-  400d05:	48 8b 3c 24          	mov    (%rsp),%rdi
-  400d09:	48 83 c7 01          	add    $0x1,%rdi
-  400d0d:	e8 3e 00 00 00       	callq  400d50 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>
-  400d12:	59                   	pop    %rcx
-  400d13:	c3                   	retq   
-  400d14:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400d1b:	00 00 00 
-  400d1e:	66 90                	xchg   %ax,%ax
+0000000000400d10 <_ZN4ikra3soa19StorageStrategySelfINS0_14StaticStorage_I9TestClassLm0EEEE13increase_sizeEm>:
+  400d10:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
+  400d15:	48 89 74 24 f0       	mov    %rsi,-0x10(%rsp)
+  400d1a:	48 8b 74 24 f8       	mov    -0x8(%rsp),%rsi
+  400d1f:	48 8b 3e             	mov    (%rsi),%rdi
+  400d22:	48 89 7c 24 e8       	mov    %rdi,-0x18(%rsp)
+  400d27:	48 8b 7c 24 f0       	mov    -0x10(%rsp),%rdi
+  400d2c:	48 03 3e             	add    (%rsi),%rdi
+  400d2f:	48 89 3e             	mov    %rdi,(%rsi)
+  400d32:	48 8b 44 24 e8       	mov    -0x18(%rsp),%rax
+  400d37:	c3                   	retq   
+  400d38:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  400d3f:	00 
 
-0000000000400d20 <_ZN4ikra3soa19StorageStrategyBase13increase_sizeEm>:
-  400d20:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
-  400d25:	48 89 74 24 f0       	mov    %rsi,-0x10(%rsp)
-  400d2a:	48 8b 74 24 f8       	mov    -0x8(%rsp),%rsi
-  400d2f:	48 8b 3e             	mov    (%rsi),%rdi
-  400d32:	48 89 7c 24 e8       	mov    %rdi,-0x18(%rsp)
-  400d37:	48 8b 7c 24 f0       	mov    -0x10(%rsp),%rdi
-  400d3c:	48 03 3e             	add    (%rsi),%rdi
-  400d3f:	48 89 3e             	mov    %rdi,(%rsi)
-  400d42:	48 8b 44 24 e8       	mov    -0x18(%rsp),%rax
-  400d47:	c3                   	retq   
-  400d48:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
-  400d4f:	00 
+0000000000400d40 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
+  400d40:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
+  400d45:	48 8b 44 24 f8       	mov    -0x8(%rsp),%rax
+  400d4a:	c3                   	retq   
+  400d4b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
 
-0000000000400d50 <_ZN4ikra3soa9SoaLayoutI9TestClassLm4660ELi0ENS0_13StaticStorageEE4get_ILi0EEENSt9enable_ifIXeqT_L_ZNS0_L16kAddressModeZeroEEEPS2_E4typeEm>:
-  400d50:	48 89 7c 24 f8       	mov    %rdi,-0x8(%rsp)
-  400d55:	48 8b 44 24 f8       	mov    -0x8(%rsp),%rax
-  400d5a:	c3                   	retq   
-  400d5b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+0000000000400d50 <__libc_csu_init>:
+  400d50:	41 57                	push   %r15
+  400d52:	41 56                	push   %r14
+  400d54:	41 89 ff             	mov    %edi,%r15d
+  400d57:	41 55                	push   %r13
+  400d59:	41 54                	push   %r12
+  400d5b:	4c 8d 25 7e 10 20 00 	lea    0x20107e(%rip),%r12        # 601de0 <__frame_dummy_init_array_entry>
+  400d62:	55                   	push   %rbp
+  400d63:	48 8d 2d 7e 10 20 00 	lea    0x20107e(%rip),%rbp        # 601de8 <__init_array_end>
+  400d6a:	53                   	push   %rbx
+  400d6b:	49 89 f6             	mov    %rsi,%r14
+  400d6e:	49 89 d5             	mov    %rdx,%r13
+  400d71:	4c 29 e5             	sub    %r12,%rbp
+  400d74:	48 83 ec 08          	sub    $0x8,%rsp
+  400d78:	48 c1 fd 03          	sar    $0x3,%rbp
+  400d7c:	e8 cf f7 ff ff       	callq  400550 <_init>
+  400d81:	48 85 ed             	test   %rbp,%rbp
+  400d84:	74 20                	je     400da6 <__libc_csu_init+0x56>
+  400d86:	31 db                	xor    %ebx,%ebx
+  400d88:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  400d8f:	00 
+  400d90:	4c 89 ea             	mov    %r13,%rdx
+  400d93:	4c 89 f6             	mov    %r14,%rsi
+  400d96:	44 89 ff             	mov    %r15d,%edi
+  400d99:	41 ff 14 dc          	callq  *(%r12,%rbx,8)
+  400d9d:	48 83 c3 01          	add    $0x1,%rbx
+  400da1:	48 39 eb             	cmp    %rbp,%rbx
+  400da4:	75 ea                	jne    400d90 <__libc_csu_init+0x40>
+  400da6:	48 83 c4 08          	add    $0x8,%rsp
+  400daa:	5b                   	pop    %rbx
+  400dab:	5d                   	pop    %rbp
+  400dac:	41 5c                	pop    %r12
+  400dae:	41 5d                	pop    %r13
+  400db0:	41 5e                	pop    %r14
+  400db2:	41 5f                	pop    %r15
+  400db4:	c3                   	retq   
+  400db5:	90                   	nop
+  400db6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  400dbd:	00 00 00 
 
-0000000000400d60 <__libc_csu_init>:
-  400d60:	41 57                	push   %r15
-  400d62:	41 56                	push   %r14
-  400d64:	41 89 ff             	mov    %edi,%r15d
-  400d67:	41 55                	push   %r13
-  400d69:	41 54                	push   %r12
-  400d6b:	4c 8d 25 6e 10 20 00 	lea    0x20106e(%rip),%r12        # 601de0 <__frame_dummy_init_array_entry>
-  400d72:	55                   	push   %rbp
-  400d73:	48 8d 2d 6e 10 20 00 	lea    0x20106e(%rip),%rbp        # 601de8 <__init_array_end>
-  400d7a:	53                   	push   %rbx
-  400d7b:	49 89 f6             	mov    %rsi,%r14
-  400d7e:	49 89 d5             	mov    %rdx,%r13
-  400d81:	4c 29 e5             	sub    %r12,%rbp
-  400d84:	48 83 ec 08          	sub    $0x8,%rsp
-  400d88:	48 c1 fd 03          	sar    $0x3,%rbp
-  400d8c:	e8 bf f7 ff ff       	callq  400550 <_init>
-  400d91:	48 85 ed             	test   %rbp,%rbp
-  400d94:	74 20                	je     400db6 <__libc_csu_init+0x56>
-  400d96:	31 db                	xor    %ebx,%ebx
-  400d98:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
-  400d9f:	00 
-  400da0:	4c 89 ea             	mov    %r13,%rdx
-  400da3:	4c 89 f6             	mov    %r14,%rsi
-  400da6:	44 89 ff             	mov    %r15d,%edi
-  400da9:	41 ff 14 dc          	callq  *(%r12,%rbx,8)
-  400dad:	48 83 c3 01          	add    $0x1,%rbx
-  400db1:	48 39 eb             	cmp    %rbp,%rbx
-  400db4:	75 ea                	jne    400da0 <__libc_csu_init+0x40>
-  400db6:	48 83 c4 08          	add    $0x8,%rsp
-  400dba:	5b                   	pop    %rbx
-  400dbb:	5d                   	pop    %rbp
-  400dbc:	41 5c                	pop    %r12
-  400dbe:	41 5d                	pop    %r13
-  400dc0:	41 5e                	pop    %r14
-  400dc2:	41 5f                	pop    %r15
-  400dc4:	c3                   	retq   
-  400dc5:	90                   	nop
-  400dc6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-  400dcd:	00 00 00 
-
-0000000000400dd0 <__libc_csu_fini>:
-  400dd0:	f3 c3                	repz retq 
+0000000000400dc0 <__libc_csu_fini>:
+  400dc0:	f3 c3                	repz retq 
 
 Disassembly of section .fini:
 
-0000000000400dd4 <_fini>:
-  400dd4:	48 83 ec 08          	sub    $0x8,%rsp
-  400dd8:	48 83 c4 08          	add    $0x8,%rsp
-  400ddc:	c3                   	retq   
+0000000000400dc4 <_fini>:
+  400dc4:	48 83 ec 08          	sub    $0x8,%rsp
+  400dc8:	48 83 c4 08          	add    $0x8,%rsp
+  400dcc:	c3                   	retq   
