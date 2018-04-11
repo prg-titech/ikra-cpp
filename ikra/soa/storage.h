@@ -109,11 +109,14 @@ class StorageStrategySelf {
     return size_;
   }
 
+  using uintptr_t_alt = unsigned long long int;
   __ikra_device__ IndexType increase_size(IndexType increment) {
-    // TODO: Make this operation atomic.
-    IndexType result = size_;
-    size_ += increment;
-    return result;
+    // TODO: Find out why this does not work with uintptr_t.
+    static_assert(sizeof(uintptr_t_alt) == sizeof(uintptr_t),
+        "Internal Error: Size mismatch!");
+    uintptr_t_alt* size_ptr = reinterpret_cast<uintptr_t_alt*>(&size_);
+    uintptr_t_alt incr = static_cast<uintptr_t_alt>(increment);
+    return atomic_add(size_ptr, incr);
   }
 #else
   // Running in CUDA mode on host.
@@ -135,15 +138,15 @@ class StorageStrategySelf {
 
  protected:
 #ifdef __CUDA_ARCH__
-  static __device__ ArenaIndexType atomic_add(ArenaIndexType* addr,
-                                              ArenaIndexType increment) {
+  template<typename T>
+  static __device__ T atomic_add(T* addr, T increment) {
     return atomicAdd(addr, increment);
   }
 #else
-  static ArenaIndexType atomic_add(ArenaIndexType* addr,
-                                   ArenaIndexType increment) {
+  template<typename T>
+  static T atomic_add(T* addr, T increment) {
     // TODO: Make atomic for thread pool execution
-    ArenaIndexType r = *addr;
+    T r = *addr;
     *addr += increment;
     return r;
   }
@@ -245,7 +248,8 @@ class alignas(8) DynamicStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_,
+                                       static_cast<ArenaIndexType>(bytes));
     return arena_base_ + new_head;
   }
 
@@ -296,7 +300,8 @@ class alignas(8) StaticStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_,
+                                       static_cast<ArenaIndexType>(bytes));
     return arena_base_ + new_head;
   }
 
