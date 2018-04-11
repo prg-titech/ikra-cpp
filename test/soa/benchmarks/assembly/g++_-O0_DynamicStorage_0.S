@@ -107,13 +107,13 @@ Disassembly of section .text:
   40058a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
 
 0000000000400590 <__do_global_dtors_aux>:
-  400590:	80 3d c9 1a 20 00 00 	cmpb   $0x0,0x201ac9(%rip)        # 602060 <completed.7594>
+  400590:	80 3d c9 1a 20 00 00 	cmpb   $0x0,0x201ac9(%rip)        # 602060 <completed.7585>
   400597:	75 11                	jne    4005aa <__do_global_dtors_aux+0x1a>
   400599:	55                   	push   %rbp
   40059a:	48 89 e5             	mov    %rsp,%rbp
   40059d:	e8 6e ff ff ff       	callq  400510 <deregister_tm_clones>
   4005a2:	5d                   	pop    %rbp
-  4005a3:	c6 05 b6 1a 20 00 01 	movb   $0x1,0x201ab6(%rip)        # 602060 <completed.7594>
+  4005a3:	c6 05 b6 1a 20 00 01 	movb   $0x1,0x201ab6(%rip)        # 602060 <completed.7585>
   4005aa:	f3 c3                	repz retq 
   4005ac:	0f 1f 40 00          	nopl   0x0(%rax)
 

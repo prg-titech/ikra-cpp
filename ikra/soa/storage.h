@@ -12,7 +12,11 @@ __device__ alignas(8) char \
     __ ## class_name ## data_buffer[sizeof(class_name::Storage)]; \
 constexpr char* class_name::storage_buffer() { \
   return __ ## class_name ## data_buffer; \
-}
+} \
+/* Force instantiation of storage-specific kernel templates. */ \
+template __global__ void \
+  ::ikra::soa::allocate_in_arena_kernel<class_name::Storage>( \
+      class_name::Storage*, size_t bytes);
 
 #define IKRA_HOST_STORAGE(class_name) \
 alignas(8) char \
@@ -30,7 +34,10 @@ static const int kStorageModeStatic = 0;
 static const int kStorageModeDynamic = 1;
 
 #ifdef __CUDACC__
+// Helper variables for kernels. Kernel results will be stored in here, so that
+// they can be memcopied to the host easily.
 __device__ IndexType d_previous_storage_size;
+__device__ char* d_arena_allocation;
 #endif  // __CUDACC__
 
 // Storage classes maintain the data of all SOA columns, as well as some meta
@@ -137,7 +144,18 @@ class StorageStrategyBase {
 };
 
 template<typename Self>
-class StorageStrategySelf : public StorageStrategyBase {};
+class StorageStrategySelf : public StorageStrategyBase {
+ public:
+#if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
+  // Not running in CUDA mode or running on device.
+  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+    return reinterpret_cast<Self*>(this)->allocate_in_arena_internal(bytes);
+  }
+#else
+  // Running in CUDA mode on host.
+  char* allocate_in_arena(size_t bytes);
+#endif
+};
 
 #if defined(__CUDACC__)
 // Note: This kernel cannot be templatized because template expansion
@@ -147,6 +165,11 @@ class StorageStrategySelf : public StorageStrategyBase {};
 __global__ void storage_increase_size_kernel(StorageStrategyBase* storage,
                                              IndexType increment) {
   d_previous_storage_size = storage->increase_size(increment);
+}
+
+template<typename Storage>
+__global__ void allocate_in_arena_kernel(Storage* storage, size_t bytes) {
+  d_arena_allocation = storage->allocate_in_arena(bytes);
 }
 
 #ifndef __CUDA_ARCH__
@@ -160,6 +183,20 @@ IndexType StorageStrategyBase::increase_size(IndexType increment) {
                        0, cudaMemcpyDeviceToHost);
   assert(cudaPeekAtLastError() == cudaSuccess);
   return h_result_value;
+}
+
+template<typename Self>
+char* StorageStrategySelf<Self>::allocate_in_arena(size_t bytes) {
+  allocate_in_arena_kernel<Self><<<1, 1>>>(
+      reinterpret_cast<Self*>(device_ptr()), bytes);
+  assert(cudaPeekAtLastError() == cudaSuccess);
+  char* h_result_value;
+  cudaMemcpyFromSymbol(&h_result_value, d_arena_allocation,
+                       sizeof(char*), 0, cudaMemcpyDeviceToHost);
+  assert(cudaPeekAtLastError() == cudaSuccess);
+
+  // Translate to host-relative address.
+  return translate_address_device_to_host(h_result_value);
 }
 #endif  // __CUDA_ARCH__
 #endif  // __CUDACC__
@@ -209,7 +246,7 @@ class alignas(8) DynamicStorage_
   // Allocate arena storage, i.e., storage that is not used for a SOA column.
   // For example, inlined dynamic arrays require arena storage for all elements
   // beyond InlineSize.
-  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+  __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
     auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);
@@ -258,7 +295,7 @@ class alignas(8) StaticStorage_
     arena_head_ = 0;
   }
 
-  __ikra_device__ char* allocate_in_arena(size_t bytes) {
+  __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
     auto new_head = StorageStrategyBase::atomic_add(&arena_head_, bytes);

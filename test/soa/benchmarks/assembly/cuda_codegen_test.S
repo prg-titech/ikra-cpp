@@ -23,9 +23,11 @@ compile_size = 64bit
 
 Resource usage:
  Common:
-  GLOBAL:8508
+  GLOBAL:8516
  Function _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0_:
   REG:4 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:328 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m:
+  REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm:
   REG:10 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:336 TEXTURE:0 SURFACE:0 SAMPLER:0
  Function _ZN4ikra8executor4cuda18kernel_call_lambdaIZNS1_18ExecuteKernelProxyIM9TestClassFviEXadL_ZNS4_10add_fieldsEiEEE4callEiEUliE_JiEEEvT_DpT0_:
@@ -67,6 +69,51 @@ Resource usage:
         /*0070*/                   NOP;                                           /* 0x4000000000001de4 */
         /*0078*/                   NOP;                                           /* 0x4000000000001de4 */
 		...............................................................................................
+
+
+		Function : _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m
+	.headerflags    @"EF_CUDA_SM30 EF_CUDA_PTX_SM(EF_CUDA_SM30)"
+                                                                         /* 0x22b2004282004307 */
+        /*0008*/                   MOV R1, c[0x0][0x44];                 /* 0x2800400110005de4 */
+        /*0010*/                   MOV R6, c[0x0][0x140];                /* 0x2800400500019de4 */
+        /*0018*/                   S2R R3, SR_LANEID;                    /* 0x2c0000000000dc04 */
+        /*0020*/                   VOTE.ALL R0, PT, PT;                  /* 0x49c0000000701c04 */
+        /*0028*/                   IADD32I R6.CC, R6, 0x8;               /* 0x0c00000020619c02 */
+        /*0030*/                   POPC R2, R0, R0;                      /* 0x5400000000009c04 */
+        /*0038*/                   FLO.U32 R5, R0;                       /* 0x7800000000015c03 */
+                                                                         /* 0x2202804240423047 */
+        /*0048*/                   IADD.X R7, RZ, c[0x0][0x144];         /* 0x4800400513f1dc43 */
+        /*0050*/                   ISETP.EQ.U32.AND P0, PT, R5, R3, PT;  /* 0x190e00000c51dc03 */
+        /*0058*/                   IMUL R4, R2, c[0x0][0x148];           /* 0x5000400520211ca3 */
+        /*0060*/                   MOV R2, R6;                           /* 0x2800000018009de4 */
+        /*0068*/                   MOV R3, R7;                           /* 0x280000001c00dde4 */
+        /*0070*/                   S2R R6, SR_LTMASK;                    /* 0x2c000000e4019c04 */
+        /*0078*/               @P0 ATOM.E.ADD R4, [R2], R4;              /* 0x547e200000210005 */
+                                                                         /* 0x22c2804373f042d7 */
+        /*0088*/                   LOP.AND R0, R6, R0;                   /* 0x6800000000601c03 */
+        /*0090*/                   POPC R0, R0, R0;                      /* 0x5400000000001c04 */
+        /*0098*/                   CCTL.E.IV [R2];                       /* 0x9c00000000201ca5 */
+        /*00a0*/                   SHFL.IDX PT, R5, R4, R5, 0x1f;        /* 0x8c007c0014415f45 */
+        /*00a8*/                   IMAD R0, R0, c[0x0][0x148], R5;       /* 0x200a400520001ca3 */
+        /*00b0*/                   MOV32I R5, 0x0;                       /* 0x1800000000015de2 */
+        /*00b8*/                   IADD R0.CC, R0, c[0x0][0x140];        /* 0x4801400500001c03 */
+                                                                         /* 0x22f0428042b20047 */
+        /*00c8*/                   IADD.X R9, RZ, c[0x0][0x144];         /* 0x4800400513f25c43 */
+        /*00d0*/                   IADD32I R8.CC, R0, 0x8;               /* 0x0c00000020021c02 */
+        /*00d8*/                   MOV32I R0, 0x0;                       /* 0x1800000000001de2 */
+        /*00e0*/                   MOV R4, R0;                           /* 0x2800000000011de4 */
+        /*00e8*/                   IADD.X R9, RZ, R9;                    /* 0x4800000027f25c43 */
+        /*00f0*/                   ST.E.64 [R4], R8;                     /* 0x9400000000421ca5 */
+        /*00f8*/                   EXIT;                                 /* 0x8000000000001de7 */
+        /*0100*/                   BRA 0x100;                            /* 0x4003ffffe0001de7 */
+        /*0108*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0110*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0118*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0120*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0128*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0130*/                   NOP;                                  /* 0x4000000000001de4 */
+        /*0138*/                   NOP;                                  /* 0x4000000000001de4 */
+		..............................................................................................
 
 
 		Function : _ZN4ikra3soa28storage_increase_size_kernelEPNS0_19StorageStrategyBaseEm
@@ -387,7 +434,7 @@ Resource usage:
 Fatbin ptx code:
 ================
 arch = sm_30
-code version = [6,1]
+code version = [6,0]
 producer = cuda
 host = linux
 compile_size = 64bit
@@ -400,7 +447,7 @@ compressed
 
 
 
-.version 6.1
+.version 6.0
 .target sm_30
 .address_size 64
 
@@ -411,6 +458,7 @@ compressed
 .global .align 8 .u64 _ZN4ikra8executor4cuda14d_storage_sizeE;
 .global .align 8 .u64 _ZN4ikra8executor4cuda19d_storage_data_headE;
 .global .align 8 .u64 _ZN4ikra3soa23d_previous_storage_sizeE;
+.global .align 8 .u64 _ZN4ikra3soa18d_arena_allocationE;
 
 .visible .entry _Z12write_field0P9TestClass(
 .param .u64 _Z12write_field0P9TestClass_param_0
@@ -634,6 +682,28 @@ ret;
 }
 
 
+.visible .entry _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m(
+.param .u64 _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m_param_0,
+.param .u64 _ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m_param_1
+)
+{
+.reg .b32 %r<3>;
+.reg .b64 %rd<7>;
+
+
+ld.param.u64 %rd1, [_ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m_param_0];
+cvta.to.global.u64 %rd2, %rd1;
+ld.param.u32 %r1, [_ZN4ikra3soa24allocate_in_arena_kernelINS0_14StaticStorage_I9TestClassLm0EEEEEvPT_m_param_1];
+add.s64 %rd3, %rd2, 8;
+atom.global.add.u32 %r2, [%rd3], %r1;
+cvt.u64.u32	%rd4, %r2;
+add.s64 %rd5, %rd1, %rd4;
+add.s64 %rd6, %rd5, 8;
+st.global.u64 [_ZN4ikra3soa18d_arena_allocationE], %rd6;
+ret;
+}
+
+
 .visible .entry _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0_(
 .param .u64 _ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0__param_0
 )
@@ -644,13 +714,13 @@ ret;
 
 ld.param.u64 %rd1, [_ZN4ikra3soa30storage_cuda_initialize_kernelINS0_19StorageStrategyBaseEJEEEvPT_DpT0__param_0];
 setp.eq.s64	%p1, %rd1, 0;
-@%p1 bra BB10_2;
+@%p1 bra BB11_2;
 
 cvta.to.global.u64 %rd2, %rd1;
 mov.u64 %rd3, 0;
 st.global.u64 [%rd2], %rd3;
 
-BB10_2:
+BB11_2:
 ret;
 }
 

@@ -49,18 +49,18 @@ Disassembly of section .text:
   4004a6:	e8 c5 ff ff ff       	callq  400470 <malloc@plt>
   4004ab:	ba 83 2d d2 27       	mov    $0x27d22d83,%edx
   4004b0:	b9 20 64 68 24       	mov    $0x24686420,%ecx
-  4004b5:	c7 05 41 0d 20 00 00 	movl   $0x0,0x200d41(%rip)        # 601200 <__TestClassdata_buffer+0x10>
-  4004bc:	00 00 00 
-  4004bf:	48 8d 58 04          	lea    0x4(%rax),%rbx
-  4004c3:	be 84 07 40 00       	mov    $0x400784,%esi
-  4004c8:	bf 01 00 00 00       	mov    $0x1,%edi
-  4004cd:	48 89 05 34 0d 20 00 	mov    %rax,0x200d34(%rip)        # 601208 <__TestClassdata_buffer+0x18>
-  4004d4:	48 c7 05 19 0d 20 00 	movq   $0x0,0x200d19(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
-  4004db:	00 00 00 00 
-  4004df:	48 c7 05 06 0d 20 00 	movq   $0x1,0x200d06(%rip)        # 6011f0 <__TestClassdata_buffer>
-  4004e6:	01 00 00 00 
-  4004ea:	89 50 04             	mov    %edx,0x4(%rax)
-  4004ed:	89 88 e4 48 00 00    	mov    %ecx,0x48e4(%rax)
+  4004b5:	48 89 05 4c 0d 20 00 	mov    %rax,0x200d4c(%rip)        # 601208 <__TestClassdata_buffer+0x18>
+  4004bc:	c7 05 3a 0d 20 00 00 	movl   $0x0,0x200d3a(%rip)        # 601200 <__TestClassdata_buffer+0x10>
+  4004c3:	00 00 00 
+  4004c6:	48 c7 05 27 0d 20 00 	movq   $0x0,0x200d27(%rip)        # 6011f8 <__TestClassdata_buffer+0x8>
+  4004cd:	00 00 00 00 
+  4004d1:	48 8d 58 04          	lea    0x4(%rax),%rbx
+  4004d5:	48 c7 05 10 0d 20 00 	movq   $0x1,0x200d10(%rip)        # 6011f0 <__TestClassdata_buffer>
+  4004dc:	01 00 00 00 
+  4004e0:	be 84 07 40 00       	mov    $0x400784,%esi
+  4004e5:	89 50 04             	mov    %edx,0x4(%rax)
+  4004e8:	89 88 e4 48 00 00    	mov    %ecx,0x48e4(%rax)
+  4004ee:	bf 01 00 00 00       	mov    $0x1,%edi
   4004f3:	31 c0                	xor    %eax,%eax
   4004f5:	e8 86 ff ff ff       	callq  400480 <__printf_chk@plt>
   4004fa:	48 8b 05 07 0d 20 00 	mov    0x200d07(%rip),%rax        # 601208 <__TestClassdata_buffer+0x18>

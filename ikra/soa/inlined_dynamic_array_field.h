@@ -153,7 +153,7 @@ class SoaInlinedDynamicArrayField_ {
   set_external_pointer(B* ptr) {
     // ptr is a pointer relative to host memory.
     B* d_p_external = Owner::storage().translate_address_host_to_device(ptr);
-    B** d_p_external_addr = Owner::storage().translate_address_device_to_host(
+    B** d_p_external_addr = Owner::storage().translate_address_host_to_device(
         get_external_pointer_addr_internal());
     cudaMemcpy(d_p_external_addr, &d_p_external, sizeof(B*),
                cudaMemcpyHostToDevice);

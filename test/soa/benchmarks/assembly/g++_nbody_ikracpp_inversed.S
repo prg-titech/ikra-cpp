@@ -75,14 +75,14 @@ Disassembly of section .text:
 
 0000000000400780 <main>:
   400780:	41 56                	push   %r14
-  400782:	bf f0 09 40 00       	mov    $0x4009f0,%edi
-  400787:	41 be 8d 68 b7 6c    	mov    $0x6cb7688d,%r14d
-  40078d:	41 55                	push   %r13
-  40078f:	41 bd d0 1a 61 00    	mov    $0x611ad0,%r13d
-  400795:	41 54                	push   %r12
-  400797:	45 31 e4             	xor    %r12d,%r12d
-  40079a:	55                   	push   %rbp
-  40079b:	53                   	push   %rbx
+  400782:	41 55                	push   %r13
+  400784:	bf f0 09 40 00       	mov    $0x4009f0,%edi
+  400789:	41 54                	push   %r12
+  40078b:	55                   	push   %rbp
+  40078c:	41 bd d0 1a 61 00    	mov    $0x611ad0,%r13d
+  400792:	53                   	push   %rbx
+  400793:	45 31 e4             	xor    %r12d,%r12d
+  400796:	41 be 8d 68 b7 6c    	mov    $0x6cb7688d,%r14d
   40079c:	48 83 ec 10          	sub    $0x10,%rsp
   4007a0:	48 c7 05 cd 18 20 00 	movq   $0x0,0x2018cd(%rip)        # 602078 <__Bodydata_buffer>
   4007a7:	00 00 00 00 
@@ -98,15 +98,15 @@ Disassembly of section .text:
   4007d4:	41 b9 0b 00 00 00    	mov    $0xb,%r9d
   4007da:	49 89 c0             	mov    %rax,%r8
   4007dd:	0f 1f 00             	nopl   (%rax)
-  4007e0:	c4 c1 7b 10 45 00    	vmovsd 0x0(%r13),%xmm0
-  4007e6:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+  4007e0:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+  4007e4:	c4 c1 7b 10 45 00    	vmovsd 0x0(%r13),%xmm0
   4007ea:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
-  4007ee:	c4 c1 7b 10 8d 40 fa 	vmovsd 0xfa40(%r13),%xmm1
-  4007f5:	00 00 
-  4007f7:	c5 eb 5a d0          	vcvtsd2ss %xmm0,%xmm2,%xmm2
+  4007ee:	c5 eb 5a d0          	vcvtsd2ss %xmm0,%xmm2,%xmm2
+  4007f2:	c4 c1 7b 10 8d 40 fa 	vmovsd 0xfa40(%r13),%xmm1
+  4007f9:	00 00 
   4007fb:	c5 f9 7e d6          	vmovd  %xmm2,%esi
-  4007ff:	41 01 f1             	add    %esi,%r9d
-  400802:	c5 e3 5a d9          	vcvtsd2ss %xmm1,%xmm3,%xmm3
+  4007ff:	c5 e3 5a d9          	vcvtsd2ss %xmm1,%xmm3,%xmm3
+  400803:	41 01 f1             	add    %esi,%r9d
   400806:	c5 f9 7e de          	vmovd  %xmm3,%esi
   40080a:	44 01 ce             	add    %r9d,%esi
   40080d:	89 f0                	mov    %esi,%eax
@@ -118,8 +118,8 @@ Disassembly of section .text:
   40081d:	41 29 c1             	sub    %eax,%r9d
   400820:	45 69 c9 87 d6 12 00 	imul   $0x12d687,%r9d,%r9d
   400827:	44 29 ce             	sub    %r9d,%esi
-  40082a:	41 89 f1             	mov    %esi,%r9d
-  40082d:	49 83 fc 09          	cmp    $0x9,%r12
+  40082a:	49 83 fc 09          	cmp    $0x9,%r12
+  40082e:	41 89 f1             	mov    %esi,%r9d
   400831:	76 37                	jbe    40086a <main+0xea>
   400833:	49 83 c4 01          	add    $0x1,%r12
   400837:	49 83 c5 08          	add    $0x8,%r13
@@ -263,85 +263,85 @@ Disassembly of section .text:
 
 00000000004009f0 <_Z13instantiationv>:
   4009f0:	41 54                	push   %r12
-  4009f2:	bf 2a 00 00 00       	mov    $0x2a,%edi
-  4009f7:	55                   	push   %rbp
+  4009f2:	55                   	push   %rbp
+  4009f3:	bf 2a 00 00 00       	mov    $0x2a,%edi
   4009f8:	53                   	push   %rbx
-  4009f9:	bb 40 1f 00 00       	mov    $0x1f40,%ebx
-  4009fe:	48 83 ec 10          	sub    $0x10,%rsp
-  400a02:	e8 39 fd ff ff       	callq  400740 <srand@plt>
-  400a07:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
-  400a0e:	00 00 
+  4009f9:	41 bc 40 1f 00 00    	mov    $0x1f40,%r12d
+  4009ff:	48 83 ec 10          	sub    $0x10,%rsp
+  400a03:	e8 38 fd ff ff       	callq  400740 <srand@plt>
+  400a08:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  400a0f:	00 
   400a10:	e8 4b fd ff ff       	callq  400760 <rand@plt>
-  400a15:	41 89 c4             	mov    %eax,%r12d
-  400a18:	e8 43 fd ff ff       	callq  400760 <rand@plt>
-  400a1d:	c5 e9 57 d2          	vxorpd %xmm2,%xmm2,%xmm2
-  400a21:	c5 fb 10 1d ef 07 00 	vmovsd 0x7ef(%rip),%xmm3        # 401218 <_IO_stdin_used+0x68>
-  400a28:	00 
-  400a29:	c5 eb 2a d0          	vcvtsi2sd %eax,%xmm2,%xmm2
-  400a2d:	c4 e2 e1 99 15 da 07 	vfmadd132sd 0x7da(%rip),%xmm3,%xmm2        # 401210 <_IO_stdin_used+0x60>
-  400a34:	00 00 
-  400a36:	c5 fb 11 54 24 08    	vmovsd %xmm2,0x8(%rsp)
-  400a3c:	e8 1f fd ff ff       	callq  400760 <rand@plt>
-  400a41:	c5 f1 57 c9          	vxorpd %xmm1,%xmm1,%xmm1
-  400a45:	c5 fb 10 25 cb 07 00 	vmovsd 0x7cb(%rip),%xmm4        # 401218 <_IO_stdin_used+0x68>
-  400a4c:	00 
-  400a4d:	c5 f3 2a c8          	vcvtsi2sd %eax,%xmm1,%xmm1
-  400a51:	c4 e2 d9 99 0d b6 07 	vfmadd132sd 0x7b6(%rip),%xmm4,%xmm1        # 401210 <_IO_stdin_used+0x60>
-  400a58:	00 00 
-  400a5a:	c5 fb 11 0c 24       	vmovsd %xmm1,(%rsp)
-  400a5f:	e8 fc fc ff ff       	callq  400760 <rand@plt>
-  400a64:	89 c5                	mov    %eax,%ebp
-  400a66:	e8 f5 fc ff ff       	callq  400760 <rand@plt>
-  400a6b:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
-  400a6f:	c5 fb 10 54 24 08    	vmovsd 0x8(%rsp),%xmm2
-  400a75:	c4 c1 7b 2a c4       	vcvtsi2sd %r12d,%xmm0,%xmm0
-  400a7a:	c5 fb 10 0c 24       	vmovsd (%rsp),%xmm1
-  400a7f:	48 8b 15 f2 15 20 00 	mov    0x2015f2(%rip),%rdx        # 602078 <__Bodydata_buffer>
-  400a86:	c5 fb 10 2d 9a 07 00 	vmovsd 0x79a(%rip),%xmm5        # 401228 <_IO_stdin_used+0x78>
-  400a8d:	00 
-  400a8e:	c4 e2 d1 99 05 89 07 	vfmadd132sd 0x789(%rip),%xmm5,%xmm0        # 401220 <_IO_stdin_used+0x70>
-  400a95:	00 00 
-  400a97:	c5 fb 59 05 91 07 00 	vmulsd 0x791(%rip),%xmm0,%xmm0        # 401230 <_IO_stdin_used+0x80>
-  400a9e:	00 
-  400a9f:	c5 fb 10 35 99 07 00 	vmovsd 0x799(%rip),%xmm6        # 401240 <_IO_stdin_used+0x90>
-  400aa6:	00 
-  400aa7:	48 8d 4a 01          	lea    0x1(%rdx),%rcx
-  400aab:	48 83 c2 03          	add    $0x3,%rdx
-  400aaf:	48 89 0d c2 15 20 00 	mov    %rcx,0x2015c2(%rip)        # 602078 <__Bodydata_buffer>
-  400ab6:	c5 fb 11 14 d5 b8 1a 	vmovsd %xmm2,0x611ab8(,%rdx,8)
-  400abd:	61 00 
-  400abf:	c5 fb 11 04 d5 78 20 	vmovsd %xmm0,0x602078(,%rdx,8)
-  400ac6:	60 00 
-  400ac8:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
-  400acc:	c5 fb 2a c5          	vcvtsi2sd %ebp,%xmm0,%xmm0
-  400ad0:	c4 e2 c9 99 05 5f 07 	vfmadd132sd 0x75f(%rip),%xmm6,%xmm0        # 401238 <_IO_stdin_used+0x88>
-  400ad7:	00 00 
+  400a15:	89 c5                	mov    %eax,%ebp
+  400a17:	e8 44 fd ff ff       	callq  400760 <rand@plt>
+  400a1c:	c5 e9 57 d2          	vxorpd %xmm2,%xmm2,%xmm2
+  400a20:	c5 fb 10 1d f0 07 00 	vmovsd 0x7f0(%rip),%xmm3        # 401218 <_IO_stdin_used+0x68>
+  400a27:	00 
+  400a28:	c5 eb 2a d0          	vcvtsi2sd %eax,%xmm2,%xmm2
+  400a2c:	c4 e2 e1 99 15 db 07 	vfmadd132sd 0x7db(%rip),%xmm3,%xmm2        # 401210 <_IO_stdin_used+0x60>
+  400a33:	00 00 
+  400a35:	c5 fb 11 54 24 08    	vmovsd %xmm2,0x8(%rsp)
+  400a3b:	e8 20 fd ff ff       	callq  400760 <rand@plt>
+  400a40:	c5 f1 57 c9          	vxorpd %xmm1,%xmm1,%xmm1
+  400a44:	c5 fb 10 25 cc 07 00 	vmovsd 0x7cc(%rip),%xmm4        # 401218 <_IO_stdin_used+0x68>
+  400a4b:	00 
+  400a4c:	c5 f3 2a c8          	vcvtsi2sd %eax,%xmm1,%xmm1
+  400a50:	c4 e2 d9 99 0d b7 07 	vfmadd132sd 0x7b7(%rip),%xmm4,%xmm1        # 401210 <_IO_stdin_used+0x60>
+  400a57:	00 00 
+  400a59:	c5 fb 11 0c 24       	vmovsd %xmm1,(%rsp)
+  400a5e:	e8 fd fc ff ff       	callq  400760 <rand@plt>
+  400a63:	89 c3                	mov    %eax,%ebx
+  400a65:	e8 f6 fc ff ff       	callq  400760 <rand@plt>
+  400a6a:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
+  400a6e:	48 8b 15 03 16 20 00 	mov    0x201603(%rip),%rdx        # 602078 <__Bodydata_buffer>
+  400a75:	c5 fb 10 2d ab 07 00 	vmovsd 0x7ab(%rip),%xmm5        # 401228 <_IO_stdin_used+0x78>
+  400a7c:	00 
+  400a7d:	c5 fb 10 35 bb 07 00 	vmovsd 0x7bb(%rip),%xmm6        # 401240 <_IO_stdin_used+0x90>
+  400a84:	00 
+  400a85:	c5 fb 2a c5          	vcvtsi2sd %ebp,%xmm0,%xmm0
+  400a89:	c4 e2 d1 99 05 8e 07 	vfmadd132sd 0x78e(%rip),%xmm5,%xmm0        # 401220 <_IO_stdin_used+0x70>
+  400a90:	00 00 
+  400a92:	c5 fb 59 05 96 07 00 	vmulsd 0x796(%rip),%xmm0,%xmm0        # 401230 <_IO_stdin_used+0x80>
+  400a99:	00 
+  400a9a:	48 8d 4a 01          	lea    0x1(%rdx),%rcx
+  400a9e:	48 83 c2 03          	add    $0x3,%rdx
+  400aa2:	41 83 ec 01          	sub    $0x1,%r12d
+  400aa6:	c5 fb 10 54 24 08    	vmovsd 0x8(%rsp),%xmm2
+  400aac:	48 89 0d c5 15 20 00 	mov    %rcx,0x2015c5(%rip)        # 602078 <__Bodydata_buffer>
+  400ab3:	c5 fb 10 0c 24       	vmovsd (%rsp),%xmm1
+  400ab8:	c5 fb 11 14 d5 b8 1a 	vmovsd %xmm2,0x611ab8(,%rdx,8)
+  400abf:	61 00 
+  400ac1:	48 c7 04 d5 b8 03 65 	movq   $0x0,0x6503b8(,%rdx,8)
+  400ac8:	00 00 00 00 00 
+  400acd:	48 c7 04 d5 f8 fd 65 	movq   $0x0,0x65fdf8(,%rdx,8)
+  400ad4:	00 00 00 00 00 
   400ad9:	c5 fb 11 0c d5 f8 14 	vmovsd %xmm1,0x6214f8(,%rdx,8)
   400ae0:	62 00 
-  400ae2:	c5 fb 59 05 5e 07 00 	vmulsd 0x75e(%rip),%xmm0,%xmm0        # 401248 <_IO_stdin_used+0x98>
-  400ae9:	00 
-  400aea:	48 c7 04 d5 b8 03 65 	movq   $0x0,0x6503b8(,%rdx,8)
-  400af1:	00 00 00 00 00 
-  400af6:	48 c7 04 d5 f8 fd 65 	movq   $0x0,0x65fdf8(,%rdx,8)
-  400afd:	00 00 00 00 00 
-  400b02:	c5 fb 11 04 d5 38 0f 	vmovsd %xmm0,0x630f38(,%rdx,8)
-  400b09:	63 00 
-  400b0b:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
-  400b0f:	c5 fb 2a c0          	vcvtsi2sd %eax,%xmm0,%xmm0
-  400b13:	c4 e2 c9 99 05 1c 07 	vfmadd132sd 0x71c(%rip),%xmm6,%xmm0        # 401238 <_IO_stdin_used+0x88>
-  400b1a:	00 00 
-  400b1c:	c5 fb 59 05 24 07 00 	vmulsd 0x724(%rip),%xmm0,%xmm0        # 401248 <_IO_stdin_used+0x98>
-  400b23:	00 
-  400b24:	c5 fb 11 04 d5 78 09 	vmovsd %xmm0,0x640978(,%rdx,8)
-  400b2b:	64 00 
-  400b2d:	83 eb 01             	sub    $0x1,%ebx
-  400b30:	0f 85 da fe ff ff    	jne    400a10 <_Z13instantiationv+0x20>
-  400b36:	48 83 c4 10          	add    $0x10,%rsp
-  400b3a:	5b                   	pop    %rbx
-  400b3b:	5d                   	pop    %rbp
-  400b3c:	41 5c                	pop    %r12
-  400b3e:	c3                   	retq   
-  400b3f:	90                   	nop
+  400ae2:	c5 fb 11 04 d5 78 20 	vmovsd %xmm0,0x602078(,%rdx,8)
+  400ae9:	60 00 
+  400aeb:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
+  400aef:	c5 fb 2a c3          	vcvtsi2sd %ebx,%xmm0,%xmm0
+  400af3:	c4 e2 c9 99 05 3c 07 	vfmadd132sd 0x73c(%rip),%xmm6,%xmm0        # 401238 <_IO_stdin_used+0x88>
+  400afa:	00 00 
+  400afc:	c5 fb 59 05 44 07 00 	vmulsd 0x744(%rip),%xmm0,%xmm0        # 401248 <_IO_stdin_used+0x98>
+  400b03:	00 
+  400b04:	c5 fb 11 04 d5 38 0f 	vmovsd %xmm0,0x630f38(,%rdx,8)
+  400b0b:	63 00 
+  400b0d:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
+  400b11:	c5 fb 2a c0          	vcvtsi2sd %eax,%xmm0,%xmm0
+  400b15:	c4 e2 c9 99 05 1a 07 	vfmadd132sd 0x71a(%rip),%xmm6,%xmm0        # 401238 <_IO_stdin_used+0x88>
+  400b1c:	00 00 
+  400b1e:	c5 fb 59 05 22 07 00 	vmulsd 0x722(%rip),%xmm0,%xmm0        # 401248 <_IO_stdin_used+0x98>
+  400b25:	00 
+  400b26:	c5 fb 11 04 d5 78 09 	vmovsd %xmm0,0x640978(,%rdx,8)
+  400b2d:	64 00 
+  400b2f:	0f 85 db fe ff ff    	jne    400a10 <_Z13instantiationv+0x20>
+  400b35:	48 83 c4 10          	add    $0x10,%rsp
+  400b39:	5b                   	pop    %rbx
+  400b3a:	5d                   	pop    %rbp
+  400b3b:	41 5c                	pop    %r12
+  400b3d:	c3                   	retq   
+  400b3e:	66 90                	xchg   %ax,%ax
 
 0000000000400b40 <_Z10run_simplev>:
   400b40:	c5 fb 10 15 e0 06 00 	vmovsd 0x6e0(%rip),%xmm2        # 401228 <_IO_stdin_used+0x78>
@@ -349,28 +349,28 @@ Disassembly of section .text:
   400b48:	b9 f4 01 00 00       	mov    $0x1f4,%ecx
   400b4d:	ba 90 20 60 00       	mov    $0x602090,%edx
   400b52:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
-  400b58:	c5 eb 59 b2 40 e3 04 	vmulsd 0x4e340(%rdx),%xmm2,%xmm6
+  400b58:	c5 eb 59 82 80 dd 05 	vmulsd 0x5dd80(%rdx),%xmm2,%xmm0
   400b5f:	00 
   400b60:	b8 64 00 00 00       	mov    $0x64,%eax
-  400b65:	c5 eb 59 aa 80 dd 05 	vmulsd 0x5dd80(%rdx),%xmm2,%xmm5
+  400b65:	c5 eb 59 b2 40 e3 04 	vmulsd 0x4e340(%rdx),%xmm2,%xmm6
   400b6c:	00 
-  400b6d:	c5 fb 10 02          	vmovsd (%rdx),%xmm0
+  400b6d:	c5 fb 10 2a          	vmovsd (%rdx),%xmm5
   400b71:	c5 fb 10 8a c0 ee 02 	vmovsd 0x2eec0(%rdx),%xmm1
   400b78:	00 
   400b79:	c5 fb 10 9a 40 fa 00 	vmovsd 0xfa40(%rdx),%xmm3
   400b80:	00 
-  400b81:	c5 cb 5e f0          	vdivsd %xmm0,%xmm6,%xmm6
-  400b85:	c5 fb 10 a2 80 f4 01 	vmovsd 0x1f480(%rdx),%xmm4
-  400b8c:	00 
-  400b8d:	c5 d3 5e e8          	vdivsd %xmm0,%xmm5,%xmm5
+  400b81:	c5 fb 10 a2 80 f4 01 	vmovsd 0x1f480(%rdx),%xmm4
+  400b88:	00 
+  400b89:	c5 cb 5e f5          	vdivsd %xmm5,%xmm6,%xmm6
+  400b8d:	c5 fb 5e ed          	vdivsd %xmm5,%xmm0,%xmm5
   400b91:	c5 fb 10 82 00 e9 03 	vmovsd 0x3e900(%rdx),%xmm0
   400b98:	00 
   400b99:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
   400ba0:	c5 f3 58 ce          	vaddsd %xmm6,%xmm1,%xmm1
-  400ba4:	c5 fb 58 c5          	vaddsd %xmm5,%xmm0,%xmm0
-  400ba8:	c4 e2 f1 b9 da       	vfmadd231sd %xmm2,%xmm1,%xmm3
-  400bad:	c4 e2 f9 b9 e2       	vfmadd231sd %xmm2,%xmm0,%xmm4
-  400bb2:	83 e8 01             	sub    $0x1,%eax
+  400ba4:	83 e8 01             	sub    $0x1,%eax
+  400ba7:	c5 fb 58 c5          	vaddsd %xmm5,%xmm0,%xmm0
+  400bab:	c4 e2 f1 b9 da       	vfmadd231sd %xmm2,%xmm1,%xmm3
+  400bb0:	c4 e2 f9 b9 e2       	vfmadd231sd %xmm2,%xmm0,%xmm4
   400bb5:	75 e9                	jne    400ba0 <_Z10run_simplev+0x60>
   400bb7:	c5 fb 11 8a c0 ee 02 	vmovsd %xmm1,0x2eec0(%rdx)
   400bbe:	00 
@@ -385,8 +385,8 @@ Disassembly of section .text:
   400be2:	0f 85 70 ff ff ff    	jne    400b58 <_Z10run_simplev+0x18>
   400be8:	83 e9 01             	sub    $0x1,%ecx
   400beb:	0f 85 5c ff ff ff    	jne    400b4d <_Z10run_simplev+0xd>
-  400bf1:	c3                   	retq   
-  400bf2:	0f 1f 40 00          	nopl   0x0(%rax)
+  400bf1:	f3 c3                	repz retq 
+  400bf3:	0f 1f 00             	nopl   (%rax)
   400bf6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   400bfd:	00 00 00 
 
@@ -416,8 +416,8 @@ Disassembly of section .text:
   400c5e:	e8 7d fa ff ff       	callq  4006e0 <memset@plt>
   400c63:	c5 fb 10 3c 24       	vmovsd (%rsp),%xmm7
   400c68:	b8 d0 03 65 00       	mov    $0x6503d0,%eax
-  400c6d:	31 f6                	xor    %esi,%esi
-  400c6f:	c5 fb 10 74 24 08    	vmovsd 0x8(%rsp),%xmm6
+  400c6d:	c5 fb 10 74 24 08    	vmovsd 0x8(%rsp),%xmm6
+  400c73:	31 f6                	xor    %esi,%esi
   400c75:	c5 fb 10 6c 24 10    	vmovsd 0x10(%rsp),%xmm5
   400c7b:	c5 fb 10 64 24 18    	vmovsd 0x18(%rsp),%xmm4
   400c81:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
@@ -430,16 +430,16 @@ Disassembly of section .text:
   400c9f:	74 70                	je     400d11 <_Z14run_simulationv+0x111>
   400ca1:	c5 fb 10 82 40 fa 00 	vmovsd 0xfa40(%rdx),%xmm0
   400ca8:	00 
-  400ca9:	c5 7b 5c 80 40 11 fd 	vsubsd -0x2eec0(%rax),%xmm0,%xmm8
+  400ca9:	c5 d3 59 88 c0 1c fb 	vmulsd -0x4e340(%rax),%xmm5,%xmm1
   400cb0:	ff 
-  400cb1:	c5 fb 10 12          	vmovsd (%rdx),%xmm2
-  400cb5:	c5 eb 5c 90 00 17 fc 	vsubsd -0x3e900(%rax),%xmm2,%xmm2
-  400cbc:	ff 
-  400cbd:	c4 c1 3b 59 d8       	vmulsd %xmm8,%xmm8,%xmm3
-  400cc2:	c5 d3 59 88 c0 1c fb 	vmulsd -0x4e340(%rax),%xmm5,%xmm1
-  400cc9:	ff 
-  400cca:	c5 f3 59 8a c0 05 ff 	vmulsd -0xfa40(%rdx),%xmm1,%xmm1
-  400cd1:	ff 
+  400cb1:	c5 7b 5c 80 40 11 fd 	vsubsd -0x2eec0(%rax),%xmm0,%xmm8
+  400cb8:	ff 
+  400cb9:	c5 fb 10 12          	vmovsd (%rdx),%xmm2
+  400cbd:	c5 eb 5c 90 00 17 fc 	vsubsd -0x3e900(%rax),%xmm2,%xmm2
+  400cc4:	ff 
+  400cc5:	c5 f3 59 8a c0 05 ff 	vmulsd -0xfa40(%rdx),%xmm1,%xmm1
+  400ccc:	ff 
+  400ccd:	c4 c1 3b 59 d8       	vmulsd %xmm8,%xmm8,%xmm3
   400cd2:	c4 e2 e9 b9 da       	vfmadd231sd %xmm2,%xmm2,%xmm3
   400cd7:	c5 e3 51 db          	vsqrtsd %xmm3,%xmm3,%xmm3
   400cdb:	c5 f9 28 c3          	vmovapd %xmm3,%xmm0
@@ -448,8 +448,8 @@ Disassembly of section .text:
   400ce8:	c5 fb 59 d2          	vmulsd %xmm2,%xmm0,%xmm2
   400cec:	c4 c1 7b 59 c0       	vmulsd %xmm8,%xmm0,%xmm0
   400cf1:	c5 eb 5e d3          	vdivsd %xmm3,%xmm2,%xmm2
-  400cf5:	c5 eb 58 10          	vaddsd (%rax),%xmm2,%xmm2
-  400cf9:	c5 fb 5e c3          	vdivsd %xmm3,%xmm0,%xmm0
+  400cf5:	c5 fb 5e c3          	vdivsd %xmm3,%xmm0,%xmm0
+  400cf9:	c5 eb 58 10          	vaddsd (%rax),%xmm2,%xmm2
   400cfd:	c5 fb 11 10          	vmovsd %xmm2,(%rax)
   400d01:	c5 fb 58 80 40 fa 00 	vaddsd 0xfa40(%rax),%xmm0,%xmm0
   400d08:	00 
@@ -476,8 +476,8 @@ Disassembly of section .text:
   400d68:	c5 cb 59 80 c0 ee 02 	vmulsd 0x2eec0(%rax),%xmm6,%xmm0
   400d6f:	00 
   400d70:	c4 c1 73 5e ca       	vdivsd %xmm10,%xmm1,%xmm1
-  400d75:	c5 f3 58 08          	vaddsd (%rax),%xmm1,%xmm1
-  400d79:	c4 c1 7b 5e c2       	vdivsd %xmm10,%xmm0,%xmm0
+  400d75:	c4 c1 7b 5e c2       	vdivsd %xmm10,%xmm0,%xmm0
+  400d7a:	c5 f3 58 08          	vaddsd (%rax),%xmm1,%xmm1
   400d7e:	c5 79 28 d9          	vmovapd %xmm1,%xmm11
   400d82:	c5 fb 11 08          	vmovsd %xmm1,(%rax)
   400d86:	c4 62 c9 a9 98 80 0b 	vfmadd213sd -0x1f480(%rax),%xmm6,%xmm11
@@ -540,17 +540,17 @@ Disassembly of section .text:
   400e50:	62 00 
   400e52:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
   400e59:	00 
-  400e5a:	c5 fb 5c 04 fd 08 15 	vsubsd 0x621508(,%rdi,8),%xmm0,%xmm0
-  400e61:	62 00 
-  400e63:	c5 fb 10 0c f5 c8 1a 	vmovsd 0x611ac8(,%rsi,8),%xmm1
-  400e6a:	61 00 
-  400e6c:	c5 fb 10 1c fd 88 20 	vmovsd 0x602088(,%rdi,8),%xmm3
-  400e73:	60 00 
-  400e75:	c5 f3 5c 0c fd c8 1a 	vsubsd 0x611ac8(,%rdi,8),%xmm1,%xmm1
-  400e7c:	61 00 
-  400e7e:	c5 fb 59 d0          	vmulsd %xmm0,%xmm0,%xmm2
-  400e82:	c5 e3 59 1c f5 88 20 	vmulsd 0x602088(,%rsi,8),%xmm3,%xmm3
-  400e89:	60 00 
+  400e5a:	c5 fb 10 1c fd 88 20 	vmovsd 0x602088(,%rdi,8),%xmm3
+  400e61:	60 00 
+  400e63:	c5 fb 5c 04 fd 08 15 	vsubsd 0x621508(,%rdi,8),%xmm0,%xmm0
+  400e6a:	62 00 
+  400e6c:	c5 fb 10 0c f5 c8 1a 	vmovsd 0x611ac8(,%rsi,8),%xmm1
+  400e73:	61 00 
+  400e75:	c5 e3 59 1c f5 88 20 	vmulsd 0x602088(,%rsi,8),%xmm3,%xmm3
+  400e7c:	60 00 
+  400e7e:	c5 f3 5c 0c fd c8 1a 	vsubsd 0x611ac8(,%rdi,8),%xmm1,%xmm1
+  400e85:	61 00 
+  400e87:	c5 fb 59 d0          	vmulsd %xmm0,%xmm0,%xmm2
   400e8b:	c5 e3 59 1d bd 03 00 	vmulsd 0x3bd(%rip),%xmm3,%xmm3        # 401250 <_IO_stdin_used+0xa0>
   400e92:	00 
   400e93:	c4 e2 f1 b9 d1       	vfmadd231sd %xmm1,%xmm1,%xmm2
@@ -562,31 +562,31 @@ Disassembly of section .text:
   400ead:	c5 f3 59 cb          	vmulsd %xmm3,%xmm1,%xmm1
   400eb1:	c5 fb 59 c3          	vmulsd %xmm3,%xmm0,%xmm0
   400eb5:	c5 f3 5e ca          	vdivsd %xmm2,%xmm1,%xmm1
-  400eb9:	c5 f3 58 88 c8 03 65 	vaddsd 0x6503c8(%rax),%xmm1,%xmm1
-  400ec0:	00 
-  400ec1:	c5 fb 5e c2          	vdivsd %xmm2,%xmm0,%xmm0
+  400eb9:	c5 fb 5e c2          	vdivsd %xmm2,%xmm0,%xmm0
+  400ebd:	c5 f3 58 88 c8 03 65 	vaddsd 0x6503c8(%rax),%xmm1,%xmm1
+  400ec4:	00 
   400ec5:	c5 fb 11 88 c8 03 65 	vmovsd %xmm1,0x6503c8(%rax)
   400ecc:	00 
   400ecd:	c5 fb 58 80 08 fe 65 	vaddsd 0x65fe08(%rax),%xmm0,%xmm0
   400ed4:	00 
   400ed5:	c5 fb 11 80 08 fe 65 	vmovsd %xmm0,0x65fe08(%rax)
   400edc:	00 
-  400edd:	c3                   	retq   
-  400ede:	66 90                	xchg   %ax,%ax
+  400edd:	f3 c3                	repz retq 
+  400edf:	90                   	nop
 
 0000000000400ee0 <_Z14codegen_updateP4Bodyd>:
-  400ee0:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
-  400ee7:	00 
-  400ee8:	48 8d 88 d0 ee 02 00 	lea    0x2eed0(%rax),%rcx
-  400eef:	c5 fb 59 0c fd c8 03 	vmulsd 0x6503c8(,%rdi,8),%xmm0,%xmm1
-  400ef6:	65 00 
-  400ef8:	c5 f3 5e 88 88 20 60 	vdivsd 0x602088(%rax),%xmm1,%xmm1
-  400eff:	00 
-  400f00:	c5 f3 58 89 78 20 60 	vaddsd 0x602078(%rcx),%xmm1,%xmm1
-  400f07:	00 
-  400f08:	48 8d 90 10 e9 03 00 	lea    0x3e910(%rax),%rdx
-  400f0f:	48 8d b0 50 fa 00 00 	lea    0xfa50(%rax),%rsi
-  400f16:	48 05 90 f4 01 00    	add    $0x1f490,%rax
+  400ee0:	c5 fb 59 0c fd c8 03 	vmulsd 0x6503c8(,%rdi,8),%xmm0,%xmm1
+  400ee7:	65 00 
+  400ee9:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
+  400ef0:	00 
+  400ef1:	48 8d 88 d0 ee 02 00 	lea    0x2eed0(%rax),%rcx
+  400ef8:	48 8d 90 10 e9 03 00 	lea    0x3e910(%rax),%rdx
+  400eff:	48 8d b0 50 fa 00 00 	lea    0xfa50(%rax),%rsi
+  400f06:	48 05 90 f4 01 00    	add    $0x1f490,%rax
+  400f0c:	c5 f3 5e 88 f8 2b 5e 	vdivsd 0x5e2bf8(%rax),%xmm1,%xmm1
+  400f13:	00 
+  400f14:	c5 f3 58 89 78 20 60 	vaddsd 0x602078(%rcx),%xmm1,%xmm1
+  400f1b:	00 
   400f1c:	c5 fb 11 89 78 20 60 	vmovsd %xmm1,0x602078(%rcx)
   400f23:	00 
   400f24:	c5 fb 59 0c fd 08 fe 	vmulsd 0x65fe08(,%rdi,8),%xmm0,%xmm1
@@ -603,12 +603,12 @@ Disassembly of section .text:
   400f54:	5f 00 
   400f56:	c5 fb 11 88 38 26 5f 	vmovsd %xmm1,0x5f2638(%rax)
   400f5d:	00 
-  400f5e:	c5 fb 10 a0 78 20 60 	vmovsd 0x602078(%rax),%xmm4
+  400f5e:	c5 fb 10 0d fa 02 00 	vmovsd 0x2fa(%rip),%xmm1        # 401260 <_IO_stdin_used+0xb0>
   400f65:	00 
-  400f66:	c4 e2 d9 99 82 78 20 	vfmadd132sd 0x602078(%rdx),%xmm4,%xmm0
-  400f6d:	60 00 
-  400f6f:	c5 fb 10 0d e9 02 00 	vmovsd 0x2e9(%rip),%xmm1        # 401260 <_IO_stdin_used+0xb0>
-  400f76:	00 
+  400f66:	c5 fb 10 a0 78 20 60 	vmovsd 0x602078(%rax),%xmm4
+  400f6d:	00 
+  400f6e:	c4 e2 d9 99 82 78 20 	vfmadd132sd 0x602078(%rdx),%xmm4,%xmm0
+  400f75:	60 00 
   400f77:	c5 fb 11 80 78 20 60 	vmovsd %xmm0,0x602078(%rax)
   400f7e:	00 
   400f7f:	c5 fb 10 96 78 20 60 	vmovsd 0x602078(%rsi),%xmm2
@@ -642,8 +642,8 @@ Disassembly of section .text:
   400fe7:	c5 fb 11 82 78 20 60 	vmovsd %xmm0,0x602078(%rdx)
   400fee:	00 
   400fef:	c3                   	retq   
-  400ff0:	c3                   	retq   
-  400ff1:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  400ff0:	f3 c3                	repz retq 
+  400ff2:	0f 1f 40 00          	nopl   0x0(%rax)
   400ff6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
   400ffd:	00 00 00 
 
@@ -670,35 +670,35 @@ Disassembly of section .text:
   40103d:	0f 1f 00             	nopl   (%rax)
 
 0000000000401040 <_Z22codengen_simple_updateP4Bodyd>:
-  401040:	c5 fb 59 34 fd c8 03 	vmulsd 0x6503c8(,%rdi,8),%xmm0,%xmm6
+  401040:	c5 fb 59 0c fd 08 fe 	vmulsd 0x65fe08(,%rdi,8),%xmm0,%xmm1
   401047:	65 00 
-  401049:	c5 fb 59 2c fd 08 fe 	vmulsd 0x65fe08(,%rdi,8),%xmm0,%xmm5
-  401050:	65 00 
-  401052:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
-  401059:	00 
-  40105a:	c5 fb 10 0c fd 88 20 	vmovsd 0x602088(,%rdi,8),%xmm1
-  401061:	60 00 
-  401063:	4c 8d 80 d0 ee 02 00 	lea    0x2eed0(%rax),%r8
-  40106a:	c5 fb 10 a0 c8 1a 61 	vmovsd 0x611ac8(%rax),%xmm4
-  401071:	00 
-  401072:	48 8d b0 10 e9 03 00 	lea    0x3e910(%rax),%rsi
-  401079:	c4 c1 7b 10 90 78 20 	vmovsd 0x602078(%r8),%xmm2
-  401080:	60 00 
-  401082:	48 8d 88 50 fa 00 00 	lea    0xfa50(%rax),%rcx
-  401089:	c5 fb 10 98 08 15 62 	vmovsd 0x621508(%rax),%xmm3
-  401090:	00 
-  401091:	48 8d 90 90 f4 01 00 	lea    0x1f490(%rax),%rdx
-  401098:	b8 64 00 00 00       	mov    $0x64,%eax
-  40109d:	c5 cb 5e f1          	vdivsd %xmm1,%xmm6,%xmm6
-  4010a1:	c5 d3 5e e9          	vdivsd %xmm1,%xmm5,%xmm5
+  401049:	48 8d 04 fd 00 00 00 	lea    0x0(,%rdi,8),%rax
+  401050:	00 
+  401051:	c5 fb 59 34 fd c8 03 	vmulsd 0x6503c8(,%rdi,8),%xmm0,%xmm6
+  401058:	65 00 
+  40105a:	4c 8d 80 d0 ee 02 00 	lea    0x2eed0(%rax),%r8
+  401061:	48 8d b0 10 e9 03 00 	lea    0x3e910(%rax),%rsi
+  401068:	48 8d 88 50 fa 00 00 	lea    0xfa50(%rax),%rcx
+  40106f:	48 8d 90 90 f4 01 00 	lea    0x1f490(%rax),%rdx
+  401076:	c5 fb 10 2c fd 88 20 	vmovsd 0x602088(,%rdi,8),%xmm5
+  40107d:	60 00 
+  40107f:	c4 c1 7b 10 90 78 20 	vmovsd 0x602078(%r8),%xmm2
+  401086:	60 00 
+  401088:	b8 64 00 00 00       	mov    $0x64,%eax
+  40108d:	c5 fb 10 a1 78 20 60 	vmovsd 0x602078(%rcx),%xmm4
+  401094:	00 
+  401095:	c5 fb 10 9a 78 20 60 	vmovsd 0x602078(%rdx),%xmm3
+  40109c:	00 
+  40109d:	c5 cb 5e f5          	vdivsd %xmm5,%xmm6,%xmm6
+  4010a1:	c5 f3 5e ed          	vdivsd %xmm5,%xmm1,%xmm5
   4010a5:	c5 fb 10 8e 78 20 60 	vmovsd 0x602078(%rsi),%xmm1
   4010ac:	00 
   4010ad:	0f 1f 00             	nopl   (%rax)
   4010b0:	c5 eb 58 d6          	vaddsd %xmm6,%xmm2,%xmm2
-  4010b4:	c5 f3 58 cd          	vaddsd %xmm5,%xmm1,%xmm1
-  4010b8:	c4 e2 f9 b9 e2       	vfmadd231sd %xmm2,%xmm0,%xmm4
-  4010bd:	c4 e2 f9 b9 d9       	vfmadd231sd %xmm1,%xmm0,%xmm3
-  4010c2:	83 e8 01             	sub    $0x1,%eax
+  4010b4:	83 e8 01             	sub    $0x1,%eax
+  4010b7:	c5 f3 58 cd          	vaddsd %xmm5,%xmm1,%xmm1
+  4010bb:	c4 e2 f9 b9 e2       	vfmadd231sd %xmm2,%xmm0,%xmm4
+  4010c0:	c4 e2 f9 b9 d9       	vfmadd231sd %xmm1,%xmm0,%xmm3
   4010c5:	75 e9                	jne    4010b0 <_Z22codengen_simple_updateP4Bodyd+0x70>
   4010c7:	c4 c1 7b 11 90 78 20 	vmovsd %xmm2,0x602078(%r8)
   4010ce:	60 00 
@@ -713,22 +713,22 @@ Disassembly of section .text:
 
 00000000004010f0 <_ZN7measureINSt6chrono8durationIlSt5ratioILl1ELl1000EEEEE9executionIRFvvEIEEElOT_DpOT0_>:
   4010f0:	55                   	push   %rbp
-  4010f1:	48 89 fd             	mov    %rdi,%rbp
-  4010f4:	53                   	push   %rbx
+  4010f1:	53                   	push   %rbx
+  4010f2:	48 89 fd             	mov    %rdi,%rbp
   4010f5:	48 83 ec 08          	sub    $0x8,%rsp
   4010f9:	e8 52 f6 ff ff       	callq  400750 <_ZNSt6chrono3_V212steady_clock3nowEv@plt>
   4010fe:	48 89 c3             	mov    %rax,%rbx
   401101:	ff d5                	callq  *%rbp
   401103:	e8 48 f6 ff ff       	callq  400750 <_ZNSt6chrono3_V212steady_clock3nowEv@plt>
-  401108:	48 83 c4 08          	add    $0x8,%rsp
-  40110c:	48 ba db 34 b6 d7 82 	movabs $0x431bde82d7b634db,%rdx
-  401113:	de 1b 43 
-  401116:	48 29 d8             	sub    %rbx,%rax
-  401119:	5b                   	pop    %rbx
-  40111a:	48 89 c1             	mov    %rax,%rcx
-  40111d:	5d                   	pop    %rbp
-  40111e:	48 c1 f9 3f          	sar    $0x3f,%rcx
-  401122:	48 f7 ea             	imul   %rdx
+  401108:	48 ba db 34 b6 d7 82 	movabs $0x431bde82d7b634db,%rdx
+  40110f:	de 1b 43 
+  401112:	48 29 d8             	sub    %rbx,%rax
+  401115:	48 83 c4 08          	add    $0x8,%rsp
+  401119:	48 89 c1             	mov    %rax,%rcx
+  40111c:	48 f7 ea             	imul   %rdx
+  40111f:	48 c1 f9 3f          	sar    $0x3f,%rcx
+  401123:	5b                   	pop    %rbx
+  401124:	5d                   	pop    %rbp
   401125:	48 89 d0             	mov    %rdx,%rax
   401128:	48 c1 f8 12          	sar    $0x12,%rax
   40112c:	48 29 c8             	sub    %rcx,%rax
