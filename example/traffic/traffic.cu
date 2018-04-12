@@ -204,10 +204,12 @@ class Car : public SoaLayout<
   }
 
   __device__ void step_prepare_path() {
-    step_initialize_iteration();
-    step_accelerate();
-    step_extend_path();
-    step_constraint_velocity();
+    if (is_active()) {
+      step_initialize_iteration();
+      step_accelerate();
+      step_extend_path();
+      step_constraint_velocity();
+    }
   }
 
   __device__ Cell* next_step(Cell* cell);
@@ -226,6 +228,52 @@ class Car : public SoaLayout<
 };
 
 IKRA_DEVICE_STORAGE(Car);
+
+class Simulation : public SoaLayout<Simulation, 1> {
+ public:
+  IKRA_INITIALIZE_CLASS
+
+  __device__ Simulation() : random_state_(123) {}
+
+  uint32_t_ random_state_;
+
+  __device__ uint32_t rand32() {
+    // Advance and return random state.
+    // Source: https://en.wikipedia.org/wiki/Lehmer_random_number_generator
+    random_state_ = static_cast<uint32_t>(
+        static_cast<uint64_t>(random_state()) * 279470273u) % 0xfffffffb;
+    return random_state_;
+  }
+
+  __device__ uint32_t rand32(uint32_t max_value) {
+    return rand32() % max_value;
+  }
+
+  __device__ uint32_t random_state() const {
+    return random_state_;
+  }
+
+  __device__ Cell* random_free_cell(Car* car) {
+    uint64_t state = random_state();
+    uint64_t num_cars = Car::size();
+    uint64_t num_cells = Cell::size();
+    uint32_t max_tries = num_cells / num_cars;
+
+    for (uint32_t i = 0; i < max_tries; ++i) {
+      uint64_t cell_id = (num_cells * (car->id() + state) / num_cars + i)
+                         % num_cells;
+      Cell* next_cell = Cell::get(cell_id);
+      if (next_cell->is_free()) {
+        return next_cell;
+      }
+    }
+
+    // Could not find free cell. Try again in next iteration.
+    return nullptr;
+  }
+};
+
+IKRA_DEVICE_STORAGE(Simulation);
 
 
 __device__ Cell* Car::next_step(Cell* position) {
@@ -269,48 +317,52 @@ __device__ void Car::step_extend_path() {
 __device__ void Car::step_constraint_velocity() {
   // This is actually only needed for the very first iteration, because a car
   // may be positioned on a traffic light cell.
-  // TODO: Why does the implicit type cast not work here?
   if (velocity_ > position()->max_velocity()) {
     velocity_ = position()->max_velocity();
   }
 
-  uint32_t distance = 0;
-  while (distance < velocity_) {
-    // Invariant: Movement of up to `distance` many cells at `velocity_`
+  uint32_t path_index = 0;
+  int distance = 1;
+
+  while (distance <= velocity_) {
+    // Invariant: Movement of up to `distance - 1` many cells at `velocity_`
     //            is allowed.
     // Now check if next cell can be entered.
-    Cell* next_cell = path_[distance];
+    Cell* next_cell = path_[path_index];
 
     // Avoid collision.
-    if (!next_cell->is_free()) {
+    if (next_cell->is_free()) {
       // Cannot enter cell.
-      velocity_ = distance;
       --distance;
+      velocity_ = distance;
       break;
     } // else: Can enter next cell.
 
     if (velocity_ > next_cell->max_velocity()) {
       // Car is too fast for this cell.
-      if (next_cell->max_velocity() > distance) {
+      if (next_cell->max_velocity() > distance - 1) {
         // Even if we slow down, we would still make progress.
         velocity_ = next_cell->max_velocity();
       } else {
         // Do not enter the next cell.
-        velocity_ = distance;
         --distance;
+        velocity_ = distance;
         break;
       }
     }
 
     ++distance;
+    ++path_index;
   }
 
   --distance;
-  assert(distance < velocity_);
+
+  // TODO: Check why the cast is necessary.
+  assert(distance <= (int) velocity());
 }
 
 __device__ void Car::step_move() {
-  Cell* cell;
+  Cell* cell = position_;
   for (int i = 0; i < velocity_; ++i) {
     // TODO: Add check here to see if cell is free.
     cell = path_[i];
@@ -330,6 +382,16 @@ __device__ void Car::step_move() {
 }
 
 __device__ void Car::step_reactivate() {
+  if (!is_active()) {
+    Cell* free_cell = Simulation::get(0)->random_free_cell(this);
+
+    if (free_cell != nullptr) {
+      position_ = free_cell;
+      is_active_ = true;
+      path_length_ = 0;
+      free_cell->occupy(this);
+    }
+  }
   // TODO
 }
 
@@ -371,14 +433,6 @@ extern IndexType* dev_signal_group_cells;
 }  // namespace aos_int_cuda
 }  // namespace simulation
 
-/*
-  __host__ __device__ Cell(uint32_t max_velocity, double x, double y,
-                           uint32_t num_incoming, Cell** incoming,
-                           uint32_t num_outgoing, Cell** outgoing,
-                           Car* car, bool is_free, bool is_sink,
-                           Type type = kResidential)
-*/
-
 __global__ void convert_to_ikra_cpp_cells(
     IndexType s_size_Cell,
     simulation::aos_int_cuda::Cell* s_Cell,
@@ -409,19 +463,19 @@ __global__ void convert_to_ikra_cpp_cells(
   }
 }
 
-/*
-  __device__ __host__ Car(bool is_active, uint32_t velocity,
-                          uint32_t max_velocity, uint32_t random_state,
-                          Cell* position)
-                          */
-
 __global__ void convert_to_ikra_cpp_cars(
     IndexType s_size_Car,
-    simulation::aos_int_cuda::Car* s_Car) {
+    simulation::aos_int_cuda::Car* s_Car,
+    IndexType s_size_Cell) {
   unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
 
   if (tid < s_size_Car) {
     simulation::aos_int_cuda::Car& car = s_Car[tid];
+
+    // Every car must have a position.
+    assert(car.position_ != 4294967295);
+    assert(car.position_ < s_size_Cell);
+
     Cell* cell_ptr = car.position_ == 4294967295
       ? nullptr : Cell::get_uninitialized(car.position_);
 
@@ -433,6 +487,7 @@ __global__ void convert_to_ikra_cpp_cars(
 
   if (tid == 0) {
     Car::storage().increase_size(s_size_Car);
+    new Simulation();
   }
 }
 
@@ -456,10 +511,19 @@ int main(int argc, char** argv) {
 
   convert_to_ikra_cpp_cars<<<kNumCars/1024 + 1, 1024>>>(
       simulation::aos_int::s_size_Car,
-      simulation::aos_int_cuda::dev_Car);
+      simulation::aos_int_cuda::dev_Car,
+      simulation::aos_int::s_size_Cell);
   gpuErrchk(cudaDeviceSynchronize());
 
-  // Now start simulation.
-  cuda_execute(&Car::step_prepare_path);
-  gpuErrchk(cudaDeviceSynchronize());
+  for (int i = 0; i < 10000; ++i) {
+    // Now start simulation.
+    cuda_execute(&Car::step_prepare_path);
+    gpuErrchk(cudaDeviceSynchronize());
+
+    cuda_execute(&Car::step_move);
+    gpuErrchk(cudaDeviceSynchronize());
+
+    cuda_execute(&Car::step_reactivate);
+    gpuErrchk(cudaDeviceSynchronize());
+  }
 }
