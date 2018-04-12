@@ -37,6 +37,8 @@ class Cell : public SoaLayout<Cell, kNumCells> {
         num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
         incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
         car_(car), is_free_(is_free), is_sink_(is_sink) {
+
+          /*
     for (uint32_t i = 0; i < num_incoming; ++i) {
       incoming_cells_[i] = incoming[i];
     }
@@ -44,6 +46,7 @@ class Cell : public SoaLayout<Cell, kNumCells> {
     for (uint32_t i = 0; i < num_outgoing; ++i) {
       outgoing_cells_[i] = outgoing[i];
     }
+*/
 
     controller_max_velocity_ = max_velocity_;
   }
@@ -357,7 +360,7 @@ __global__ void convert_to_ikra_cpp(
 
   if (tid < s_size_Cell) {
     simulation::aos_int_cuda::Cell& cell = s_Cell[tid];
-    
+
     // Neighbors
     Cell** outgoing_cells = new Cell*[cell.num_outgoing_cells_];
     for (int j = 0; j < cell.num_outgoing_cells_; ++j) {
@@ -369,9 +372,10 @@ __global__ void convert_to_ikra_cpp(
       incoming_cells[j] = Cell::get_uninitialized(
           s_incoming_cells[cell.first_incoming_cell_idx_ + j]);
     }
+
     Cell* new_cell = new(Cell::get_uninitialized(tid)) Cell(
         cell.max_velocity_, cell.x_, cell.y_, cell.num_incoming_cells_,
-        incoming_cells, cell.num_outgoing_cells_, outgoing_cells,
+        nullptr, cell.num_outgoing_cells_, nullptr,
         Car::get_uninitialized(0), cell.is_free_, cell.is_sink_,
         (Cell::Type) cell.type_);
     assert(new_cell->id() == tid);
