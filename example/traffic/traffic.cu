@@ -1,5 +1,6 @@
 #include "executor/executor.h"
 #include "soa/soa.h"
+#include "executor/cuda_executor.h"
 
 static const uint32_t kNumCells = 217000;
 static const uint32_t kNumCars = 21000;
@@ -9,6 +10,8 @@ static const uint32_t kArrayInlineSizeIncomingCells = 4;
 static const uint32_t kArrayInlineSizePath = 6;
 
 using ikra::soa::SoaLayout;
+using ikra::soa::kAddressModeZero;
+using ikra::soa::StaticStorageWithArena;
 
 class Car;
 
@@ -37,8 +40,6 @@ class Cell : public SoaLayout<Cell, kNumCells> {
         num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
         incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
         car_(car), is_free_(is_free), is_sink_(is_sink) {
-
-          /*
     for (uint32_t i = 0; i < num_incoming; ++i) {
       incoming_cells_[i] = incoming[i];
     }
@@ -46,7 +47,27 @@ class Cell : public SoaLayout<Cell, kNumCells> {
     for (uint32_t i = 0; i < num_outgoing; ++i) {
       outgoing_cells_[i] = outgoing[i];
     }
-*/
+
+    controller_max_velocity_ = max_velocity_;
+  }
+
+  // Overload: Provide cell indices instead of pointers.
+  __host__ __device__ Cell(uint32_t max_velocity, double x, double y,
+                           uint32_t num_incoming, unsigned int* incoming,
+                           uint32_t num_outgoing, unsigned int* outgoing,
+                           Car* car, bool is_free, bool is_sink,
+                           Type type = kResidential)
+      : max_velocity_(max_velocity), x_(x), y_(y), type_(type),
+        num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
+        incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
+        car_(car), is_free_(is_free), is_sink_(is_sink) {
+    for (uint32_t i = 0; i < num_incoming; ++i) {
+      incoming_cells_[i] = Cell::get_uninitialized(incoming[i]);
+    }
+
+    for (uint32_t i = 0; i < num_outgoing; ++i) {
+      outgoing_cells_[i] = Cell::get_uninitialized(outgoing[i]);
+    }
 
     controller_max_velocity_ = max_velocity_;
   }
@@ -129,9 +150,18 @@ class Cell : public SoaLayout<Cell, kNumCells> {
 
 IKRA_DEVICE_STORAGE(Cell);
 
-class Car : public SoaLayout<Car, kNumCars> {
+class Car : public SoaLayout<
+    Car, kNumCars, kAddressModeZero,
+    StaticStorageWithArena<kNumCars*50*sizeof(uint32_t)>> {
  public:
   IKRA_INITIALIZE_CLASS
+
+  __device__ __host__ Car(bool is_active, uint32_t velocity,
+                          uint32_t max_velocity, uint32_t random_state,
+                          Cell* position)
+      : is_active_(is_active), velocity_(velocity), path_length_(0),
+        path_(max_velocity), random_state_(random_state), position_(position),
+        max_velocity_(max_velocity) {}
 
   // If a car enters a sink, it is removed from the simulation (inactive)
   // for a short time.
@@ -349,7 +379,7 @@ extern IndexType* dev_signal_group_cells;
                            Type type = kResidential)
 */
 
-__global__ void convert_to_ikra_cpp(
+__global__ void convert_to_ikra_cpp_cells(
     IndexType s_size_Cell,
     simulation::aos_int_cuda::Cell* s_Cell,
     IndexType s_size_outgoing_cells,
@@ -360,25 +390,49 @@ __global__ void convert_to_ikra_cpp(
 
   if (tid < s_size_Cell) {
     simulation::aos_int_cuda::Cell& cell = s_Cell[tid];
-
-    // Neighbors
-    Cell** outgoing_cells = new Cell*[cell.num_outgoing_cells_];
-    for (int j = 0; j < cell.num_outgoing_cells_; ++j) {
-      outgoing_cells[j] = Cell::get_uninitialized(
-          s_outgoing_cells[cell.first_outgoing_cell_idx_ + j]);
-    }
-    Cell** incoming_cells = new Cell*[cell.num_incoming_cells_];
-    for (int j = 0; j < cell.num_incoming_cells_; ++j) {
-      incoming_cells[j] = Cell::get_uninitialized(
-          s_incoming_cells[cell.first_incoming_cell_idx_ + j]);
-    }
+    Car* car_ptr = cell.car_ == 4294967295
+      ? nullptr : Car::get_uninitialized(cell.car_);
 
     Cell* new_cell = new(Cell::get_uninitialized(tid)) Cell(
-        cell.max_velocity_, cell.x_, cell.y_, cell.num_incoming_cells_,
-        nullptr, cell.num_outgoing_cells_, nullptr,
-        Car::get_uninitialized(0), cell.is_free_, cell.is_sink_,
+        cell.max_velocity_, cell.x_, cell.y_,
+        cell.num_incoming_cells_,
+        s_incoming_cells + cell.first_incoming_cell_idx_,
+        cell.num_outgoing_cells_,
+        s_outgoing_cells + cell.first_outgoing_cell_idx_,
+        car_ptr, cell.is_free_, cell.is_sink_,
         (Cell::Type) cell.type_);
     assert(new_cell->id() == tid);
+  }
+
+  if (tid == 0) {
+    Cell::storage().increase_size(s_size_Cell);
+  }
+}
+
+/*
+  __device__ __host__ Car(bool is_active, uint32_t velocity,
+                          uint32_t max_velocity, uint32_t random_state,
+                          Cell* position)
+                          */
+
+__global__ void convert_to_ikra_cpp_cars(
+    IndexType s_size_Car,
+    simulation::aos_int_cuda::Car* s_Car) {
+  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
+
+  if (tid < s_size_Car) {
+    simulation::aos_int_cuda::Car& car = s_Car[tid];
+    Cell* cell_ptr = car.position_ == 4294967295
+      ? nullptr : Cell::get_uninitialized(car.position_);
+
+    Car* new_car = new(Car::get_uninitialized(tid)) Car(
+        car.is_active_, car.velocity_, car.max_velocity_,
+        car.random_state_, cell_ptr);
+    assert(new_car->id() == tid);
+  }
+
+  if (tid == 0) {
+    Car::storage().increase_size(s_size_Car);
   }
 }
 
@@ -391,12 +445,21 @@ int main(int argc, char** argv) {
   assert(simulation::aos_int::s_size_Car <= kNumCars);
   assert(simulation::aos_int::s_size_Cell <= kNumCells);
 
-  convert_to_ikra_cpp<<<kNumCells/1024 + 1, 1024>>>(
+  convert_to_ikra_cpp_cells<<<kNumCells/1024 + 1, 1024>>>(
       simulation::aos_int::s_size_Cell,
       simulation::aos_int_cuda::dev_Cell,
       simulation::aos_int::s_size_outgoing_cells,
       simulation::aos_int_cuda::dev_outgoing_cells,
       simulation::aos_int::s_size_incoming_cells,
       simulation::aos_int_cuda::dev_incoming_cells);
+  gpuErrchk(cudaDeviceSynchronize());
+
+  convert_to_ikra_cpp_cars<<<kNumCars/1024 + 1, 1024>>>(
+      simulation::aos_int::s_size_Car,
+      simulation::aos_int_cuda::dev_Car);
+  gpuErrchk(cudaDeviceSynchronize());
+
+  // Now start simulation.
+  cuda_execute(&Car::step_prepare_path);
   gpuErrchk(cudaDeviceSynchronize());
 }
