@@ -2,12 +2,12 @@
 #include "soa/soa.h"
 #include "executor/cuda_executor.h"
 
-static const uint32_t kNumCells = 217000;
-static const uint32_t kNumCars = 21000;
+static const uint32_t kNumCells = 4624613;
+static const uint32_t kNumCars = 110000;
 
-static const uint32_t kArrayInlineSizeOutgoingCells = 4;
-static const uint32_t kArrayInlineSizeIncomingCells = 4;
-static const uint32_t kArrayInlineSizePath = 6;
+static const uint32_t kArrayInlineSizeOutgoingCells = 10;  // 4
+static const uint32_t kArrayInlineSizeIncomingCells = 10;  // 4
+static const uint32_t kArrayInlineSizePath = 10;           // 6
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
@@ -15,7 +15,9 @@ using ikra::soa::StaticStorageWithArena;
 
 class Car;
 
-class Cell : public SoaLayout<Cell, kNumCells> {
+class Cell : public SoaLayout<
+    Cell, kNumCells, kAddressModeZero,
+    StaticStorageWithArena<kNumCells*8*sizeof(uint32_t)>> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -161,7 +163,9 @@ class Car : public SoaLayout<
                           Cell* position)
       : is_active_(is_active), velocity_(velocity), path_length_(0),
         path_(max_velocity), random_state_(random_state), position_(position),
-        max_velocity_(max_velocity) {}
+        max_velocity_(max_velocity) {
+    assert(is_active);
+  }
 
   // If a car enters a sink, it is removed from the simulation (inactive)
   // for a short time.
@@ -209,6 +213,7 @@ class Car : public SoaLayout<
       step_accelerate();
       step_extend_path();
       step_constraint_velocity();
+      step_slow_down();
     }
   }
 
@@ -225,6 +230,12 @@ class Car : public SoaLayout<
   __device__ void step_move();
 
   __device__ void step_reactivate();
+
+  __device__ void step_slow_down() {
+    if (rand32(1000) < 200 && velocity_ > 0) {
+      velocity_ = velocity_ - 1;
+    }
+  }
 };
 
 IKRA_DEVICE_STORAGE(Car);
@@ -331,7 +342,7 @@ __device__ void Car::step_constraint_velocity() {
     Cell* next_cell = path_[path_index];
 
     // Avoid collision.
-    if (next_cell->is_free()) {
+    if (!next_cell->is_free()) {
       // Cannot enter cell.
       --distance;
       velocity_ = distance;
@@ -491,6 +502,54 @@ __global__ void convert_to_ikra_cpp_cars(
   }
 }
 
+__global__ void print_velocity_histogram() {
+  int counter[50];
+  int inactive = 0;
+
+  for (int i = 0; i < 50; ++i) {
+    counter[i] = 0;
+  }
+
+  for (int i = 0; i < Car::size(); ++i) {
+    counter[Car::get(i)->velocity()]++;
+    if (!Car::get(i)->is_active()) {
+      inactive++;
+    }
+  }
+
+  for (int i = 0; i < 50; ++i) {
+    printf("velocity[%i] = %i\n", i, counter[i]);
+  }
+  printf("Inactive cars: %i\n", inactive);
+}
+
+void run_simulation() {
+  for (int i = 0; i < 100; ++i) {
+    // Now start simulation.
+    cuda_execute(&Car::step_prepare_path);
+    cuda_execute(&Car::step_move);
+    cuda_execute(&Car::step_reactivate);
+    gpuErrchk(cudaDeviceSynchronize());
+  }
+}
+
+#include <iostream>
+#include <chrono>
+
+template<typename TimeT = std::chrono::milliseconds>
+struct measure
+{
+    template<typename F, typename ...Args>
+    static typename TimeT::rep execution(F&& func, Args&&... args)
+    {
+        auto start = std::chrono::steady_clock::now();
+        std::forward<decltype(func)>(func)(std::forward<Args>(args)...);
+        auto duration = std::chrono::duration_cast< TimeT> 
+                            (std::chrono::steady_clock::now() - start);
+        return duration.count();
+    }
+};
+
 int main(int argc, char** argv) {
   Cell::initialize_storage();
   Car::initialize_storage();
@@ -515,15 +574,9 @@ int main(int argc, char** argv) {
       simulation::aos_int::s_size_Cell);
   gpuErrchk(cudaDeviceSynchronize());
 
-  for (int i = 0; i < 10000; ++i) {
-    // Now start simulation.
-    cuda_execute(&Car::step_prepare_path);
-    gpuErrchk(cudaDeviceSynchronize());
+  uint64_t time_action = measure<>::execution(run_simulation);
+  printf("Time for simulation: %lu\n", time_action);
 
-    cuda_execute(&Car::step_move);
-    gpuErrchk(cudaDeviceSynchronize());
-
-    cuda_execute(&Car::step_reactivate);
-    gpuErrchk(cudaDeviceSynchronize());
-  }
+  print_velocity_histogram<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
 }
