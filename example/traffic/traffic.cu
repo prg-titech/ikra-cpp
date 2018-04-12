@@ -369,7 +369,7 @@ __global__ void convert_to_ikra_cpp(
       incoming_cells[j] = Cell::get_uninitialized(
           s_incoming_cells[cell.first_incoming_cell_idx_ + j]);
     }
-    Cell* new_cell = new(reinterpret_cast<void*>(tid + 1)) Cell(
+    Cell* new_cell = new(Cell::get_uninitialized(tid)) Cell(
         cell.max_velocity_, cell.x_, cell.y_, cell.num_incoming_cells_,
         incoming_cells, cell.num_outgoing_cells_, outgoing_cells,
         Car::get_uninitialized(0), cell.is_free_, cell.is_sink_,
