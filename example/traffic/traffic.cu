@@ -4,10 +4,12 @@
 
 static const uint32_t kNumCells = 4624613;
 static const uint32_t kNumCars = 110000;
+static const uint32_t kNumSharedSignalGroups = 140000;
 
 static const uint32_t kArrayInlineSizeOutgoingCells = 10;  // 4
 static const uint32_t kArrayInlineSizeIncomingCells = 10;  // 4
 static const uint32_t kArrayInlineSizePath = 10;           // 6
+static const uint32_t kArrayInlineSizeSignalGroupCells = 4;
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
@@ -239,6 +241,39 @@ class Car : public SoaLayout<
 };
 
 IKRA_DEVICE_STORAGE(Car);
+
+class SharedSignalGroup : public SoaLayout<SharedSignalGroup,
+    kNumSharedSignalGroups, kAddressModeZero,
+    StaticStorageWithArena<kNumSharedSignalGroups*4*sizeof(uint32_t)>> {
+ public:
+  IKRA_INITIALIZE_CLASS
+  
+  __device__ SharedSignalGroup(uint32_t num_cells, unsigned int* cells)
+      : num_cells_(num_cells), cells_(num_cells) {
+    for (uint32_t i = 0; i < num_cells; ++i) {
+      cells_[i] = Cell::get_uninitialized(cells[i]);
+    }
+  }
+
+  __device__ void signal_go() {
+    for (uint32_t i = 0; i < num_cells_; ++i) {
+      cells_[i]->remove_controller_max_velocity();
+    }
+  }
+
+  __device__ void signal_stop() {
+    for (uint32_t i = 0; i < num_cells_; ++i) {
+      cells_[i]->set_controller_max_velocity(0);
+    }
+  }
+
+  array_(Cell*, kArrayInlineSizeSignalGroupCells, inline_soa) cells_;
+  uint32_t_ num_cells_;
+  __device__ uint32_t num_cells() const { return num_cells_; }
+  __device__ Cell* cell(uint32_t index) { return cells_[index]; }
+};
+
+IKRA_DEVICE_STORAGE(SharedSignalGroup);
 
 class Simulation : public SoaLayout<Simulation, 1> {
  public:
