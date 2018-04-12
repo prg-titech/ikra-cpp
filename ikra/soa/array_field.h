@@ -33,13 +33,11 @@ class AosArrayField_ {
 
   template<size_t Pos>
   __ikra_device__ B* array_data_ptr() const {
-    assert(this->id() < Owner::storage().size());
     static_assert(Pos < ArraySize, "Array index out of bounds.");
     return reinterpret_cast<B*>(data_ptr()) + Pos;
   }
 
   __ikra_device__ B* array_data_ptr(size_t pos) const {
-    assert(this->id() < Owner::storage().size());
     assert(pos < ArraySize);
     return reinterpret_cast<B*>(data_ptr()) + pos;
   }
@@ -89,10 +87,6 @@ class SoaArrayField_ {
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size());
-
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = Owner::storage().data_reference();
     auto p_result = (p_base + p_this - p_base - A)/A*sizeof(B) +
@@ -105,7 +99,6 @@ class SoaArrayField_ {
                                           S == kStorageModeStatic, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    assert(this->id() < Owner::storage().size());
 
     // Use constant-folded value for address computation.
     constexpr auto cptr_data_offset =
@@ -130,7 +123,6 @@ class SoaArrayField_ {
                                           S == kStorageModeDynamic, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    assert(this->id() < Owner::storage().size());
 
     // Cannot constant fold dynamically allocated storage.
     auto p_base = Owner::storage().data_reference();
@@ -143,9 +135,6 @@ class SoaArrayField_ {
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size());
 
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
@@ -160,7 +149,6 @@ class SoaArrayField_ {
                                           S == kStorageModeStatic, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    assert(this->id() < Owner::storage().size());
 
     // Use constant-folded value for address computation.
     constexpr auto cptr_data_offset =
@@ -179,7 +167,6 @@ class SoaArrayField_ {
                                           S == kStorageModeDynamic, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    assert(this->id() < Owner::storage().size());
 
     // Cannot constant fold dynamically allocated storage.
     auto p_base = Owner::storage().data_reference();

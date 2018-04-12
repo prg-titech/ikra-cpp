@@ -115,10 +115,19 @@ TYPED_TEST_P(BasicClassTest, Constructor) {
   }
 }
 
+TYPED_TEST_P(BasicClassTest, PlacementNew) {
+  TypeParam::initialize_storage();
+  EXPECT_EQ(TypeParam::size(), 0UL);
+
+  TypeParam* obj = new(TypeParam::get_uninitialized(4)) TypeParam();
+  EXPECT_EQ(obj->id(), 4);
+}
+
 REGISTER_TYPED_TEST_CASE_P(BasicClassTest,
                            Fields,
                            SetFieldsAfterNew,
-                           Constructor);
+                           Constructor,
+                           PlacementNew);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest, TestClassV);
 INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest, TestClassZ);

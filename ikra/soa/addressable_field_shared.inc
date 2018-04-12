@@ -86,9 +86,6 @@ data_ptr_uninitialized() const {
 template<int A = AddressMode>
 __ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
 data_ptr() const {
-  // Ensure that this is a valid pointer: Only those objects may be accessed
-  // which were created with the "new" keyword and are thus initialized.
-  assert(id() < Owner::storage().size());
   return data_ptr_uninitialized();
 }
 
@@ -130,8 +127,5 @@ data_ptr_uninitialized() const {
 template<int A = AddressMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
 data_ptr() const {
-  // Ensure that this is a valid pointer: Only those objects may be accessed
-  // which were created with the "new" keyword and are thus initialized.
-  assert(id() < Owner::storage().size());
   return data_ptr_uninitialized();
 }

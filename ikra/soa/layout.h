@@ -119,29 +119,22 @@ class SoaLayout : SizeNDummy<AddressMode> {
     return get(Self::storage().increase_size(1));
   }
 
+  // Create a new instance of this class with placement new.
+  __ikra_device__ void* operator new(size_t /*count*/, void* ptr) {
+    // TODO: Add pointer check for various addressing modes.
+    check_sizeof_class();
+    return ptr;
+  }
+
   // TODO: Implement delete operator.
   __ikra_device__ void operator delete(void* /*ptr*/) {
     assert(false);
   }
 
-#ifdef __CUDACC__
-  // Create a new instance of this class with placement new. This is only
-  // allowed in CUDA mode where we keep track of instance counters in a
-  // different way.
-  // TODO: Assuming zero addressing mode.
-  __device__ void* operator new(size_t count, void* ptr) {
-    static_assert(kAddressMode == ikra::soa::kAddressModeZero,
-        "Not implemented: Valid addressing mode.");
-    check_sizeof_class();
-    assert(reinterpret_cast<uintptr_t>(ptr) > 0);
-    return ptr;
-  }
-
   // TODO: Implement delete operator.
-  __device__ void operator delete(void* /*ptr*/, void* /*place*/) {
+  __ikra_device__ void operator delete(void* /*ptr*/, void* /*place*/) {
     assert(false);
   }
-#endif  // __CUDACC__
 
   // Create multiple new instances of this class. Data will be allocated inside
   // storage.data.
