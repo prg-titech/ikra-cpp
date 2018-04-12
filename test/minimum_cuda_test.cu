@@ -108,6 +108,20 @@ void run_test_host_side_new() {
   gpuErrchk(cudaPeekAtLastError());
 }
 
+void run_test_placement_new() {
+  Vertex::initialize_storage();
+  EXPECT_EQ(Vertex::size(), 0UL);
+
+  Vertex* v1 = new(Vertex::get_uninitialized(4)) Vertex(10, 20);
+  EXPECT_EQ(Vertex::size(), 0UL);
+  EXPECT_EQ(v1->field0, 10);
+  EXPECT_EQ(v1->field1, 20);
+  EXPECT_EQ(v1->id(), 4);
+
+  // Make sure that we had no CUDA failures.
+  gpuErrchk(cudaPeekAtLastError());
+}
+
 TEST(MinimumCudaTest, ConstructAndExecute) {
   run_test_construct_and_execute();
 }
@@ -119,3 +133,8 @@ TEST(MinimumCudaTest, HostSideAssignment) {
 TEST(MinimumCudaTest, HostSideNew) {
   run_test_host_side_new();
 }
+
+TEST(MinimumCudaTest, PlacementNew) {
+  run_test_placement_new();
+}
+

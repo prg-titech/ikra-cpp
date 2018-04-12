@@ -95,8 +95,6 @@ class SoaInlinedDynamicArrayField_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, B**>::type
   get_external_pointer_addr_internal() const {
-    assert(this->id() < Owner::storage().size());
-
     /*
     auto p_this = reinterpret_cast<uintptr_t>(this);
     auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
@@ -112,8 +110,6 @@ class SoaInlinedDynamicArrayField_ {
   template<int A = AddressMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero, B**>::type
   get_external_pointer_addr_internal() const {
-    assert(this->id() < Owner::storage().size());
-
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
                       + (Capacity+1)*(Offset + InlinedSize*sizeof(B));
@@ -167,9 +163,6 @@ class SoaInlinedDynamicArrayField_ {
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size());
 
     if (Pos < InlinedSize) {
       // Within inlined storage.
@@ -191,7 +184,6 @@ class SoaInlinedDynamicArrayField_ {
                                           S == kStorageModeStatic, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    assert(this->id() < Owner::storage().size());
 
     if (Pos < InlinedSize) {
       // Within inlined storage.
@@ -224,7 +216,6 @@ class SoaInlinedDynamicArrayField_ {
                                           S == kStorageModeDynamic, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
-    assert(this->id() < Owner::storage().size());
 
     if (Pos < InlinedSize) {
       // Cannot constant fold dynamically allocated storage.
@@ -244,9 +235,6 @@ class SoaInlinedDynamicArrayField_ {
   __ikra_device__ typename std::enable_if<A != kAddressModeZero, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    // Ensure that this is a valid pointer: Only those objects may be accessed
-    // which were created with the "new" keyword and are thus initialized.
-    assert(this->id() < Owner::storage().size());
 
     if (pos < InlinedSize) {
       // Within inlined storage.
@@ -269,7 +257,6 @@ class SoaInlinedDynamicArrayField_ {
                                           S == kStorageModeStatic, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    assert(this->id() < Owner::storage().size());
 
     if (pos < InlinedSize) {
       // Within inlined storage.
@@ -296,7 +283,6 @@ class SoaInlinedDynamicArrayField_ {
                                           S == kStorageModeDynamic, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
-    assert(this->id() < Owner::storage().size());
 
     if (pos < InlinedSize) {
       // Within inlined storage.
