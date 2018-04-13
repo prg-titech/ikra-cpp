@@ -2,18 +2,18 @@
 #include "soa/soa.h"
 #include "executor/cuda_executor.h"
 
-static const uint32_t kNumCells = 4624613;
-static const uint32_t kNumCars = 110000;
-static const uint32_t kNumSharedSignalGroups = 140000;
-static const uint32_t kNumTrafficLights = 50000;
-static const uint32_t kNumPriorityCtrls = 6000;
+static const uint32_t kNumCells = 2453579;
+static const uint32_t kNumCars = 100000;
+static const uint32_t kNumSharedSignalGroups = 65075;
+static const uint32_t kNumTrafficLights = 19448;
+static const uint32_t kNumPriorityCtrls = 2100;
 
-static const uint32_t kArrayInlineSizeOutgoingCells = 10;  // 4
-static const uint32_t kArrayInlineSizeIncomingCells = 10;  // 4
-static const uint32_t kArrayInlineSizePath = 10;           // 6
-static const uint32_t kArrayInlineSizeSignalGroupCells = 4;
-static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 4;
-static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 2;
+static const uint32_t kArrayInlineSizeOutgoingCells = 0;  // 4
+static const uint32_t kArrayInlineSizeIncomingCells = 0;  // 4
+static const uint32_t kArrayInlineSizePath = 0;            // 6
+static const uint32_t kArrayInlineSizeSignalGroupCells = 0;
+static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 0;
+static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 0;
 
 
 using ikra::soa::SoaLayout;
@@ -560,13 +560,11 @@ __device__ void Car::step_constraint_velocity() {
 __device__ void Car::step_move() {
   Cell* cell = position_;
   for (int i = 0; i < velocity_; ++i) {
-    // TODO: Add check here to see if cell is free.
     cell = path_[i];
+    position()->release();
+    cell->occupy(this);
+    position_ = cell;
   }
-
-  position()->release();
-  cell->occupy(this);
-  position_ = cell;
 
   if (position()->is_sink()) {
     // Remove car from the simulation. Will be added again in the next
@@ -723,6 +721,8 @@ __global__ void convert_to_ikra_cpp_traffic_lights(
                      s_signal_groups + light.first_signal_group_idx_,
                      light.num_signal_groups_);
     assert(new_light->id() == tid);
+
+    new_light->initialize();
   }
 
   if (tid == 0) {
@@ -748,6 +748,8 @@ __global__ void convert_to_ikra_cpp_priority_ctrls(
             s_signal_groups + ctrl.first_group_idx_,
             ctrl.num_groups_);
     assert(new_ctrl->id() == tid);
+
+    new_ctrl->initialize();
   }
 
   if (tid == 0) {
@@ -778,12 +780,12 @@ __global__ void print_velocity_histogram() {
 }
 
 void run_simulation() {
-  for (int i = 0; i < 100; ++i) {
-    printf("ITERATION: %i\n", i);
+  for (int i = 0; i < 1000; ++i) {
+    // printf("ITERATION: %i\n", i);
     // Now start simulation.
     cuda_execute(&Simulation::step_random_state);
-    //cuda_execute(&TrafficLight::step);
-    //cuda_execute(&PriorityYieldTrafficController::step);
+    cuda_execute(&TrafficLight::step);
+    cuda_execute(&PriorityYieldTrafficController::step);
     cuda_execute(&Car::step_prepare_path);
     cuda_execute(&Car::step_move);
     cuda_execute(&Car::step_reactivate);
