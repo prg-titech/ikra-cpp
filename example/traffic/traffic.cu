@@ -5,11 +5,16 @@
 static const uint32_t kNumCells = 4624613;
 static const uint32_t kNumCars = 110000;
 static const uint32_t kNumSharedSignalGroups = 140000;
+static const uint32_t kNumTrafficLights = 50000;
+static const uint32_t kNumPriorityCtrls = 6000;
 
 static const uint32_t kArrayInlineSizeOutgoingCells = 10;  // 4
 static const uint32_t kArrayInlineSizeIncomingCells = 10;  // 4
 static const uint32_t kArrayInlineSizePath = 10;           // 6
 static const uint32_t kArrayInlineSizeSignalGroupCells = 4;
+static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 4;
+static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 2;
+
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
@@ -96,6 +101,12 @@ class Cell : public SoaLayout<
     return controller_max_velocity_ < max_velocity_
         ? controller_max_velocity_
         : max_velocity_;
+  }
+
+  // The maximum velocity allowed on this cell regardless of
+  // traffic controllers.
+  __device__ uint32_t street_max_velocity() const {
+    return max_velocity_;
   }
 
   // Sets the maximum temporary speed limit (traffic controller).
@@ -274,6 +285,137 @@ class SharedSignalGroup : public SoaLayout<SharedSignalGroup,
 };
 
 IKRA_DEVICE_STORAGE(SharedSignalGroup);
+
+class TrafficLight : public SoaLayout<
+    TrafficLight, kNumTrafficLights, kAddressModeZero, 
+    StaticStorageWithArena<kNumTrafficLights*4*sizeof(uint32_t)>> {
+ public:
+   IKRA_INITIALIZE_CLASS
+
+  __device__ TrafficLight(uint32_t timer, uint32_t phase_time, uint32_t phase,
+                          unsigned int* signal_groups,
+                          uint32_t num_signal_groups)
+      : timer_(timer), phase_time_(phase_time), phase_(phase),
+        signal_groups_(num_signal_groups),
+        num_signal_groups_(num_signal_groups) {
+    for (uint32_t i = 0; i < num_signal_groups; ++i) {
+      signal_groups_[i] =
+          SharedSignalGroup::get_uninitialized(signal_groups[i]);
+    }
+  }
+
+  __device__ void initialize() {
+    for (uint32_t i = 0; i < num_signal_groups_; ++i) {
+      signal_groups_[i]->signal_stop();
+    }
+  }
+
+  __device__ void step() {
+    timer_ = (timer_ + 1) % phase_time_;
+
+    if (timer_ == 0) {
+      signal_groups_[phase_]->signal_stop();
+      phase_ = (phase_ + 1) % num_signal_groups_;
+      signal_groups_[phase_]->signal_go();
+    }
+  }
+
+  // This timer is increased with every step.
+  uint32_t_ timer_;
+
+  uint32_t_ phase_time_;
+
+  uint32_t_ phase_;
+
+  array_(SharedSignalGroup*, kArrayInlineSizeTrafficLightSignalGroups,
+         inline_soa) signal_groups_;
+  uint32_t_ num_signal_groups_;
+};
+
+IKRA_DEVICE_STORAGE(TrafficLight);
+
+class PriorityYieldTrafficController : public SoaLayout<
+    PriorityYieldTrafficController, kNumPriorityCtrls, kAddressModeZero,
+    StaticStorageWithArena<kNumPriorityCtrls*4*sizeof(uint32_t)>> {
+ public:
+  IKRA_INITIALIZE_CLASS
+
+  __device__ PriorityYieldTrafficController(unsigned int* signal_groups,
+                                            uint32_t num_signal_groups) 
+      : signal_groups_(num_signal_groups),
+        num_signal_groups_(num_signal_groups) {
+    for (uint32_t i = 0; i < num_signal_groups; ++i) {
+      signal_groups_[i] =
+          SharedSignalGroup::get_uninitialized(signal_groups[i]);
+    }
+  }
+
+  __device__ void initialize() {
+    for (uint32_t i = 0; i < num_signal_groups_; ++i) {
+      signal_groups_[i]->signal_stop();
+    }
+  }
+
+  __device__ void step() {
+    bool found_traffic = false;
+    // Cells are sorted by priority.
+    for (uint32_t i = 0; i < num_signal_groups_; ++i) {
+      SharedSignalGroup* next_group = signal_groups_[i];
+      bool has_incoming = has_incoming_traffic(next_group);
+      uint32_t num_cells = next_group->num_cells();
+
+      if (!found_traffic && has_incoming) {
+        found_traffic = true;
+        // Allow traffic to flow.
+        for (uint32_t j = 0; j < num_cells; ++j) {
+          next_group->cell(j)->remove_controller_max_velocity();
+        }
+      } else if (has_incoming) {
+        // Traffic with higher priority is incoming.
+        for (uint32_t j = 0; j < num_cells; ++j) {
+          next_group->cell(j)->set_controller_max_velocity(0);
+        }
+      }
+    }
+  }
+
+  array_(SharedSignalGroup*, kArrayInlineSizePriorityCtrlSignalGroups,
+         inline_soa) signal_groups_;
+  uint32_t_ num_signal_groups_;
+
+  __device__ bool has_incoming_traffic(SharedSignalGroup* group) const {
+    const uint32_t num_cells = group->num_cells();
+    for (uint32_t i = 0; i < num_cells; ++i) {
+      Cell* next_cell = group->cell(i);
+
+      // Report incoming traffic if at least one cells in the group reports
+      // incoming traffic.
+      if (has_incoming_traffic(next_cell, next_cell->street_max_velocity())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  __device__ bool has_incoming_traffic(Cell* cell, uint32_t lookahead) const {
+    if (lookahead == 0) {
+      return !cell->is_free();
+    }
+
+    // Check incoming cells. This is BFS.
+    const uint32_t num_incoming = cell->num_incoming_cells();
+    for (uint32_t i = 0; i < num_incoming; ++i) {
+      Cell* next_cell = cell->incoming_cell(i);
+      if (has_incoming_traffic(next_cell, lookahead - 1)) {
+        return true;
+      }
+    }
+
+    return !cell->is_free();
+  }
+};
+
+IKRA_DEVICE_STORAGE(PriorityYieldTrafficController)
 
 class Simulation : public SoaLayout<Simulation, 1> {
  public:
