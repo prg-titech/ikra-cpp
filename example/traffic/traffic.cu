@@ -8,12 +8,12 @@ static const uint32_t kNumSharedSignalGroups = 65075;
 static const uint32_t kNumTrafficLights = 19448;
 static const uint32_t kNumPriorityCtrls = 2100;
 
-static const uint32_t kArrayInlineSizeOutgoingCells = 0;  // 4
-static const uint32_t kArrayInlineSizeIncomingCells = 0;  // 4
+static const uint32_t kArrayInlineSizeOutgoingCells = 2;  // 4
+static const uint32_t kArrayInlineSizeIncomingCells = 2;  // 4
 static const uint32_t kArrayInlineSizePath = 0;            // 6
-static const uint32_t kArrayInlineSizeSignalGroupCells = 0;
-static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 0;
-static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 0;
+static const uint32_t kArrayInlineSizeSignalGroupCells = 6;
+static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 10;
+static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 10;
 
 
 using ikra::soa::SoaLayout;
@@ -164,7 +164,10 @@ class Cell : public SoaLayout<
 
   // x and y coordinates, only for rendering and debugging purposes.
   double_ x_;
+  __device__ double x() const { return x_; }
+
   double_ y_;
+  __device__ double y() const { return y_; }
 };
 
 IKRA_DEVICE_STORAGE(Cell);
@@ -774,13 +777,27 @@ __global__ void print_velocity_histogram() {
   }
 
   for (int i = 0; i < 50; ++i) {
-    printf("velocity[%i] = %i\n", i, counter[i]);
+    if (counter[i] > 0) {
+      printf("velocity[%i] = %i\n", i, counter[i]);
+    }
   }
   printf("Inactive cars: %i\n", inactive);
 }
 
+__global__ void caluclate_checksum() {
+  uint64_t c = 17;
+  for (uint32_t i = 0; i < Car::size(); ++i) {
+    Cell* position = Car::get(i)->position();
+    c += position->x() + position->y();
+    c %= UINT64_MAX;
+  }
+  int result = c % 1234567;
+
+  printf("Checksum: %i\n", result);
+}
+
 void run_simulation() {
-  for (int i = 0; i < 1000; ++i) {
+  for (int i = 0; i < 100; ++i) {
     // printf("ITERATION: %i\n", i);
     // Now start simulation.
     cuda_execute(&Simulation::step_random_state);
@@ -856,5 +873,7 @@ int main(int argc, char** argv) {
   printf("Time for simulation: %lu\n", time_action);
 
   print_velocity_histogram<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
+  caluclate_checksum<<<1,1>>>();
   gpuErrchk(cudaDeviceSynchronize());
 }
