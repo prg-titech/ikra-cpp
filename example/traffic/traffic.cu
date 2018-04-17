@@ -2,19 +2,7 @@
 #include "soa/soa.h"
 #include "executor/cuda_executor.h"
 
-static const uint32_t kNumCells = 2453579;
-static const uint32_t kNumCars = 100000;
-static const uint32_t kNumSharedSignalGroups = 65075;
-static const uint32_t kNumTrafficLights = 19448;
-static const uint32_t kNumPriorityCtrls = 2100;
-
-static const uint32_t kArrayInlineSizeOutgoingCells = 2;  // 4
-static const uint32_t kArrayInlineSizeIncomingCells = 2;  // 4
-static const uint32_t kArrayInlineSizePath = 0;            // 6
-static const uint32_t kArrayInlineSizeSignalGroupCells = 6;
-static const uint32_t kArrayInlineSizeTrafficLightSignalGroups = 10;
-static const uint32_t kArrayInlineSizePriorityCtrlSignalGroups = 10;
-
+#include "configuration.h"
 
 using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
@@ -22,9 +10,8 @@ using ikra::soa::StaticStorageWithArena;
 
 class Car;
 
-class Cell : public SoaLayout<
-    Cell, kNumCells, kAddressModeZero,
-    StaticStorageWithArena<kNumCells*8*sizeof(uint32_t)>> {
+class Cell : public SoaLayout<Cell, kNumCells, kAddressModeZero,
+                              StaticStorageWithArena<kCellArenaSize>> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -40,6 +27,8 @@ class Cell : public SoaLayout<
     kMaxType
   };
 
+  // Default constructor, where incoming/outgoing cell lists are passed as
+  // Cell pointers.
   __host__ __device__ Cell(uint32_t max_velocity, double x, double y,
                            uint32_t num_incoming, Cell** incoming,
                            uint32_t num_outgoing, Cell** outgoing,
@@ -121,7 +110,7 @@ class Cell : public SoaLayout<
   }
 
   // Incoming cells.
-  array_(Cell*, kArrayInlineSizeIncomingCells, inline_soa) incoming_cells_;
+  ARRAY_CELL_INCOMING incoming_cells_;
   uint32_t_ num_incoming_cells_;
   __device__ uint32_t num_incoming_cells() const {
     return num_incoming_cells_;
@@ -131,7 +120,7 @@ class Cell : public SoaLayout<
   }
 
   // Outgoing cells.
-  array_(Cell*, kArrayInlineSizeOutgoingCells, inline_soa) outgoing_cells_;
+  ARRAY_CELL_OUTGOING outgoing_cells_;
   uint32_t_ num_outgoing_cells_;
   __device__ uint32_t num_outgoing_cells() const {
     return num_outgoing_cells_;
@@ -172,9 +161,8 @@ class Cell : public SoaLayout<
 
 IKRA_DEVICE_STORAGE(Cell);
 
-class Car : public SoaLayout<
-    Car, kNumCars, kAddressModeZero,
-    StaticStorageWithArena<kNumCars*50*sizeof(uint32_t)>> {
+class Car : public SoaLayout<Car, kNumCars, kAddressModeZero,
+                             StaticStorageWithArena<kCarArenaSize>> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -201,7 +189,7 @@ class Car : public SoaLayout<
   __device__ uint32_t max_velocity() const { return max_velocity_; }
 
   // An array of cells that the car will move onto next.
-  array_(Cell*, kArrayInlineSizePath, inline_soa) path_;
+  ARRAY_CAR_PATH path_;
   uint32_t_ path_length_;
 
   // The current position of the car.
@@ -260,9 +248,9 @@ class Car : public SoaLayout<
 
 IKRA_DEVICE_STORAGE(Car);
 
-class SharedSignalGroup : public SoaLayout<SharedSignalGroup,
-    kNumSharedSignalGroups, kAddressModeZero,
-    StaticStorageWithArena<kNumSharedSignalGroups*4*sizeof(uint32_t)>> {
+class SharedSignalGroup : public SoaLayout<
+    SharedSignalGroup, kNumSharedSignalGroups, kAddressModeZero,
+    StaticStorageWithArena<kSharedSignalGroupArenaSize>> {
  public:
   IKRA_INITIALIZE_CLASS
   
@@ -285,7 +273,7 @@ class SharedSignalGroup : public SoaLayout<SharedSignalGroup,
     }
   }
 
-  array_(Cell*, kArrayInlineSizeSignalGroupCells, inline_soa) cells_;
+  ARRAY_SIGNAL_GROUP_CELLS cells_;
   uint32_t_ num_cells_;
   __device__ uint32_t num_cells() const { return num_cells_; }
   __device__ Cell* cell(uint32_t index) { return cells_[index]; }
@@ -295,7 +283,7 @@ IKRA_DEVICE_STORAGE(SharedSignalGroup);
 
 class TrafficLight : public SoaLayout<
     TrafficLight, kNumTrafficLights, kAddressModeZero, 
-    StaticStorageWithArena<kNumTrafficLights*4*sizeof(uint32_t)>> {
+    StaticStorageWithArena<kTrafficLightArenaSize>> {
  public:
    IKRA_INITIALIZE_CLASS
 
@@ -334,8 +322,7 @@ class TrafficLight : public SoaLayout<
 
   uint32_t_ phase_;
 
-  array_(SharedSignalGroup*, kArrayInlineSizeTrafficLightSignalGroups,
-         inline_soa) signal_groups_;
+  ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS signal_groups_;
   uint32_t_ num_signal_groups_;
 };
 
@@ -343,7 +330,7 @@ IKRA_DEVICE_STORAGE(TrafficLight);
 
 class PriorityYieldTrafficController : public SoaLayout<
     PriorityYieldTrafficController, kNumPriorityCtrls, kAddressModeZero,
-    StaticStorageWithArena<kNumPriorityCtrls*4*sizeof(uint32_t)>> {
+    StaticStorageWithArena<kPriorityCtrlArenaSize>> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -386,8 +373,7 @@ class PriorityYieldTrafficController : public SoaLayout<
     }
   }
 
-  array_(SharedSignalGroup*, kArrayInlineSizePriorityCtrlSignalGroups,
-         inline_soa) signal_groups_;
+  ARRAY_PRIORITY_CTRL_SIGNAL_GROUPS signal_groups_;
   uint32_t_ num_signal_groups_;
 
   __device__ bool has_incoming_traffic(SharedSignalGroup* group) const {
@@ -589,177 +575,11 @@ __device__ void Car::step_reactivate() {
       free_cell->occupy(this);
     }
   }
-  // TODO
 }
 
 #include "simulation_adapter.cuh"
 #include "traffic-simulation/traffic_aos_int_cuda.h"
-
-using IndexType = unsigned int;
-
-// Data storage.
-namespace simulation {
-namespace aos_int {
-extern IndexType s_size_Cell;
-extern IndexType s_size_outgoing_cells;
-extern IndexType s_size_incoming_cells;
-extern IndexType s_size_Car;
-extern IndexType s_size_car_paths;
-extern IndexType s_size_inactive_cars;
-extern IndexType s_size_TrafficLight;
-extern IndexType s_size_PriorityYieldTrafficController;
-extern IndexType s_size_SharedSignalGroup;
-extern IndexType s_size_traffic_light_signal_groups;
-extern IndexType s_size_priority_ctrl_signal_groups;
-extern IndexType s_size_signal_group_cells;
-}  // namespace aos_int
-
-namespace aos_int_cuda {
-extern Cell* dev_Cell;
-extern IndexType* dev_outgoing_cells;
-extern IndexType* dev_incoming_cells;
-extern Car* dev_Car;
-extern IndexType* dev_car_paths;
-extern IndexType* dev_inactive_cars;
-extern TrafficLight* dev_TrafficLight;
-extern PriorityYieldTrafficController* dev_PriorityYieldTrafficController;
-extern SharedSignalGroup* dev_SharedSignalGroup;
-extern IndexType* dev_traffic_light_signal_groups;
-extern IndexType* dev_priority_ctrl_signal_groups;
-extern IndexType* dev_signal_group_cells;
-}  // namespace aos_int_cuda
-}  // namespace simulation
-
-__global__ void convert_to_ikra_cpp_cells(
-    IndexType s_size_Cell,
-    simulation::aos_int_cuda::Cell* s_Cell,
-    IndexType s_size_outgoing_cells,
-    IndexType* s_outgoing_cells,
-    IndexType s_size_incoming_cells,
-    IndexType* s_incoming_cells) {
-  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
-
-  if (tid < s_size_Cell) {
-    simulation::aos_int_cuda::Cell& cell = s_Cell[tid];
-    Car* car_ptr = cell.car_ == 4294967295
-      ? nullptr : Car::get_uninitialized(cell.car_);
-
-    Cell* new_cell = new(Cell::get_uninitialized(tid)) Cell(
-        cell.max_velocity_, cell.x_, cell.y_,
-        cell.num_incoming_cells_,
-        s_incoming_cells + cell.first_incoming_cell_idx_,
-        cell.num_outgoing_cells_,
-        s_outgoing_cells + cell.first_outgoing_cell_idx_,
-        car_ptr, cell.is_free_, cell.is_sink_,
-        cell.controller_max_velocity_,
-        (Cell::Type) cell.type_);
-    assert(new_cell->id() == tid);
-  }
-
-  if (tid == 0) {
-    Cell::storage().increase_size(s_size_Cell);
-  }
-}
-
-__global__ void convert_to_ikra_cpp_cars(
-    IndexType s_size_Car,
-    simulation::aos_int_cuda::Car* s_Car,
-    IndexType s_size_Cell) {
-  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
-
-  if (tid < s_size_Car) {
-    simulation::aos_int_cuda::Car& car = s_Car[tid];
-
-    // Every car must have a position.
-    assert(car.position_ != 4294967295);
-    assert(car.position_ < s_size_Cell);
-
-    Cell* cell_ptr = car.position_ == 4294967295
-      ? nullptr : Cell::get_uninitialized(car.position_);
-
-    Car* new_car = new(Car::get_uninitialized(tid)) Car(
-        car.is_active_, car.velocity_, car.max_velocity_,
-        car.random_state_, cell_ptr);
-    assert(new_car->id() == tid);
-  }
-
-  if (tid == 0) {
-    Car::storage().increase_size(s_size_Car);
-    new Simulation();
-  }
-}
-
-__global__ void convert_to_ikra_cpp_signal_groups(
-    IndexType s_size_SharedSignalGroup,
-    simulation::aos_int_cuda::SharedSignalGroup* s_SharedSignalGroup,
-    IndexType* s_cells) {
-  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
-
-  if (tid < s_size_SharedSignalGroup) {
-    simulation::aos_int_cuda::SharedSignalGroup& group =
-        s_SharedSignalGroup[tid];
-
-    SharedSignalGroup* new_group =
-        new(SharedSignalGroup::get_uninitialized(tid)) SharedSignalGroup(
-            group.num_cells_, s_cells + group.first_cell_idx_);
-    assert(new_group->id() == tid);
-  }
-
-  if (tid == 0) {
-    SharedSignalGroup::storage().increase_size(s_size_SharedSignalGroup);
-  }
-}
-
-__global__ void convert_to_ikra_cpp_traffic_lights(
-    IndexType s_size_TrafficLight,
-    simulation::aos_int_cuda::TrafficLight* s_TrafficLight,
-    IndexType* s_signal_groups) {
-  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
-
-  if (tid < s_size_TrafficLight) {
-    simulation::aos_int_cuda::TrafficLight& light = s_TrafficLight[tid];
-
-    TrafficLight* new_light = new(TrafficLight::get_uninitialized(tid))
-        TrafficLight(light.timer_, light.phase_time_, light.phase_,
-                     s_signal_groups + light.first_signal_group_idx_,
-                     light.num_signal_groups_);
-    assert(new_light->id() == tid);
-
-    new_light->initialize();
-  }
-
-  if (tid == 0) {
-    TrafficLight::storage().increase_size(s_size_TrafficLight);
-  }
-
-}
-
-__global__ void convert_to_ikra_cpp_priority_ctrls(
-    IndexType s_size_PriorityYieldTrafficController,
-    simulation::aos_int_cuda::PriorityYieldTrafficController*
-        s_PriorityYieldTrafficController,
-    IndexType* s_signal_groups) {
-  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
-
-  if (tid < s_size_PriorityYieldTrafficController) {
-    simulation::aos_int_cuda::PriorityYieldTrafficController& ctrl =
-        s_PriorityYieldTrafficController[tid];
-
-    PriorityYieldTrafficController* new_ctrl =
-        new(PriorityYieldTrafficController::get_uninitialized(tid))
-        PriorityYieldTrafficController(
-            s_signal_groups + ctrl.first_group_idx_,
-            ctrl.num_groups_);
-    assert(new_ctrl->id() == tid);
-
-    new_ctrl->initialize();
-  }
-
-  if (tid == 0) {
-    PriorityYieldTrafficController::storage().increase_size(
-        s_size_PriorityYieldTrafficController);
-  }
-}
+#include "simulation_converter.inc"
 
 __global__ void print_velocity_histogram() {
   int counter[50];
@@ -796,24 +616,24 @@ __global__ void caluclate_checksum() {
   printf("Checksum: %i\n", result);
 }
 
-void run_simulation() {
-  for (int i = 0; i < 100; ++i) {
-    // printf("ITERATION: %i\n", i);
-    // Now start simulation.
-    cuda_execute(&Simulation::step_random_state);
-    cuda_execute(&TrafficLight::step);
-    cuda_execute(&PriorityYieldTrafficController::step);
-    cuda_execute(&Car::step_prepare_path);
-    cuda_execute(&Car::step_move);
-    cuda_execute(&Car::step_reactivate);
-    gpuErrchk(cudaDeviceSynchronize());
-  }
+void run_traffic_controllers() {
+  cuda_execute(&Simulation::step_random_state);
+  cuda_execute(&TrafficLight::step);
+  cuda_execute(&PriorityYieldTrafficController::step);
+  cudaDeviceSynchronize();
+}
+
+void run_cars() {
+  cuda_execute(&Car::step_prepare_path);
+  cuda_execute(&Car::step_move);
+  cuda_execute(&Car::step_reactivate);
+  cudaDeviceSynchronize();
 }
 
 #include <iostream>
 #include <chrono>
 
-template<typename TimeT = std::chrono::milliseconds>
+template<typename TimeT = std::chrono::microseconds>
 struct measure
 {
     template<typename F, typename ...Args>
@@ -827,50 +647,52 @@ struct measure
     }
 };
 
+#define RUNS 4
+void run_simulation() {
+  int time_controllers[RUNS] = {0};
+  int time_cars[RUNS] = {0};
+  int time_total[RUNS] = {0};
+
+  for (int r = 0; r < RUNS; ++r) {
+    for (int i = 0; i < 1000; ++i) {
+      int t_ctrl = measure<>::execution(run_traffic_controllers);
+      time_controllers[r] += t_ctrl;
+
+      int t_car = measure<>::execution(run_cars);
+      time_cars[r] += t_car;
+
+      time_total[r] = time_controllers[r] + time_cars[r];
+    }
+    gpuErrchk(cudaPeekAtLastError());
+  }
+
+  // Find best run.
+  int best_time = 10000000;
+  int best_index = -1;
+  for (int r = 0; r < RUNS; ++r) {
+    if (time_total[r] < best_time) {
+      best_time = time_total[r];
+      best_index = r;
+    }
+  }
+
+  // Print best run.
+  printf("Time cars: %i, Time traffic controllers: %i, Total: %i\n",
+         time_cars[best_index]/100, time_controllers[best_index]/100, time_total[best_index]/100);
+  fprintf(stderr, "%i,%i,%i,%i", 123, time_cars[best_index]/100, time_controllers[best_index]/100, time_total[best_index]/100);
+}
+
+
+
 int main(int argc, char** argv) {
   Cell::initialize_storage();
   Car::initialize_storage();
 
   load_simulation(argc, argv);
+  convert_simulation();
 
-  assert(simulation::aos_int::s_size_Car <= kNumCars);
-  assert(simulation::aos_int::s_size_Cell <= kNumCells);
-
-  convert_to_ikra_cpp_cells<<<kNumCells/1024 + 1, 1024>>>(
-      simulation::aos_int::s_size_Cell,
-      simulation::aos_int_cuda::dev_Cell,
-      simulation::aos_int::s_size_outgoing_cells,
-      simulation::aos_int_cuda::dev_outgoing_cells,
-      simulation::aos_int::s_size_incoming_cells,
-      simulation::aos_int_cuda::dev_incoming_cells);
-  gpuErrchk(cudaDeviceSynchronize());
-
-  convert_to_ikra_cpp_cars<<<kNumCars/1024 + 1, 1024>>>(
-      simulation::aos_int::s_size_Car,
-      simulation::aos_int_cuda::dev_Car,
-      simulation::aos_int::s_size_Cell);
-  gpuErrchk(cudaDeviceSynchronize());
-
-  convert_to_ikra_cpp_signal_groups<<<kNumSharedSignalGroups/1024 + 1, 1024>>>(
-      simulation::aos_int::s_size_SharedSignalGroup,
-      simulation::aos_int_cuda::dev_SharedSignalGroup,
-      simulation::aos_int_cuda::dev_signal_group_cells);
-  gpuErrchk(cudaDeviceSynchronize());
-
-  convert_to_ikra_cpp_traffic_lights<<<kNumTrafficLights/1024 + 1, 1024>>>(
-      simulation::aos_int::s_size_TrafficLight,
-      simulation::aos_int_cuda::dev_TrafficLight,
-      simulation::aos_int_cuda::dev_traffic_light_signal_groups);
-  gpuErrchk(cudaDeviceSynchronize());
-
-  convert_to_ikra_cpp_priority_ctrls<<<kNumPriorityCtrls/1024 + 1, 1024>>>(
-    simulation::aos_int::s_size_PriorityYieldTrafficController,
-    simulation::aos_int_cuda::dev_PriorityYieldTrafficController,
-    simulation::aos_int_cuda::dev_priority_ctrl_signal_groups);
-  gpuErrchk(cudaDeviceSynchronize());
-
-  uint64_t time_action = measure<>::execution(run_simulation);
-  printf("Time for simulation: %lu\n", time_action);
+  int chk_time = measure<>::execution(run_simulation);
+  printf("    -- CHK TIME: %i\n", chk_time);
 
   print_velocity_histogram<<<1, 1>>>();
   gpuErrchk(cudaDeviceSynchronize());

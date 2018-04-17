@@ -1,3 +1,7 @@
+set(num_cars "-1" CACHE STRING "")
+ADD_DEFINITIONS(-DSIM_NUM_CARS=${num_cars})
+
+
 # CUDA
 # TODO: cuda_add_library does not support INTERFACE libraries
 include_directories(${CMAKE_SOURCE_DIR}/ikra)
