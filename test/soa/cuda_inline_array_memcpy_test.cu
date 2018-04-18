@@ -27,7 +27,7 @@ using ikra::soa::kAddressModeZero;
 #define INLINE_ARR_SIZE (ARRAY_SIZE - READ_FROM_ARENA_ELEMENTS)
 
 class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
-    StaticStorageWithArena<EXTRA_BYTES>> {
+    StaticStorageWithArena<EXTRA_BYTES>, ikra::soa::kLayoutModeSoa> {
  public:
   IKRA_INITIALIZE_CLASS
 

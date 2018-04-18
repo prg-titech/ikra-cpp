@@ -31,7 +31,7 @@ class SoaInlinedDynamicArrayField_ {
  private:
   using Self = SoaInlinedDynamicArrayField_<B, InlinedSize, Capacity, Offset,
                                             AddressMode, StorageMode,
-                                            LayoutMode, Owner>;
+                                            LayoutMode, Owner, ArraySizeT>;
 
   // TODO: Move functions that require this constant in a separate file and
   // do not include here.
@@ -109,8 +109,9 @@ class SoaInlinedDynamicArrayField_ {
     return nullptr;
   }
 
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, B**>::type
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          L == kLayoutModeSoa, B**>::type
   get_external_pointer_addr_internal() const {
     auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
                       reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
@@ -131,9 +132,7 @@ class SoaInlinedDynamicArrayField_ {
 #else
 // Running on host, but data is located on GPU.
   // TODO: This seems really inefficient. Use only for debugging at the moment!
-  template<int A = AddressMode>
-  typename std::enable_if<A == kAddressModeZero, B*>::type
-  get_external_pointer() const {
+  B* get_external_pointer() const {
     // Copy external pointer from GPU.
     B** dev_p_external = Owner::storage().translate_address_host_to_device(
         reinterpret_cast<B**>(get_external_pointer_addr_internal()));
@@ -146,9 +145,7 @@ class SoaInlinedDynamicArrayField_ {
     return Owner::storage().translate_address_device_to_host(dev_result);
   }
 
-  template<int A = AddressMode>
-  __ikra_device__ typename std::enable_if<A == kAddressModeZero, void>::type
-  set_external_pointer(B* ptr) {
+  void set_external_pointer(B* ptr) {
     // ptr is a pointer relative to host memory.
     B* d_p_external = Owner::storage().translate_address_host_to_device(ptr);
     B** d_p_external_addr = Owner::storage().translate_address_host_to_device(
@@ -181,9 +178,11 @@ class SoaInlinedDynamicArrayField_ {
     }
   }
 
-  template<size_t Pos, int A = AddressMode, int S = StorageMode>
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
 
@@ -254,9 +253,10 @@ class SoaInlinedDynamicArrayField_ {
     }
   }
 
-  template<int A = AddressMode, int S = StorageMode>
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
 

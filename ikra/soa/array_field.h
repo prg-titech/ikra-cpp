@@ -96,9 +96,11 @@ class SoaArrayField_ {
     return reinterpret_cast<B*>(p_result);
   }
 
-  template<size_t Pos, int A = AddressMode, int S = StorageMode>
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
 
@@ -146,9 +148,10 @@ class SoaArrayField_ {
     return reinterpret_cast<B*>(p_result);
   }
 
-  template<int A = AddressMode, int S = StorageMode>
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
 
