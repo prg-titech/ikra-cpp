@@ -13,16 +13,16 @@ static const uint32_t kNumIterations = 1000;
 static const uint32_t kNumBenchmarkRuns = 1;
 
 // Number of objects.
-static const uint32_t kNumCells = 7112859; //6428104;
-const uint32_t kNumCars = 100000;
+static const uint32_t kNumCells = 11433334; //7112859; //6428104;
+const uint32_t kNumCars = 250000;
 static const uint32_t kNumSharedSignalGroups = 344418;
-static const uint32_t kNumTrafficLights = 51715;
+static const uint32_t kNumTrafficLights = 79437;
 static const uint32_t kNumPriorityCtrls = 6000;
 
 // Inlining sizes of arrays.
 static const uint32_t kArrInlineOutgoingCells = 4;
-static const uint32_t kArrInlineIncomingCells = 8;
-static const uint32_t kArrInlinePath = 4;
+static const uint32_t kArrInlineIncomingCells = 4;
+static const uint32_t kArrInlinePath = 5;
 static const uint32_t kArrInlineSignalGroupCells = 4;
 static const uint32_t kArrInlineTrafficLightSignalGroups = 4;
 
@@ -47,7 +47,7 @@ static const uint32_t kPriorityCtrlArenaSize = 0;
 #define ARRAY_CELL_OUTGOING \
     array_(Cell*, kArrInlineOutgoingCells, inline_soa)
 #define ARRAY_CAR_PATH \
-    array_(Cell*, 16, soa)
+    array_(Cell*, 16, aos)
 #define ARRAY_SIGNAL_GROUP_CELLS \
     array_(Cell*, kArrInlineSignalGroupCells, inline_soa)
 #define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \

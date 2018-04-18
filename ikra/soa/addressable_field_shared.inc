@@ -89,6 +89,8 @@ data_ptr() const {
   return data_ptr_uninitialized();
 }
 
+// Calculate the address of this field based on the "this" pointer of this
+// Field instance.
 template<int A = AddressMode, int S = StorageMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                         S == kStorageModeStatic, T*>::type
