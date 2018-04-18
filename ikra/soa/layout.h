@@ -195,13 +195,32 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Return a pointer to an object by ID (assuming zero addressing mode).
   // TODO: This method should be private!
-  template<int A = AddressMode>
+  template<int A = AddressMode, int L = LayoutMode>
   __ikra_device__
-  static typename std::enable_if<A == kAddressModeZero, Self*>::type
+  static typename std::enable_if<A == kAddressModeZero &&
+                                 L == kLayoutModeSoa, Self*>::type
   get_(IndexType id) {
     // Start counting from 1 internally.
     assert(id > 0);
     return reinterpret_cast<Self*>(id);
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__
+  static typename std::enable_if<A == kAddressModeZero &&
+                                 L == kLayoutModeAos, Self*>::type
+  get_(IndexType id) {
+    // Start counting from 1 internally.
+    assert(id > 0);
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<Storage>::value;
+    constexpr auto cptr_storage_buffer = Self::storage_buffer();
+    char* buffer_location = reinterpret_cast<char*>(
+        cptr_storage_buffer + cptr_data_offset);
+
+    return reinterpret_cast<Self*>(buffer_location
+        + id*Self::ObjectSize::value);
   }
 
   // Return an iterator pointing to the first instance of this class.
@@ -225,9 +244,10 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Calculate the ID of this object (assuming zero addressing mode).
-  template<int A = AddressMode>
+  template<int A = AddressMode, int L = LayoutMode>
   __ikra_device__
-  typename std::enable_if<A == kAddressModeZero, IndexType>::type 
+  typename std::enable_if<A == kAddressModeZero &&
+                          L == kLayoutModeSoa, IndexType>::type 
   id() const {
     return reinterpret_cast<uintptr_t>(this) - 1;
   }
