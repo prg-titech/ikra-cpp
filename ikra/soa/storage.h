@@ -109,6 +109,10 @@ class StorageStrategySelf {
     return size_;
   }
 
+  __ikra_device__ IndexType arena_utilization() const {
+    return reinterpret_cast<const Self*>(this)->arena_head_;
+  }
+
   using uintptr_t_alt = unsigned long long int;
   __ikra_device__ IndexType increase_size(IndexType increment) {
     // TODO: Find out why this does not work with uintptr_t.
@@ -129,6 +133,15 @@ class StorageStrategySelf {
                cudaMemcpyDeviceToHost);
     assert(cudaPeekAtLastError() == cudaSuccess);
     return host_size;
+  }
+
+  __ikra_device__ IndexType arena_utilization() const {
+    // Copy utilization to host and return.
+    IndexType host_utilization;
+    cudaMemcpy(&host_utilization, &device_ptr()->arena_head_,
+               sizeof(IndexType), cudaMemcpyDeviceToHost);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+    return host_utilization;
   }
 
   // Increase the instance counter on the device.
@@ -208,6 +221,8 @@ class alignas(8) DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  private:
   using SuperT = StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>>;
+  friend class StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>>;
+
  public:
   static const int kStorageMode = kStorageModeDynamic;
 
@@ -266,7 +281,7 @@ class alignas(8) DynamicStorage_
 
   static const bool kIsStaticStorage = false;
 
- private:
+ protected:
   template<typename StorageClass>
   friend class StorageDataOffset;
 
@@ -288,6 +303,8 @@ class alignas(8) StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  private:
   using SuperT = StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>>;
+  friend class StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>>;
+
  public:
   static const int kStorageMode = kStorageModeStatic;
 
@@ -313,7 +330,7 @@ class alignas(8) StaticStorage_
 
   static const bool kIsStaticStorage = true;
 
- private:
+ protected:
   template<typename StorageClass>
   friend class StorageDataOffset;
 
