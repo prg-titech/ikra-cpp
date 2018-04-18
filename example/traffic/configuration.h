@@ -4,14 +4,17 @@
 class Cell;
 class SharedSignalGroup;
 
+static const uint32_t kNumIterations = 2000;
+static const uint32_t kNumBenchmarkRuns = 5;
+
 static const uint32_t kNumCells = 5856393;
 static const uint32_t kNumCars = 250000;
 static const uint32_t kNumSharedSignalGroups = 344418;
 static const uint32_t kNumTrafficLights = 50972;
 static const uint32_t kNumPriorityCtrls = 6000;
 
-static const uint32_t kArrInlineOutgoingCells = 0;  // 4
-static const uint32_t kArrInlineIncomingCells = 0;  // 8
+static const uint32_t kArrInlineOutgoingCells = 4;  // 4
+static const uint32_t kArrInlineIncomingCells = 8;  // 8
 static const uint32_t kArrInlinePath = 5;            // 5
 static const uint32_t kArrInlineSignalGroupCells = 4;
 static const uint32_t kArrInlineTrafficLightSignalGroups = 4;
@@ -26,6 +29,12 @@ static const uint32_t kTrafficLightArenaSize =
 static const uint32_t kPriorityCtrlArenaSize =
     kNumPriorityCtrls*8*sizeof(SharedSignalGroup*);
 
+#define ARRAY_CELL_IS_PARTIAL
+#define ARRAY_CAR_IS_PARTIAL
+#define ARRAY_SIGNAL_GROUP_IS_PARTIAL
+#define ARRAY_TRAFFIC_LIGHT_IS_PARTIAL
+#define ARRAY_PRIORITY_CTRL_IS_PARTIAL
+
 #define ARRAY_CELL_INCOMING \
     array_(Cell*, kArrInlineIncomingCells, inline_soa)
 #define ARRAY_CELL_OUTGOING \
@@ -38,4 +47,5 @@ static const uint32_t kPriorityCtrlArenaSize =
     array_(SharedSignalGroup*, kArrInlineTrafficLightSignalGroups, inline_soa)
 #define ARRAY_PRIORITY_CTRL_SIGNAL_GROUPS \
     array_(SharedSignalGroup*, kArrInlinePriorityCtrlSignalGroups, inline_soa)
+
 #endif  // EXAMPLE_TRAFFIC_CONFIGURATION_H

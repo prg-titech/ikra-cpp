@@ -1,7 +1,11 @@
+#include <limits>
+#include <iostream>
+
 #include "executor/executor.h"
 #include "soa/soa.h"
 #include "executor/cuda_executor.h"
 
+#include "benchmark.h"
 #include "configuration.h"
 
 using ikra::soa::SoaLayout;
@@ -37,7 +41,9 @@ class Cell : public SoaLayout<Cell, kNumCells, kAddressModeZero,
                            Type type = kResidential)
       : max_velocity_(max_velocity), x_(x), y_(y), type_(type),
         num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
+#ifdef ARRAY_CELL_IS_PARTIAL
         incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
+#endif  // ARRAY_CELL_IS_PARTIAL
         car_(car), is_free_(is_free), is_sink_(is_sink),
         controller_max_velocity_(controller_max_velocity) {
     for (uint32_t i = 0; i < num_incoming; ++i) {
@@ -58,7 +64,9 @@ class Cell : public SoaLayout<Cell, kNumCells, kAddressModeZero,
                            Type type = kResidential)
       : max_velocity_(max_velocity), x_(x), y_(y), type_(type),
         num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
+#ifdef ARRAY_CELL_IS_PARTIAL
         incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
+#endif  // ARRAY_CELL_IS_PARTIAL
         car_(car), is_free_(is_free), is_sink_(is_sink) {
     for (uint32_t i = 0; i < num_incoming; ++i) {
       incoming_cells_[i] = Cell::get_uninitialized(incoming[i]);
@@ -170,8 +178,11 @@ class Car : public SoaLayout<Car, kNumCars, kAddressModeZero,
                           uint32_t max_velocity, uint32_t random_state,
                           Cell* position)
       : is_active_(is_active), velocity_(velocity), path_length_(0),
-        path_(max_velocity), random_state_(random_state), position_(position),
-        max_velocity_(max_velocity) {
+#ifdef ARRAY_CAR_IS_PARTIAL
+        path_(max_velocity),
+#endif  // ARRAY_CAR_IS_PARTIAL
+        max_velocity_(max_velocity), random_state_(random_state),
+        position_(position) {
     assert(is_active);
   }
 
@@ -254,8 +265,11 @@ class SharedSignalGroup : public SoaLayout<
  public:
   IKRA_INITIALIZE_CLASS
   
-  __device__ SharedSignalGroup(uint32_t num_cells, unsigned int* cells)
-      : num_cells_(num_cells), cells_(num_cells) {
+  __device__ SharedSignalGroup(uint32_t num_cells, unsigned int* cells) :
+#ifdef ARRAY_SIGNAL_GROUP_IS_PARTIAL 
+      cells_(num_cells),
+#endif  // ARRAY_SIGNAL_GROUP_IS_PARTIAL
+      num_cells_(num_cells) {
     for (uint32_t i = 0; i < num_cells; ++i) {
       cells_[i] = Cell::get_uninitialized(cells[i]);
     }
@@ -291,7 +305,9 @@ class TrafficLight : public SoaLayout<
                           unsigned int* signal_groups,
                           uint32_t num_signal_groups)
       : timer_(timer), phase_time_(phase_time), phase_(phase),
+#ifdef ARRAY_TRAFFIC_LIGHT_IS_PARTIAL
         signal_groups_(num_signal_groups),
+#endif  // ARRAY_TRAFFIC_LIGHT_IS_PARTIAL
         num_signal_groups_(num_signal_groups) {
     for (uint32_t i = 0; i < num_signal_groups; ++i) {
       signal_groups_[i] =
@@ -335,8 +351,10 @@ class PriorityYieldTrafficController : public SoaLayout<
   IKRA_INITIALIZE_CLASS
 
   __device__ PriorityYieldTrafficController(unsigned int* signal_groups,
-                                            uint32_t num_signal_groups) 
-      : signal_groups_(num_signal_groups),
+                                            uint32_t num_signal_groups) :
+#ifdef ARRAY_PRIORITY_CTRL_IS_PARTIAL 
+        signal_groups_(num_signal_groups),
+#endif  // ARRAY_PRIORITY_CTRL_IS_PARTIAL
         num_signal_groups_(num_signal_groups) {
     for (uint32_t i = 0; i < num_signal_groups; ++i) {
       signal_groups_[i] =
@@ -630,35 +648,25 @@ void run_cars() {
   cudaDeviceSynchronize();
 }
 
-#include <iostream>
-#include <chrono>
+void benchmark() {
+  uint32_t time_controllers[kNumBenchmarkRuns] = {0};
+  uint32_t time_cars[kNumBenchmarkRuns] = {0};
+  uint32_t time_total[kNumBenchmarkRuns] = {0};
 
-template<typename TimeT = std::chrono::microseconds>
-struct measure
-{
-    template<typename F, typename ...Args>
-    static typename TimeT::rep execution(F&& func, Args&&... args)
-    {
-        auto start = std::chrono::steady_clock::now();
-        std::forward<decltype(func)>(func)(std::forward<Args>(args)...);
-        auto duration = std::chrono::duration_cast< TimeT> 
-                            (std::chrono::steady_clock::now() - start);
-        return duration.count();
-    }
-};
+  for (uint32_t r = 0; r < kNumBenchmarkRuns; ++r) {
+    Cell::initialize_storage();
+    Car::initialize_storage();
+    SharedSignalGroup::initialize_storage();
+    TrafficLight::initialize_storage();
+    PriorityYieldTrafficController::initialize_storage();
 
-#define RUNS 4
-void run_simulation() {
-  int time_controllers[RUNS] = {0};
-  int time_cars[RUNS] = {0};
-  int time_total[RUNS] = {0};
+    convert_simulation();
 
-  for (int r = 0; r < RUNS; ++r) {
-    for (int i = 0; i < 1000; ++i) {
-      int t_ctrl = measure<>::execution(run_traffic_controllers);
+    for (uint32_t i = 0; i < kNumIterations; ++i) {
+      uint32_t t_ctrl = measure<>::execution(run_traffic_controllers);
       time_controllers[r] += t_ctrl;
 
-      int t_car = measure<>::execution(run_cars);
+      uint32_t t_car = measure<>::execution(run_cars);
       time_cars[r] += t_car;
 
       time_total[r] = time_controllers[r] + time_cars[r];
@@ -667,9 +675,9 @@ void run_simulation() {
   }
 
   // Find best run.
-  int best_time = 10000000;
-  int best_index = -1;
-  for (int r = 0; r < RUNS; ++r) {
+  uint32_t best_time = std::numeric_limits<uint32_t>::max();
+  uint32_t best_index = -1;
+  for (uint32_t r = 0; r < kNumBenchmarkRuns; ++r) {
     if (time_total[r] < best_time) {
       best_time = time_total[r];
       best_index = r;
@@ -677,22 +685,16 @@ void run_simulation() {
   }
 
   // Print best run.
-  printf("Time cars: %i, Time traffic controllers: %i, Total: %i\n",
-         time_cars[best_index]/100, time_controllers[best_index]/100, time_total[best_index]/100);
-  fprintf(stderr, "%i,%i,%i,%i", 123, time_cars[best_index]/100, time_controllers[best_index]/100, time_total[best_index]/100);
+  printf("Time cars: %lu, Time traffic controllers: %lu, Total: %lu\n",
+         (unsigned long) time_cars[best_index]/100, (unsigned long) time_controllers[best_index]/100, (unsigned long) time_total[best_index]/100);
+  //fprintf(stderr, "%lu,%i,%i,%i", 123, (unsigned long) time_cars[best_index]/100, (unsigned long) time_controllers[best_index]/100, (unsigned long) time_total[best_index]/100);
 }
 
 
 
 int main(int argc, char** argv) {
-  Cell::initialize_storage();
-  Car::initialize_storage();
-
   load_simulation(argc, argv);
-  convert_simulation();
-
-  int chk_time = measure<>::execution(run_simulation);
-  printf("    -- CHK TIME: %i\n", chk_time);
+  benchmark();
 
   print_velocity_histogram<<<1, 1>>>();
   gpuErrchk(cudaDeviceSynchronize());
