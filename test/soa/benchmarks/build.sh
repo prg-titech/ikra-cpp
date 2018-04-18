@@ -15,10 +15,11 @@ do
     do
       for v_addr_mode in "0" "4"
       do
-        out_name="${v_compiler}_${v_opt_mode}_${v_storage}_${v_addr_mode}"
+        out_name="${v_compiler}_${v_opt_mode}_${v_storage}_${v_addr_mode}_Soa"
         ${v_compiler} -std=c++11 ${v_opt_mode} ${extra_args} \
             -DSTORAGE_STRATEGY=${v_storage} \
             -DADDRESS_MODE=${v_addr_mode} \
+            -DLAYOUT_MODE=Soa \
             codegen_test.cc \
             -I../../../ikra \
             -o bin/${out_name}
@@ -28,6 +29,27 @@ do
     done
   done
 done
+
+for v_compiler in "g++" "${clang_bin}"
+do
+  for v_opt_mode in "-O0" "-O3"
+  do
+    for v_layout_mode in "Aos" "Soa"
+    do
+      out_name="${v_compiler}_${v_opt_mode}_StaticStorage_0_Aos"
+      ${v_compiler} -std=c++11 ${v_opt_mode} ${extra_args} \
+          -DSTORAGE_STRATEGY=StaticStorage \
+          -DADDRESS_MODE=0 \
+          -DLAYOUT_MODE=Aos \
+          codegen_test.cc \
+          -I../../../ikra \
+          -o bin/${out_name}
+      bin/${out_name}
+      objdump -S bin/${out_name} > assembly/${out_name}.S
+    done
+  done
+done
+
 
 # CUDA test
 /usr/local/cuda/bin/nvcc \

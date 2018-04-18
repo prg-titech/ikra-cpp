@@ -69,6 +69,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
       sizeof(AddressingModeCompilerCheck<AddressMode>) == AddressMode,
       "Selected addressing mode not supported by compiler.");
 
+  // AOS layout is only for reference and not fully implemented.
+  static_assert(LayoutMode == kLayoutModeSoa || 
+      (AddressMode == kAddressModeZero && kStorageMode == kStorageModeStatic),
+      "AOS layout allowed only in zero addressing mode with static storage.");
+
   __ikra_host_device__ static constexpr Storage& storage() {
     return *reinterpret_cast<Storage*>(Self::storage_buffer()); 
   }
@@ -250,6 +255,22 @@ class SoaLayout : SizeNDummy<AddressMode> {
                           L == kLayoutModeSoa, IndexType>::type 
   id() const {
     return reinterpret_cast<uintptr_t>(this) - 1;
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__
+  typename std::enable_if<A == kAddressModeZero &&
+                          L == kLayoutModeAos, IndexType>::type 
+  id() const {
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<Storage>::value;
+    constexpr auto cptr_storage_buffer = Self::storage_buffer();
+    uintptr_t buffer_location = reinterpret_cast<uintptr_t>(
+        cptr_storage_buffer + cptr_data_offset);
+    auto buffer_offset = reinterpret_cast<uintptr_t>(this) - buffer_location;
+
+    assert(buffer_offset % Self::ObjectSize::value == 0);
+    return buffer_offset / Self::ObjectSize::value  - 1;
   }
 
 #ifdef __CUDACC__

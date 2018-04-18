@@ -12,13 +12,14 @@ id() const {
              / A - 1 - 1;
 }
 
-template<int A = AddressMode>
+template<int A = AddressMode, int L = LayoutMode>
 __ikra_device__
 typename std::enable_if<A == kAddressModeZero, IndexType>::type
 id() const {
   static_assert(sizeof(Self) == 0,
                 "Zero addressing mode not supported by compiler.");
-  return reinterpret_cast<uintptr_t>(this) - 1;
+  // TODO: Check if there's a slowdown here due to forwarding this.
+  return reinterpret_cast<Owner*>(this)->id();
 }
 
 // Force size of this class to be 0.

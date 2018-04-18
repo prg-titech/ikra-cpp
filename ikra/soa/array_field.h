@@ -122,6 +122,19 @@ class SoaArrayField_ {
     return soa_array + reinterpret_cast<uintptr_t>(this);
   }
 
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr() const {
+    static_assert(Pos < ArraySize, "Array index out of bounds.");
+
+    B* inner_array = reinterpret_cast<B*>(
+        reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+    return inner_array + Pos;
+  }
+
   template<size_t Pos, int A = AddressMode, int S = StorageMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           S == kStorageModeDynamic, B*>::type
@@ -165,6 +178,18 @@ class SoaArrayField_ {
                                         + pos*sizeof(B)*(Capacity+1));
 
     return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr(size_t pos) const {
+    assert(pos < ArraySize);
+
+    B* inner_array = reinterpret_cast<B*>(
+        reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+    return inner_array + pos;
   }
 
   template<int A = AddressMode, int S = StorageMode>

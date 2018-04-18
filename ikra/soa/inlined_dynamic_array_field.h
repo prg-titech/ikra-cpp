@@ -113,11 +113,31 @@ class SoaInlinedDynamicArrayField_ {
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           L == kLayoutModeSoa, B**>::type
   get_external_pointer_addr_internal() const {
-    auto p_external = reinterpret_cast<uintptr_t>(this)*sizeof(B*) +
-                      reinterpret_cast<uintptr_t>(Owner::storage().data_ptr())
-                      + (Capacity+1)*(Offset + InlinedSize*sizeof(B));
-    assert(p_external % sizeof(B**) == 0);
-    return reinterpret_cast<B**>(p_external);
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<typename Owner::Storage>::value;
+    constexpr auto cptr_storage_buffer = Owner::storage_buffer();
+    constexpr auto array_location =
+        cptr_storage_buffer + cptr_data_offset +
+        (Capacity+1)*(Offset + InlinedSize*sizeof(B));
+
+#ifdef __clang__
+    // Clang does not allow reinterpret_cast in constexprs.
+    constexpr B** soa_array = IKRA_fold(reinterpret_cast<B**>(array_location));
+#else
+    constexpr B** soa_array = reinterpret_cast<B**>(array_location);
+#endif  // __clang__
+
+    return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          L == kLayoutModeAos, B**>::type
+  get_external_pointer_addr_internal() const {
+    return reinterpret_cast<B**>(
+        reinterpret_cast<char*>(const_cast<Self*>(this))
+        + Offset + InlinedSize*sizeof(B));
   }
 
 #if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
@@ -212,6 +232,27 @@ class SoaInlinedDynamicArrayField_ {
     }
   }
 
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr() const {
+    static_assert(Pos < ArraySize, "Array index out of bounds.");
+
+    if (Pos < InlinedSize) {
+      // Within inlined storage.
+      B* inner_array = reinterpret_cast<B*>(
+          reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+      return inner_array + Pos;
+    } else {
+      // Within external storage.
+      B* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (Pos - InlinedSize);
+    }
+  }
+
   template<size_t Pos, int A = AddressMode, int S = StorageMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           S == kStorageModeDynamic, B*>::type
@@ -272,6 +313,26 @@ class SoaInlinedDynamicArrayField_ {
                                           + pos*sizeof(B)*(Capacity+1));
 
       return soa_array + reinterpret_cast<uintptr_t>(this);
+    } else {
+      // Within external storage.
+      B* p_external = this->get_external_pointer();
+      assert(p_external != nullptr);
+      return p_external + (pos - InlinedSize);
+    }
+  }
+
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr(size_t pos) const {
+    assert(pos < ArraySize);
+
+    if (pos < InlinedSize) {
+      // Within inlined storage.
+      B* inner_array = reinterpret_cast<B*>(
+          reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+      return inner_array + pos;
     } else {
       // Within external storage.
       B* p_external = this->get_external_pointer();

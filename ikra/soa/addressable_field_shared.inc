@@ -95,25 +95,9 @@ __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                         S == kStorageModeStatic &&
                                         L == kLayoutModeAos, T*>::type
 data_ptr_uninitialized() const {
-  // Use constant-folded value for address computation.
-  constexpr auto cptr_data_offset =
-      StorageDataOffset<typename Owner::Storage>::value;
-  constexpr auto cptr_storage_buffer = Owner::storage_buffer();
-  constexpr auto array_location =
-      cptr_storage_buffer + cptr_data_offset + Offset;
-
-#ifdef __clang__
-  // Clang does not allow reinterpret_cast in constexprs.
-  constexpr char* soa_array = IKRA_fold(reinterpret_cast<char*>(array_location));
-#else
-  constexpr char* soa_array = reinterpret_cast<char*>(array_location);
-#endif  // __clang__
-
-  // Not necessarily aligned
-  // assert(reinterpret_cast<uintptr_t>(soa_array) % 8 == 0);
-
-  return reinterpret_cast<T*>(soa_array 
-         + reinterpret_cast<uintptr_t>(this)*Owner::ObjectSize::value);
+  // TODO: Fix field alignment.
+  return reinterpret_cast<T*>(
+      reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
 }
 
 template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
