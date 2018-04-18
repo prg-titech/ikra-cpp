@@ -1,4 +1,4 @@
-#include "simulation_adapter.cuh"
+#include "simulation_adapter.h"
 
 namespace simulation {
 namespace standard {
@@ -24,8 +24,8 @@ using namespace std;
 
 #include "traffic-simulation/traffic_aos_int.h"
 
-void load_simulation(int argc, char** argv) {
-  instance = build_simulation(argc, argv);
+void load_simulation(int argc, char** argv, unsigned int num_cars) {
+  instance = build_simulation(argc, argv, num_cars);
   simulation::aos_int::instance = new simulation::aos_int::Simulation(
       simulation::standard::instance);
   simulation::aos_int_cuda::initialize();

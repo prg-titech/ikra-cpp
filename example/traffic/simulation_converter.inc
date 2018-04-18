@@ -127,8 +127,6 @@ __global__ void convert_to_ikra_cpp_traffic_lights(
                      s_signal_groups + light.first_signal_group_idx_,
                      light.num_signal_groups_);
     assert(new_light->id() == tid);
-
-    new_light->initialize();
   }
 
   if (tid == 0) {
@@ -154,8 +152,6 @@ __global__ void convert_to_ikra_cpp_priority_ctrls(
             s_signal_groups + ctrl.first_group_idx_,
             ctrl.num_groups_);
     assert(new_ctrl->id() == tid);
-
-    new_ctrl->initialize();
   }
 
   if (tid == 0) {
@@ -167,6 +163,11 @@ __global__ void convert_to_ikra_cpp_priority_ctrls(
 void convert_simulation() {
   assert(simulation::aos_int::s_size_Car <= kNumCars);
   assert(simulation::aos_int::s_size_Cell <= kNumCells);
+  assert(simulation::aos_int::s_size_SharedSignalGroup
+      <= kNumSharedSignalGroups);
+  assert(simulation::aos_int::s_size_TrafficLight <= kNumTrafficLights);
+  assert(simulation::aos_int::s_size_PriorityYieldTrafficController
+      <= kNumPriorityCtrls);
 
   convert_to_ikra_cpp_cells<<<kNumCells/1024 + 1, 1024>>>(
       simulation::aos_int::s_size_Cell,
