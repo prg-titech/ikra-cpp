@@ -22,10 +22,15 @@ using ikra::soa::StaticStorage;
 #error Storage strategy undefined
 #endif
 
+#ifndef LAYOUT_MODE
+#error Layout mode undefined
+#endif
+
 static const uint32_t kClassMaxInst = 0x1234;
 
 class TestClass : public SoaLayout<TestClass, kClassMaxInst,
-                                   ADDRESS_MODE, STORAGE_STRATEGY> {
+                                   ADDRESS_MODE, STORAGE_STRATEGY,
+                                   LAYOUT_MODE> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -42,6 +47,21 @@ class TestClass : public SoaLayout<TestClass, kClassMaxInst,
 };
 
 IKRA_HOST_STORAGE(TestClass)
+
+class TestClassCompare {
+  int field0_;
+  int field1_;
+
+  void increase_field0() {
+    field0 *= 0x5555;
+  }
+
+  void increase_field1() {
+    field1 *= 0x4444;
+  }
+};
+
+TestClassCompare test_compare_array[kClassMaxInst];
 
 
 int main() {

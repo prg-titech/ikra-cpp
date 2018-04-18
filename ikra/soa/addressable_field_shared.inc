@@ -93,7 +93,7 @@ data_ptr_uninitialized() const {
 template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                         S == kStorageModeStatic &&
-                                        L == kLayoutModeSoa, T*>::type
+                                        L == kLayoutModeAos, T*>::type
 data_ptr_uninitialized() const {
   // Use constant-folded value for address computation.
   constexpr auto cptr_data_offset =
@@ -119,7 +119,7 @@ data_ptr_uninitialized() const {
 template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                         S == kStorageModeStatic &&
-                                        L == kLayoutModeAos, T*>::type
+                                        L == kLayoutModeSoa, T*>::type
 data_ptr_uninitialized() const {
   // Use constant-folded value for address computation.
   constexpr auto cptr_data_offset =
