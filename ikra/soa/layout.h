@@ -42,7 +42,8 @@ struct SizeNDummy {
 template<class Self,
          IndexType UserCapacity,
          int AddressMode = kAddressModeZero,
-         class StorageStrategy = StaticStorage>
+         class StorageStrategy = StaticStorage,
+         int LayoutMode = kLayoutModeSoa>
 class SoaLayout : SizeNDummy<AddressMode> {
  private:
   // Calculate real capacity of the container, such that its size is a multiple
@@ -75,7 +76,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
   using Field = Field_<T, Capacity, Offset, AddressMode,
-                       kStorageMode, Self>;
+                       kStorageMode, LayoutMode, Self>;
 
   // Generate field types. Implement more types as necessary.
   // TODO: Can this be merged with field_type_generator.h?
@@ -94,17 +95,17 @@ class SoaLayout : SizeNDummy<AddressMode> {
     template<typename T, size_t N, int Offset>
     using aos = ikra::soa::AosArrayField_<std::array<T, N>, T, N, Capacity,
                                           Offset, AddressMode,
-                                          kStorageMode, Self>;
+                                          kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t N, int Offset>
     using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
                                           Offset, AddressMode,
-                                          kStorageMode, Self>;
+                                          kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
     using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
         T, InlineSize, Capacity, Offset, AddressMode,
-        kStorageMode, Self>;
+        kStorageMode, LayoutMode, Self>;
   };
 
   static const int kAddressMode = AddressMode;

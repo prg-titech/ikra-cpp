@@ -24,12 +24,14 @@ template<typename B,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner,
          class ArraySizeT = IndexType>
 class SoaInlinedDynamicArrayField_ {
  private:
   using Self = SoaInlinedDynamicArrayField_<B, InlinedSize, Capacity, Offset,
-                                            AddressMode, StorageMode, Owner>;
+                                            AddressMode, StorageMode,
+                                            LayoutMode, Owner>;
 
   // TODO: Move functions that require this constant in a separate file and
   // do not include here.

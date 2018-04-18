@@ -3,22 +3,35 @@
 
 namespace {
 using ikra::soa::SoaLayout;
+using ikra::soa::StaticStorage;
 using ikra::soa::kAddressModeZero;
+using ikra::soa::kLayoutModeSoa;
+using ikra::soa::kLayoutModeAos;
 
 static const int kClassMaxInst = 1024;
 static const int kTestSize = 40;
 
 // Zero addressing mode.
-#define IKRA_TEST_CLASSNAME TestClassZ
+#define IKRA_TEST_CLASSNAME TestClassZ_Soa
 #define IKRA_TEST_ADDRESS_MODE kAddressModeZero
+#define IKRA_TEST_LAYOUT_MODE kLayoutModeSoa
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
-IKRA_HOST_STORAGE(TestClassZ)
+IKRA_HOST_STORAGE(TestClassZ_Soa)
+
+#define IKRA_TEST_CLASSNAME TestClassZ_Aos
+#define IKRA_TEST_ADDRESS_MODE kAddressModeZero
+#define IKRA_TEST_LAYOUT_MODE kLayoutModeAos
+#include "basic_class_test_layout.inc"
+#undef IKRA_TEST_CLASSNAME
+#undef IKRA_TEST_ADDRESS_MODE
+IKRA_HOST_STORAGE(TestClassZ_Aos)
 
 // Valid addressing mode.
 #define IKRA_TEST_CLASSNAME TestClassV
 #define IKRA_TEST_ADDRESS_MODE sizeof(int)
+#define IKRA_TEST_LAYOUT_MODE kLayoutModeSoa
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
@@ -130,6 +143,7 @@ REGISTER_TYPED_TEST_CASE_P(BasicClassTest,
                            PlacementNew);
 
 INSTANTIATE_TYPED_TEST_CASE_P(Valid, BasicClassTest, TestClassV);
-INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest, TestClassZ);
+INSTANTIATE_TYPED_TEST_CASE_P(Zero, BasicClassTest, TestClassZ_Soa);
+INSTANTIATE_TYPED_TEST_CASE_P(ZeroAos, BasicClassTest, TestClassZ_Aos);
 
 }  // namespace

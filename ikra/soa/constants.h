@@ -31,6 +31,10 @@ static const int kAddressModeZero = 0;
 // See test/soa/pointer_arithmetics_test.cc for pointer arithmetics examples.
 static const int kAddressModeValid = 1;
 
+static const int kLayoutModeAos = 0;
+
+static const int kLayoutModeSoa = 1;
+
 // The type that is used to represent indices.
 using IndexType = uintptr_t;
 

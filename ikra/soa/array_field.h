@@ -19,11 +19,12 @@ template<typename T,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner>
 class AosArrayField_ {
  private:
   using Self = AosArrayField_<T, B, ArraySize, Capacity, Offset, AddressMode,
-                              StorageMode, Owner>;
+                              StorageMode, LayoutMode, Owner>;
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
 
@@ -56,11 +57,12 @@ template<typename B,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner>
 class SoaArrayField_ {
  private:
   using Self = SoaArrayField_<B, ArraySize, Capacity, Offset,
-                              AddressMode, StorageMode, Owner>;
+                              AddressMode, StorageMode, LayoutMode, Owner>;
 
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
