@@ -1,6 +1,7 @@
 class SharedSignalGroup : public SoaLayout<
     SharedSignalGroup, kNumSharedSignalGroups, kAddressModeZero,
-    StaticStorageWithArena<kSharedSignalGroupArenaSize>> {
+    StaticStorageWithArena<kSharedSignalGroupArenaSize>,
+    kSharedSignalGroupLayoutMode> {
  public:
   IKRA_INITIALIZE_CLASS
   
@@ -26,8 +27,18 @@ class SharedSignalGroup : public SoaLayout<
     }
   }
 
+  // Cells controlled by this group.
+  // [ PADDING = 0 ]
   ARRAY_SIGNAL_GROUP_CELLS cells_;
+
+  // Number of cells.
+  // [ PADDING = k*PTR_SIZE ]
   uint32_t_ num_cells_;
+
+  // Add dummy field to make sure that objects are properly aligned in AOS.
+  // [ OFFSET = 4 + k*PTR_SIZE ]
+  array_(char, kSharedSignalGroupAlignmentPadding, object) dummy_alignment_;
+
   __device__ uint32_t num_cells() const { return num_cells_; }
   __device__ Cell* cell(uint32_t index) { return cells_[index]; }
 };

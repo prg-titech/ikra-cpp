@@ -1,7 +1,8 @@
 
 class TrafficLight : public SoaLayout<
     TrafficLight, kNumTrafficLights, kAddressModeZero, 
-    StaticStorageWithArena<kTrafficLightArenaSize>> {
+    StaticStorageWithArena<kTrafficLightArenaSize>,
+    kTrafficLightLayoutMode> {
  public:
    IKRA_INITIALIZE_CLASS
 
@@ -106,14 +107,28 @@ class TrafficLight : public SoaLayout<
   }
 
   // This timer is increased with every step.
+  // [ PADDING = 0 ]
   uint32_t_ timer_;
 
+  // The length of one phase, i.e., number of iterations until the signal
+  // changes.
+  // [ PADDING = 4 ]
   uint32_t_ phase_time_;
 
+  // An index into signal_groups_, marking the group that currently has a
+  // green signal.
+  // [ PADDING = 8 ]
   uint32_t_ phase_;
 
-  ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS signal_groups_;
+  // Number of signal groups.
+  // [ PADDING = 12 ]
   uint32_t_ num_signal_groups_;
+
+  // Signal groups controlled by this traffic lights.
+  // [ PADDING = 16 ]
+  ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS signal_groups_;
+
+  // No additional padding required for AOS.
 };
 
 IKRA_DEVICE_STORAGE(TrafficLight);

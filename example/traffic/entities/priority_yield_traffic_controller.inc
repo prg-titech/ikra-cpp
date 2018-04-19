@@ -1,6 +1,7 @@
 class PriorityYieldTrafficController : public SoaLayout<
     PriorityYieldTrafficController, kNumPriorityCtrls, kAddressModeZero,
-    StaticStorageWithArena<kPriorityCtrlArenaSize>> {
+    StaticStorageWithArena<kPriorityCtrlArenaSize>,
+    kPriorityCtrlLayoutMode> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -45,8 +46,17 @@ class PriorityYieldTrafficController : public SoaLayout<
     }
   }
 
+  // Signal groups controlled by this controller.
+  // [ PADDING = 0]
   ARRAY_PRIORITY_CTRL_SIGNAL_GROUPS signal_groups_;
+
+  // Number of signal groups.
+  // [ PADDING = k*PTR_SIZE ]
   uint32_t_ num_signal_groups_;
+
+  // Add dummy field to make sure that objects are properly aligned in AOS.
+  // [ OFFSET = 4 + k*PTR_SIZE ]
+  array_(char, kPriorityCtrlAlignmentPadding, object) dummy_alignment_;
 
   __device__ bool has_incoming_traffic(SharedSignalGroup* group) const {
     const uint32_t num_cells = group->num_cells();

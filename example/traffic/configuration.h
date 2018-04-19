@@ -1,6 +1,9 @@
 #ifndef EXAMPLE_TRAFFIC_CONFIGURATION_H
 #define EXAMPLE_TRAFFIC_CONFIGURATION_H
 
+using ikra::soa::kLayoutModeSoa;
+using ikra::soa::kLayoutModeAos;
+
 class Cell;
 class SharedSignalGroup;
 
@@ -18,6 +21,20 @@ const uint32_t kNumCars = 250000;
 static const uint32_t kNumSharedSignalGroups = 344418;
 static const uint32_t kNumTrafficLights = 79437;
 static const uint32_t kNumPriorityCtrls = 6000;
+
+// Layout mode: SOA or AOS.
+static const int kCellLayoutMode = kLayoutModeSoa;
+static const int kCarLayoutMode = kLayoutModeSoa;
+static const int kSharedSignalGroupLayoutMode = kLayoutModeSoa;
+static const int kPriorityCtrlLayoutMode = kLayoutModeSoa;
+static const int kTrafficLightLayoutMode = kLayoutModeSoa;
+
+static const uint32_t kCellAlignmentPadding = 2;
+static const uint32_t kCarAlignmentPadding = 7;
+static const uint32_t kSharedSignalGroupAlignmentPadding = 4;
+static const uint32_t kPriorityCtrlAlignmentPadding = 4;
+// No padding required for traffic lights.
+// static const uint32_t kTrafficLightAlignmentPadding = 0;
 
 // Inlining sizes of arrays.
 static const uint32_t kArrInlineOutgoingCells = 4;
@@ -47,7 +64,7 @@ static const uint32_t kPriorityCtrlArenaSize = 0;
 #define ARRAY_CELL_OUTGOING \
     array_(Cell*, kArrInlineOutgoingCells, partially_inlined)
 #define ARRAY_CAR_PATH \
-    array_(Cell*, 16, object)
+    array_(Cell*, 16, fully_inlined)
 #define ARRAY_SIGNAL_GROUP_CELLS \
     array_(Cell*, kArrInlineSignalGroupCells, partially_inlined)
 #define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \

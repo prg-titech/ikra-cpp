@@ -1,5 +1,6 @@
 class Car : public SoaLayout<Car, kNumCars, kAddressModeZero,
-                             StaticStorageWithArena<kCarArenaSize>> {
+                             StaticStorageWithArena<kCarArenaSize>,
+                             kCarLayoutMode> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -15,29 +16,46 @@ class Car : public SoaLayout<Car, kNumCars, kAddressModeZero,
     assert(is_active);
   }
 
-  // If a car enters a sink, it is removed from the simulation (inactive)
-  // for a short time.
-  bool_ is_active_;
-  __device__ bool is_active() const { return is_active_; }
-
   // The velocity of the car in cells/iteration.
+  // [ OFFSET = 0 ]
   uint32_t_ velocity_;
-  __device__ uint32_t velocity() const { return velocity_; }
 
   // The max. possible velocity of this car.
+  // [ OFFSET = 4 ]
   uint32_t_ max_velocity_;
-  __device__ uint32_t max_velocity() const { return max_velocity_; }
 
-  // An array of cells that the car will move onto next.
-  ARRAY_CAR_PATH path_;
+  // The lengths of the precalculated path.
+  // [ OFFSET = 8 ]
   uint32_t_ path_length_;
 
+  // Every car has a random state to allow for reproducible results.
+  // [ OFFSET = 12 ]
+  uint32_t_ random_state_;
+
+  // An array of cells that the car will move onto next.
+  // [ OFFSET = 16 ]
+  ARRAY_CAR_PATH path_;
+
   // The current position of the car.
+  // [ OFFSET = 16 + k*PTR_SIZE ]
   field_(Cell*) position_;
+
+  // If a car enters a sink, it is removed from the simulation (inactive)
+  // for a short time.
+  // [ OFFSET = 16 + k*PTR_SIZE ]
+  bool_ is_active_;
+
+  // Add dummy field to make sure that objects are properly aligned in AOS.
+  // [ OFFSET = 17 + k*PTR_SIZE ]
+  array_(char, kCarAlignmentPadding, object) dummy_alignment_;
+
+  __device__ uint32_t velocity() const { return velocity_; }
+
+  __device__ uint32_t max_velocity() const { return max_velocity_; }
+
   __device__ Cell* position() const { return position_; }
 
-  // Every car has a random state to allow for reproducible results.
-  uint32_t_ random_state_;
+  __device__ bool is_active() const { return is_active_; }
 
   __device__ uint32_t rand32() {
     // Advance and return random state.
