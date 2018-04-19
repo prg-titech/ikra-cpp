@@ -10,9 +10,9 @@ namespace ikra {
 namespace soa {
 
 // Class for field declarations of type "Inlined Dynamic Array". This type
-// stores InlinedSize many items in SOA format (like SoaArrayField_) and
-// the remaining items in a user-specified location. This array does not know
-// its size.
+// stores InlinedSize many items in SOA format (like FullyInlinedArrayField_)
+// and the remaining items in a user-specified location. This array does not
+// know its size.
 // Description of template parameters:
 // * B: Base type of the array.
 // * InlinedSize: Number of elements that should be stored in SOA format.
@@ -27,11 +27,11 @@ template<typename B,
          int LayoutMode,
          class Owner,
          class ArraySizeT = IndexType>
-class SoaInlinedDynamicArrayField_ {
+class PartiallyInlinedArrayField_ {
  private:
-  using Self = SoaInlinedDynamicArrayField_<B, InlinedSize, Capacity, Offset,
-                                            AddressMode, StorageMode,
-                                            LayoutMode, Owner, ArraySizeT>;
+  using Self = PartiallyInlinedArrayField_<B, InlinedSize, Capacity, Offset,
+                                           AddressMode, StorageMode,
+                                           LayoutMode, Owner, ArraySizeT>;
 
   // TODO: Move functions that require this constant in a separate file and
   // do not include here.
@@ -40,11 +40,11 @@ class SoaInlinedDynamicArrayField_ {
  public:
   static const int kSize = InlinedSize*sizeof(B) + sizeof(B*);
 
-  __ikra_device__ SoaInlinedDynamicArrayField_(B* external_storage) {
+  __ikra_device__ PartiallyInlinedArrayField_(B* external_storage) {
     this->set_external_pointer(external_storage);
   }
 
-  __ikra_device__ SoaInlinedDynamicArrayField_(size_t num_elements) {
+  __ikra_device__ PartiallyInlinedArrayField_(size_t num_elements) {
     // Allocate memory in arena if necessary.
     if (num_elements > InlinedSize) {
       void* mem = Owner::storage().allocate_in_arena(
@@ -67,7 +67,7 @@ class SoaInlinedDynamicArrayField_ {
   // TODO: Implement iterator and other methods.
 
  protected:
-  __ikra_device__ SoaInlinedDynamicArrayField_() {
+  __ikra_device__ PartiallyInlinedArrayField_() {
     this->set_external_pointer(nullptr);
   }
 

@@ -1,6 +1,6 @@
-// This file contains methods that are common to Field_ and SoaArrayField_.
-// Cannot use inheritance here because sizeof cannot be set to 0 in CUDA with
-// inheritance.
+// This file contains methods that are common to Field_ and
+// FullyInlinedArrayField_. Cannot use inheritance here because sizeof
+// cannot be set to 0 in CUDA with inheritance.
 
 protected:
 template<int A = AddressMode>

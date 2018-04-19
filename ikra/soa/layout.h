@@ -8,7 +8,7 @@
 #include "soa/constants.h"
 #include "soa/cuda.h"
 #include "soa/field.h"
-#include "soa/inlined_dynamic_array_field.h"
+#include "soa/partially_inlined_array_field.h"
 #include "soa/storage.h"
 #include "soa/util.h"
 
@@ -98,17 +98,16 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // This struct serves as a namespace and contains array field types.
   struct array {
     template<typename T, size_t N, int Offset>
-    using aos = ikra::soa::AosArrayField_<std::array<T, N>, T, N, Capacity,
-                                          Offset, AddressMode,
-                                          kStorageMode, LayoutMode, Self>;
+    using aos = ikra::soa::ArrayObjectField_<std::array<T, N>, T, N, Capacity,
+                                             Offset, AddressMode,
+                                             kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t N, int Offset>
-    using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
-                                          Offset, AddressMode,
-                                          kStorageMode, LayoutMode, Self>;
+    using soa = ikra::soa::FullyInlinedArrayField_<
+        T, N, Capacity, Offset, AddressMode, kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
-    using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
+    using inline_soa = ikra::soa::PartiallyInlinedArrayField_<
         T, InlineSize, Capacity, Offset, AddressMode,
         kStorageMode, LayoutMode, Self>;
   };

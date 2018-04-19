@@ -21,10 +21,10 @@ template<typename T,
          int StorageMode,
          int LayoutMode,
          class Owner>
-class AosArrayField_ {
+class ArrayObjectField_ {
  private:
-  using Self = AosArrayField_<T, B, ArraySize, Capacity, Offset, AddressMode,
-                              StorageMode, LayoutMode, Owner>;
+  using Self = ArrayObjectField_<T, B, ArraySize, Capacity, Offset,
+                                 AddressMode, StorageMode, LayoutMode, Owner>;
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
 
@@ -49,7 +49,7 @@ class AosArrayField_ {
 };
 
 // Class for field declarations of type array. B is the base type of the array.
-// This class is the SoA counter part of AosArrayField_. Array slots are
+// This class is the SoA counter part of ArrayObjectField_. Array slots are
 // layouted as if they were SoA fields (columns).
 template<typename B,
          size_t ArraySize,
@@ -59,10 +59,11 @@ template<typename B,
          int StorageMode,
          int LayoutMode,
          class Owner>
-class SoaArrayField_ {
+class FullyInlinedArrayField_ {
  private:
-  using Self = SoaArrayField_<B, ArraySize, Capacity, Offset,
-                              AddressMode, StorageMode, LayoutMode, Owner>;
+  using Self = FullyInlinedArrayField_<B, ArraySize, Capacity, Offset,
+                                       AddressMode, StorageMode,
+                                       LayoutMode, Owner>;
 
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
