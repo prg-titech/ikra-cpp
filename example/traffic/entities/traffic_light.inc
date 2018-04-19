@@ -123,6 +123,7 @@ class TrafficLight : public SoaLayout<
   // Number of signal groups.
   // [ PADDING = 12 ]
   uint32_t_ num_signal_groups_;
+  __device__ uint32_t num_signal_groups() const { return num_signal_groups_; }
 
   // Signal groups controlled by this traffic lights.
   // [ PADDING = 16 ]

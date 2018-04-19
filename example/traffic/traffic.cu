@@ -26,27 +26,55 @@ class Car;
 #include "entities/simulation.inc"
 #include "simulation_converter.inc"
 
-__global__ void print_velocity_histogram() {
-  int counter[50];
-  int inactive = 0;
+#define STRINGIFY(val) #val
 
-  for (int i = 0; i < 50; ++i) {
-    counter[i] = 0;
-  }
+#define PRINT_HISTORAM(class, function, maxval) \
+{ \
+  printf("------------------------------------------------\n"); \
+  int counter[maxval];\
+  uint64_t sum = 0; \
+  uint64_t squared_sum = 0; \
+  for (int i = 0; i < maxval; ++i) { \
+    counter[i] = 0; \
+  } \
+  for (uint32_t i = 0; i < class::size(); ++i) { \
+    counter[class::get(i)->function()]++; \
+    sum += class::get(i)->function(); \
+    squared_sum += class::get(i)->function() * class::get(i)->function(); \
+  } \
+  for (int i = 0; i < maxval; ++i) { \
+    if (counter[i] > 0) { \
+      printf(STRINGIFY(class) "::" STRINGIFY(function) "[%i] = %i  [ %f % ]\n", \
+             i, counter[i], (float) counter[i] * 100.0f / class::size()); \
+    } \
+  } \
+  double mean = sum / (double) class::size(); \
+  double variance = (squared_sum - class::size() * mean * mean) \
+      / (class::size() - 1.0f); \
+  printf("Mean = %f,   Variance = %f,   stddev = %f\n", \
+         mean, variance, sqrt(variance)); \
+}
 
-  for (int i = 0; i < Car::size(); ++i) {
-    counter[Car::get(i)->velocity()]++;
-    if (!Car::get(i)->is_active()) {
-      inactive++;
-    }
-  }
+__global__ void print_histograms_1() {
+  PRINT_HISTORAM(Car, velocity, 50);
+  PRINT_HISTORAM(Car, max_velocity, 50);
+}
 
-  for (int i = 0; i < 50; ++i) {
-    if (counter[i] > 0) {
-      printf("velocity[%i] = %i\n", i, counter[i]);
-    }
-  }
-  printf("Inactive cars: %i\n", inactive);
+__global__ void print_histograms_2() {
+  PRINT_HISTORAM(SharedSignalGroup, num_cells, 50);
+  PRINT_HISTORAM(TrafficLight, num_signal_groups, 50);
+}
+
+__global__ void print_histograms_3() {
+  PRINT_HISTORAM(Cell, num_incoming_cells, 50);
+}
+
+__global__ void print_histograms_4() {
+  PRINT_HISTORAM(Cell, num_outgoing_cells, 50);
+}
+
+__global__ void print_histograms_5() {
+  PRINT_HISTORAM(Cell, street_max_velocity, 50);
 }
 
 __global__ void caluclate_checksum() {
@@ -175,7 +203,15 @@ int main(int argc, char** argv) {
   load_simulation(argc, argv, kNumCars);
   benchmark();
 
-  print_velocity_histogram<<<1, 1>>>();
+  print_histograms_1<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
+  print_histograms_2<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
+  print_histograms_3<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
+  print_histograms_4<<<1, 1>>>();
+  gpuErrchk(cudaDeviceSynchronize());
+  print_histograms_5<<<1, 1>>>();
   gpuErrchk(cudaDeviceSynchronize());
   caluclate_checksum<<<1,1>>>();
   gpuErrchk(cudaDeviceSynchronize());

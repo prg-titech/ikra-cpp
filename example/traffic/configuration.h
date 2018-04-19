@@ -44,12 +44,15 @@ static const uint32_t kArrInlineSignalGroupCells = 4;
 static const uint32_t kArrInlineTrafficLightSignalGroups = 4;
 
 // Sizes of arena.
-static const uint32_t kCellArenaSize = kNumCells*4*sizeof(Cell*);
-static const uint32_t kCarArenaSize = kNumCars*20*sizeof(Cell*);
+// Worse case: avg = 1.05 each, so share 3 slots/instance.
+static const uint32_t kCellArenaSize = kNumCells*3*sizeof(Cell*);
+// Worse case: avg is around 20.
+static const uint32_t kCarArenaSize = kNumCars*21*sizeof(Cell*);
 static const uint32_t kSharedSignalGroupArenaSize =
     kNumSharedSignalGroups*4*sizeof(Cell*);
+// Worse case: ~40% have 4 signal groups or more.
 static const uint32_t kTrafficLightArenaSize =
-    kNumTrafficLights*8*sizeof(SharedSignalGroup*);
+    kNumTrafficLights*3*sizeof(SharedSignalGroup*);
 static const uint32_t kPriorityCtrlArenaSize = 0;
 
 // Types of arrays.
