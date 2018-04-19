@@ -21,7 +21,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST> {
 
   int_ field0;
 
-  array_(int, ARRAY_SIZE, aos) field1;
+  array_(int, ARRAY_SIZE, object) field1;
 
   int_ field2;
 

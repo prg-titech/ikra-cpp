@@ -28,7 +28,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
 
   int_ field0;
 
-  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
+  array_(int, INLINE_ARR_SIZE, partially_inlined) field1;
 
   int_ field2;
 

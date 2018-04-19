@@ -22,8 +22,8 @@ class TestClass : public SoaLayout<TestClass, 1000> {
     field1[1] = f1[1];
   }
 
-  array_(double, 2) field0;
-  array_(double, 2) field1;
+  array_(double, 2, fully_inlined) field0;
+  array_(double, 2, fully_inlined) field1;
 
   __device__ void add_fields() {
     field0[0] = field0[0] + field0[1] + field1[0] + field1[1];

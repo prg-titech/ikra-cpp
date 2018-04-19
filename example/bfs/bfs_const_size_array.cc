@@ -65,8 +65,8 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices> {
   int_ distance_ = std::numeric_limits<int>::max();
   int_ adj_list_size_;
 
-  // By default a SOA array.
-  array_(Vertex*, kMaxDegree) adj_list_;
+  // A fully inlined SOA array.
+  array_(Vertex*, kMaxDegree, fully_inlined) adj_list_;
 };
 
 IKRA_HOST_STORAGE(Vertex)

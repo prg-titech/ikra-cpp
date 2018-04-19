@@ -43,18 +43,18 @@ static const uint32_t kPriorityCtrlArenaSize = 0;
 // #define ARRAY_PRIORITY_CTRL_IS_PARTIAL
 
 #define ARRAY_CELL_INCOMING \
-    array_(Cell*, kArrInlineIncomingCells, inline_soa)
+    array_(Cell*, kArrInlineIncomingCells, partially_inlined)
 #define ARRAY_CELL_OUTGOING \
-    array_(Cell*, kArrInlineOutgoingCells, inline_soa)
+    array_(Cell*, kArrInlineOutgoingCells, partially_inlined)
 #define ARRAY_CAR_PATH \
-    array_(Cell*, 16, aos)
+    array_(Cell*, 16, object)
 #define ARRAY_SIGNAL_GROUP_CELLS \
-    array_(Cell*, kArrInlineSignalGroupCells, inline_soa)
+    array_(Cell*, kArrInlineSignalGroupCells, partially_inlined)
 #define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \
-    array_(SharedSignalGroup*, kArrInlineTrafficLightSignalGroups, inline_soa)
+    array_(SharedSignalGroup*, kArrInlineTrafficLightSignalGroups, partially_inlined)
 
 // Priority controller have always two signal groups.
 #define ARRAY_PRIORITY_CTRL_SIGNAL_GROUPS \
-    array_(SharedSignalGroup*, 2, soa)
+    array_(SharedSignalGroup*, 2, fully_inlined)
 
 #endif  // EXAMPLE_TRAFFIC_CONFIGURATION_H

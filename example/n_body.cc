@@ -49,9 +49,9 @@ class Body : public SoaLayout<Body, kNumBodies> {
   }
 
   double_ mass_;
-  array_(double, 2) position_;
-  array_(double, 2) velocity_;
-  array_(double, 2) force_;
+  array_(double, 2, fully_inlined) position_;
+  array_(double, 2, fully_inlined) velocity_;
+  array_(double, 2, fully_inlined) force_;
 
   void add_force(Body* body) {
     if (this == body) return;

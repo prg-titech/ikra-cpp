@@ -58,7 +58,7 @@ class Well : public SoaLayout<Well, kNumWells> {
   }
 
   double_ mass_;
-  array_(double, 2) position_;
+  array_(double, 2, fully_inlined) position_;
 };
 
 IKRA_HOST_STORAGE(Well)
@@ -78,9 +78,9 @@ class Particle : public SoaLayout<Particle, kNumParticles> {
   }
 
   double_ mass_;
-  array_(double, 2) position_;
-  array_(double, 2) velocity_;
-  array_(double, 2) force_;
+  array_(double, 2, fully_inlined) position_;
+  array_(double, 2, fully_inlined) velocity_;
+  array_(double, 2, fully_inlined) force_;
 
   void add_force(Well* well) {
     double EPS = 3e4;    // Softening parameter (just to avoid infinities).

@@ -43,7 +43,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
 
   int_ field2;
 
-  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
+  array_(int, INLINE_ARR_SIZE, partially_inlined) field1;
 
   __device__ void update_field1(int increment) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {

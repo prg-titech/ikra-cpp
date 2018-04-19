@@ -98,16 +98,16 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // This struct serves as a namespace and contains array field types.
   struct array {
     template<typename T, size_t N, int Offset>
-    using aos = ikra::soa::ArrayObjectField_<std::array<T, N>, T, N, Capacity,
-                                             Offset, AddressMode,
-                                             kStorageMode, LayoutMode, Self>;
+    using object = ikra::soa::ArrayObjectField_<
+        std::array<T, N>, T, N, Capacity, Offset, AddressMode,
+        kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t N, int Offset>
-    using soa = ikra::soa::FullyInlinedArrayField_<
+    using fully_inlined = ikra::soa::FullyInlinedArrayField_<
         T, N, Capacity, Offset, AddressMode, kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
-    using inline_soa = ikra::soa::PartiallyInlinedArrayField_<
+    using partially_inlined = ikra::soa::PartiallyInlinedArrayField_<
         T, InlineSize, Capacity, Offset, AddressMode,
         kStorageMode, LayoutMode, Self>;
   };

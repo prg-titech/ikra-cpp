@@ -7,11 +7,11 @@ class IKRA_TEST_CLASSNAME
   int_ field0;
 
   // Array has size 12 bytes.
-  array_(int, 3, aos) field1;
+  array_(int, 3, object) field1;
   int_ field2;
 
   // Array has size 12 bytes.
-  array_(int, 3) field3;
+  array_(int, 3, fully_inlined) field3;
   int_ field4;
 
   int field1_sum() {
