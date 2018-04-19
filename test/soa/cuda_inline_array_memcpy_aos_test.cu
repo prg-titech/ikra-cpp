@@ -26,8 +26,9 @@ using ikra::soa::kAddressModeZero;
 // Number of array elements stored in inline storage.
 #define INLINE_ARR_SIZE (ARRAY_SIZE - READ_FROM_ARENA_ELEMENTS)
 
+// TODO: Alignment is broken in AOS mode.
 class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
-    StaticStorageWithArena<EXTRA_BYTES>, ikra::soa::kLayoutModeSoa> {
+    StaticStorageWithArena<EXTRA_BYTES>, ikra::soa::kLayoutModeAos> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -40,9 +41,9 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
 
   int_ field0;
 
-  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
-
   int_ field2;
+
+  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
 
   __device__ void update_field1(int increment) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
@@ -76,6 +77,6 @@ void run_test_construct_and_execute() {
   }
 }
 
-TEST(CudaInlineArrayMemcpyTest, ConstructAndExecute) {
+TEST(CudaInlineArrayMemcpyAosTest, ConstructAndExecute) {
   run_test_construct_and_execute();
 }
