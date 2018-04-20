@@ -9,3 +9,5 @@ add_executable(n_body n_body.cc)
 target_link_libraries(n_body ikra ${SDL2_LIBRARIES})
 
 add_subdirectory(bfs)
+
+add_subdirectory(traffic)

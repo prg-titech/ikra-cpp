@@ -19,11 +19,12 @@ template<typename T,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner>
-class AosArrayField_ {
+class ArrayObjectField_ {
  private:
-  using Self = AosArrayField_<T, B, ArraySize, Capacity, Offset, AddressMode,
-                              StorageMode, Owner>;
+  using Self = ArrayObjectField_<T, B, ArraySize, Capacity, Offset,
+                                 AddressMode, StorageMode, LayoutMode, Owner>;
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
 
@@ -48,7 +49,7 @@ class AosArrayField_ {
 };
 
 // Class for field declarations of type array. B is the base type of the array.
-// This class is the SoA counter part of AosArrayField_. Array slots are
+// This class is the SoA counter part of ArrayObjectField_. Array slots are
 // layouted as if they were SoA fields (columns).
 template<typename B,
          size_t ArraySize,
@@ -56,11 +57,13 @@ template<typename B,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner>
-class SoaArrayField_ {
+class FullyInlinedArrayField_ {
  private:
-  using Self = SoaArrayField_<B, ArraySize, Capacity, Offset,
-                              AddressMode, StorageMode, Owner>;
+  using Self = FullyInlinedArrayField_<B, ArraySize, Capacity, Offset,
+                                       AddressMode, StorageMode,
+                                       LayoutMode, Owner>;
 
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
@@ -94,9 +97,11 @@ class SoaArrayField_ {
     return reinterpret_cast<B*>(p_result);
   }
 
-  template<size_t Pos, int A = AddressMode, int S = StorageMode>
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
 
@@ -116,6 +121,19 @@ class SoaArrayField_ {
 #endif  // __clang__
 
     return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<size_t Pos, int A = AddressMode, int S = StorageMode,
+           int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr() const {
+    static_assert(Pos < ArraySize, "Array index out of bounds.");
+
+    B* inner_array = reinterpret_cast<B*>(
+        reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+    return inner_array + Pos;
   }
 
   template<size_t Pos, int A = AddressMode, int S = StorageMode>
@@ -144,9 +162,10 @@ class SoaArrayField_ {
     return reinterpret_cast<B*>(p_result);
   }
 
-  template<int A = AddressMode, int S = StorageMode>
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                          S == kStorageModeStatic, B*>::type
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeSoa, B*>::type
   array_data_ptr(size_t pos) const {
     assert(pos < ArraySize);
 
@@ -160,6 +179,18 @@ class SoaArrayField_ {
                                         + pos*sizeof(B)*(Capacity+1));
 
     return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                          S == kStorageModeStatic &&
+                                          L == kLayoutModeAos, B*>::type
+  array_data_ptr(size_t pos) const {
+    assert(pos < ArraySize);
+
+    B* inner_array = reinterpret_cast<B*>(
+        reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
+    return inner_array + pos;
   }
 
   template<int A = AddressMode, int S = StorageMode>

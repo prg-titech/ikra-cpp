@@ -27,12 +27,12 @@ using ikra::soa::kAddressModeZero;
 #define INLINE_ARR_SIZE (ARRAY_SIZE - READ_FROM_ARENA_ELEMENTS)
 
 class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
-    StaticStorageWithArena<EXTRA_BYTES>> {
+    StaticStorageWithArena<EXTRA_BYTES>, ikra::soa::kLayoutModeSoa> {
  public:
   IKRA_INITIALIZE_CLASS
 
-  __host__ __device__ DummyClass(int f0, int f2): field0(f0), field2(f2),
-                                         field1(ARRAY_SIZE) {
+  __host__ __device__ DummyClass(int f0, int f2) : field0(f0), field2(f2),
+                                                   field1(ARRAY_SIZE) {
     for (int i = 0; i < ARRAY_SIZE; ++i) {
       field1[i] = id()*17 + i;
     }
@@ -40,7 +40,7 @@ class DummyClass : public SoaLayout<DummyClass, NUM_INST, kAddressModeZero,
 
   int_ field0;
 
-  array_(int, INLINE_ARR_SIZE, inline_soa) field1;
+  array_(int, INLINE_ARR_SIZE, partially_inlined) field1;
 
   int_ field2;
 
@@ -79,4 +79,3 @@ void run_test_construct_and_execute() {
 TEST(CudaInlineArrayMemcpyTest, ConstructAndExecute) {
   run_test_construct_and_execute();
 }
-

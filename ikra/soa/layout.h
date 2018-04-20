@@ -8,7 +8,7 @@
 #include "soa/constants.h"
 #include "soa/cuda.h"
 #include "soa/field.h"
-#include "soa/inlined_dynamic_array_field.h"
+#include "soa/partially_inlined_array_field.h"
 #include "soa/storage.h"
 #include "soa/util.h"
 
@@ -42,7 +42,8 @@ struct SizeNDummy {
 template<class Self,
          IndexType UserCapacity,
          int AddressMode = kAddressModeZero,
-         class StorageStrategy = StaticStorage>
+         class StorageStrategy = StaticStorage,
+         int LayoutMode = kLayoutModeSoa>
 class SoaLayout : SizeNDummy<AddressMode> {
  private:
   // Calculate real capacity of the container, such that its size is a multiple
@@ -68,6 +69,11 @@ class SoaLayout : SizeNDummy<AddressMode> {
       sizeof(AddressingModeCompilerCheck<AddressMode>) == AddressMode,
       "Selected addressing mode not supported by compiler.");
 
+  // AOS layout is only for reference and not fully implemented.
+  static_assert(LayoutMode == kLayoutModeSoa || 
+      (AddressMode == kAddressModeZero && kStorageMode == kStorageModeStatic),
+      "AOS layout allowed only in zero addressing mode with static storage.");
+
   __ikra_host_device__ static constexpr Storage& storage() {
     return *reinterpret_cast<Storage*>(Self::storage_buffer()); 
   }
@@ -75,31 +81,35 @@ class SoaLayout : SizeNDummy<AddressMode> {
   // Define a Field_ alias as a shortcut.
   template<typename T, int Offset>
   using Field = Field_<T, Capacity, Offset, AddressMode,
-                       kStorageMode, Self>;
+                       kStorageMode, LayoutMode, Self>;
 
   // Generate field types. Implement more types as necessary.
+  // TODO: Can this be merged with field_type_generator.h?
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(bool)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(char)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(double)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(float)
   IKRA_DEFINE_LAYOUT_FIELD_TYPE(int)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint8_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint16_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint32_t)
+  IKRA_DEFINE_LAYOUT_FIELD_TYPE(uint64_t)
 
   // This struct serves as a namespace and contains array field types.
   struct array {
     template<typename T, size_t N, int Offset>
-    using aos = ikra::soa::AosArrayField_<std::array<T, N>, T, N, Capacity,
-                                          Offset, AddressMode,
-                                          kStorageMode, Self>;
+    using object = ikra::soa::ArrayObjectField_<
+        std::array<T, N>, T, N, Capacity, Offset, AddressMode,
+        kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t N, int Offset>
-    using soa = ikra::soa::SoaArrayField_<T, N, Capacity,
-                                          Offset, AddressMode,
-                                          kStorageMode, Self>;
+    using fully_inlined = ikra::soa::FullyInlinedArrayField_<
+        T, N, Capacity, Offset, AddressMode, kStorageMode, LayoutMode, Self>;
 
     template<typename T, size_t InlineSize, int Offset>
-    using inline_soa = ikra::soa::SoaInlinedDynamicArrayField_<
+    using partially_inlined = ikra::soa::PartiallyInlinedArrayField_<
         T, InlineSize, Capacity, Offset, AddressMode,
-        kStorageMode, Self>;
+        kStorageMode, LayoutMode, Self>;
   };
 
   static const int kAddressMode = AddressMode;
@@ -189,13 +199,32 @@ class SoaLayout : SizeNDummy<AddressMode> {
 
   // Return a pointer to an object by ID (assuming zero addressing mode).
   // TODO: This method should be private!
-  template<int A = AddressMode>
+  template<int A = AddressMode, int L = LayoutMode>
   __ikra_device__
-  static typename std::enable_if<A == kAddressModeZero, Self*>::type
+  static typename std::enable_if<A == kAddressModeZero &&
+                                 L == kLayoutModeSoa, Self*>::type
   get_(IndexType id) {
     // Start counting from 1 internally.
     assert(id > 0);
     return reinterpret_cast<Self*>(id);
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__
+  static typename std::enable_if<A == kAddressModeZero &&
+                                 L == kLayoutModeAos, Self*>::type
+  get_(IndexType id) {
+    // Start counting from 1 internally.
+    assert(id > 0);
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<Storage>::value;
+    constexpr auto cptr_storage_buffer = Self::storage_buffer();
+    char* buffer_location = reinterpret_cast<char*>(
+        cptr_storage_buffer + cptr_data_offset);
+
+    return reinterpret_cast<Self*>(buffer_location
+        + id*Self::ObjectSize::value);
   }
 
   // Return an iterator pointing to the first instance of this class.
@@ -219,11 +248,28 @@ class SoaLayout : SizeNDummy<AddressMode> {
   }
 
   // Calculate the ID of this object (assuming zero addressing mode).
-  template<int A = AddressMode>
+  template<int A = AddressMode, int L = LayoutMode>
   __ikra_device__
-  typename std::enable_if<A == kAddressModeZero, IndexType>::type 
+  typename std::enable_if<A == kAddressModeZero &&
+                          L == kLayoutModeSoa, IndexType>::type 
   id() const {
     return reinterpret_cast<uintptr_t>(this) - 1;
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__
+  typename std::enable_if<A == kAddressModeZero &&
+                          L == kLayoutModeAos, IndexType>::type 
+  id() const {
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<Storage>::value;
+    constexpr auto cptr_storage_buffer = Self::storage_buffer();
+    uintptr_t buffer_location = reinterpret_cast<uintptr_t>(
+        cptr_storage_buffer + cptr_data_offset);
+    auto buffer_offset = reinterpret_cast<uintptr_t>(this) - buffer_location;
+
+    assert(buffer_offset % Self::ObjectSize::value == 0);
+    return buffer_offset / Self::ObjectSize::value  - 1;
   }
 
 #ifdef __CUDACC__

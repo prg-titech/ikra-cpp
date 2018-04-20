@@ -12,6 +12,9 @@ using ikra::soa::SoaLayout;
 using ikra::soa::kAddressModeZero;
 using ikra::soa::DynamicStorage;
 using ikra::soa::StaticStorage;
+using ikra::soa::kLayoutModeAos;
+using ikra::soa::kLayoutModeSoa;
+
 
 // Compiler flags determine addressing mode and storage strategy.
 #ifndef ADDRESS_MODE
@@ -22,10 +25,15 @@ using ikra::soa::StaticStorage;
 #error Storage strategy undefined
 #endif
 
+#ifndef LAYOUT_MODE
+#error Layout mode undefined
+#endif
+
 static const uint32_t kClassMaxInst = 0x1234;
 
 class TestClass : public SoaLayout<TestClass, kClassMaxInst,
-                                   ADDRESS_MODE, STORAGE_STRATEGY> {
+                                   ADDRESS_MODE, STORAGE_STRATEGY,
+                                   PP_CONCAT(kLayoutMode, LAYOUT_MODE)> {
  public:
   IKRA_INITIALIZE_CLASS
 
@@ -41,7 +49,23 @@ class TestClass : public SoaLayout<TestClass, kClassMaxInst,
   }
 };
 
-IKRA_HOST_STORAGE(TestClass)
+IKRA_HOST_STORAGE(TestClass);
+
+class TestClassCompare {
+ public:
+  int field0;
+  int field1;
+
+  void increase_field0() {
+    field0 *= 0x5555;
+  }
+
+  void increase_field1() {
+    field1 *= 0x4444;
+  }
+};
+
+TestClassCompare test_compare_array[kClassMaxInst];
 
 
 int main() {
@@ -91,4 +115,20 @@ void explicit_write_field0(uintptr_t id) {
 
 int explicit_read_field0(uintptr_t id) {
   return explicit_field0[id];
+}
+
+void explicit_write_field0_aos(TestClassCompare* obj) {
+  obj->field0 = 0x7777;
+}
+
+int explicit_read_field0_aos(TestClassCompare* obj) {
+  return obj->field0;
+}
+
+void explicit_write_field1_aos(TestClassCompare* obj) {
+  obj->field1 = 0x7777;
+}
+
+int explicit_read_field1_aos(TestClassCompare* obj) {
+  return obj->field1;
 }

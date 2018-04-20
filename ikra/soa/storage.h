@@ -14,6 +14,7 @@ constexpr char* class_name::storage_buffer() { \
   return __ ## class_name ## data_buffer; \
 } \
 /* Force instantiation of storage-specific kernel templates. */ \
+/* TODO: Does not work if macro is used inside a namespace. */ \
 template __global__ void \
     ::ikra::soa::allocate_in_arena_kernel<class_name::Storage>( \
         class_name::Storage*, size_t); \
@@ -108,11 +109,18 @@ class StorageStrategySelf {
     return size_;
   }
 
+  __ikra_device__ IndexType arena_utilization() const {
+    return reinterpret_cast<const Self*>(this)->arena_head_;
+  }
+
+  using uintptr_t_alt = unsigned long long int;
   __ikra_device__ IndexType increase_size(IndexType increment) {
-    // TODO: Make this operation atomic.
-    IndexType result = size_;
-    size_ += increment;
-    return result;
+    // TODO: Find out why this does not work with uintptr_t.
+    static_assert(sizeof(uintptr_t_alt) == sizeof(uintptr_t),
+        "Internal Error: Size mismatch!");
+    uintptr_t_alt* size_ptr = reinterpret_cast<uintptr_t_alt*>(&size_);
+    uintptr_t_alt incr = static_cast<uintptr_t_alt>(increment);
+    return atomic_add(size_ptr, incr);
   }
 #else
   // Running in CUDA mode on host.
@@ -127,6 +135,15 @@ class StorageStrategySelf {
     return host_size;
   }
 
+  __ikra_device__ IndexType arena_utilization() const {
+    // Copy utilization to host and return.
+    IndexType host_utilization;
+    cudaMemcpy(&host_utilization, &device_ptr()->arena_head_,
+               sizeof(IndexType), cudaMemcpyDeviceToHost);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+    return host_utilization;
+  }
+
   // Increase the instance counter on the device.
   // Note: This is a host function.
   IndexType increase_size(IndexType increment);
@@ -134,15 +151,15 @@ class StorageStrategySelf {
 
  protected:
 #ifdef __CUDA_ARCH__
-  static __device__ ArenaIndexType atomic_add(ArenaIndexType* addr,
-                                              ArenaIndexType increment) {
+  template<typename T>
+  static __device__ T atomic_add(T* addr, T increment) {
     return atomicAdd(addr, increment);
   }
 #else
-  static ArenaIndexType atomic_add(ArenaIndexType* addr,
-                                   ArenaIndexType increment) {
+  template<typename T>
+  static T atomic_add(T* addr, T increment) {
     // TODO: Make atomic for thread pool execution
-    ArenaIndexType r = *addr;
+    T r = *addr;
     *addr += increment;
     return r;
   }
@@ -204,6 +221,8 @@ class alignas(8) DynamicStorage_
     : public StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>> {
  private:
   using SuperT = StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>>;
+  friend class StorageStrategySelf<DynamicStorage_<OwnerT, ArenaSize>>;
+
  public:
   static const int kStorageMode = kStorageModeDynamic;
 
@@ -244,7 +263,8 @@ class alignas(8) DynamicStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_,
+                                       static_cast<ArenaIndexType>(bytes));
     return arena_base_ + new_head;
   }
 
@@ -261,7 +281,7 @@ class alignas(8) DynamicStorage_
 
   static const bool kIsStaticStorage = false;
 
- private:
+ protected:
   template<typename StorageClass>
   friend class StorageDataOffset;
 
@@ -283,6 +303,8 @@ class alignas(8) StaticStorage_
     : public StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>> {
  private:
   using SuperT = StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>>;
+  friend class StorageStrategySelf<StaticStorage_<OwnerT, ArenaSize>>;
+
  public:
   static const int kStorageMode = kStorageModeStatic;
 
@@ -295,7 +317,8 @@ class alignas(8) StaticStorage_
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
     assert(arena_head_ + bytes < ArenaSize);
-    auto new_head = SuperT::atomic_add(&arena_head_, bytes);
+    auto new_head = SuperT::atomic_add(&arena_head_,
+                                       static_cast<ArenaIndexType>(bytes));
     return arena_base_ + new_head;
   }
 
@@ -307,7 +330,7 @@ class alignas(8) StaticStorage_
 
   static const bool kIsStaticStorage = true;
 
- private:
+ protected:
   template<typename StorageClass>
   friend class StorageDataOffset;
 

@@ -1,6 +1,8 @@
 class IKRA_TEST_CLASSNAME : public SoaLayout<IKRA_TEST_CLASSNAME,
                                              kClassMaxInst,
-                                             IKRA_TEST_ADDRESS_MODE> {
+                                             IKRA_TEST_ADDRESS_MODE,
+                                             StaticStorage,
+                                             IKRA_TEST_LAYOUT_MODE> {
  public:
   IKRA_INITIALIZE_CLASS
 

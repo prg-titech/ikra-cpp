@@ -71,10 +71,15 @@ Self& operator=(T value) {
 #endif  // __CUDA_ARCH__
 
 protected:
+__ikra_device__ T* data_ptr() const {
+  return data_ptr_uninitialized();
+}
+
 // Calculate the address of this field based on the "this" pointer of this
 // Field instance.
-template<int A = AddressMode>
-__ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
+template<int A = AddressMode, int L = LayoutMode>
+__ikra_device__ typename std::enable_if<A != kAddressModeZero &&
+                                        L == kLayoutModeSoa, T*>::type
 data_ptr_uninitialized() const {
   auto p_this = reinterpret_cast<uintptr_t>(this);
   auto p_base = reinterpret_cast<uintptr_t>(Owner::storage().data_ptr());
@@ -83,15 +88,22 @@ data_ptr_uninitialized() const {
   return reinterpret_cast<T*>(p_result);
 }
 
-template<int A = AddressMode>
-__ikra_device__ typename std::enable_if<A != kAddressModeZero, T*>::type
-data_ptr() const {
-  return data_ptr_uninitialized();
+// Calculate the address of this field based on the "this" pointer of this
+// Field instance.
+template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
+__ikra_device__ typename std::enable_if<A == kAddressModeZero &&
+                                        S == kStorageModeStatic &&
+                                        L == kLayoutModeAos, T*>::type
+data_ptr_uninitialized() const {
+  // TODO: Fix field alignment.
+  return reinterpret_cast<T*>(
+      reinterpret_cast<char*>(const_cast<Self*>(this)) + Offset);
 }
 
-template<int A = AddressMode, int S = StorageMode>
+template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                        S == kStorageModeStatic, T*>::type
+                                        S == kStorageModeStatic &&
+                                        L == kLayoutModeSoa, T*>::type
 data_ptr_uninitialized() const {
   // Use constant-folded value for address computation.
   constexpr auto cptr_data_offset =
@@ -113,9 +125,10 @@ data_ptr_uninitialized() const {
   return soa_array + reinterpret_cast<uintptr_t>(this);
 }
 
-template<int A = AddressMode, int S = StorageMode>
+template<int A = AddressMode, int S = StorageMode, int L = LayoutMode>
 __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
-                                        S == kStorageModeDynamic, T*>::type
+                                        S == kStorageModeDynamic &&
+                                        L == kLayoutModeSoa, T*>::type
 data_ptr_uninitialized() const {
   // Cannot constant fold dynamically allocated storage.
   auto p_base = Owner::storage().data_reference();
@@ -124,8 +137,3 @@ data_ptr_uninitialized() const {
       reinterpret_cast<uintptr_t>(this)*sizeof(T));
 }
 
-template<int A = AddressMode>
-__ikra_device__ typename std::enable_if<A == kAddressModeZero, T*>::type
-data_ptr() const {
-  return data_ptr_uninitialized();
-}

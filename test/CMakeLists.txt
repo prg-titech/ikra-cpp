@@ -36,3 +36,8 @@ include_directories(${CMAKE_SOURCE_DIR}/ikra ${gtest_SOURCE_DIR}/include ${gtest
 cuda_add_executable(cuda_inline_array_memcpy_test soa/cuda_inline_array_memcpy_test.cu)
 target_link_libraries(cuda_inline_array_memcpy_test gtest gtest_main ikra)
 add_test(cuda_inline_array_memcpy_test ${CMAKE_BINARY_DIR}/bin/cuda_inline_array_memcpy_test)
+
+include_directories(${CMAKE_SOURCE_DIR}/ikra ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+cuda_add_executable(cuda_inline_array_memcpy_aos_test soa/cuda_inline_array_memcpy_aos_test.cu)
+target_link_libraries(cuda_inline_array_memcpy_aos_test gtest gtest_main ikra)
+add_test(cuda_inline_array_memcpy_aos_test ${CMAKE_BINARY_DIR}/bin/cuda_inline_array_memcpy_aos_test)

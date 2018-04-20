@@ -23,10 +23,12 @@ template<typename T,
          uint32_t Offset,
          int AddressMode,
          int StorageMode,
+         int LayoutMode,
          class Owner>
 class Field_ {
  private:
-  using Self = Field_<T, Capacity, Offset, AddressMode, StorageMode, Owner>;
+  using Self = Field_<T, Capacity, Offset, AddressMode,
+                      StorageMode, LayoutMode, Owner>;
 
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
