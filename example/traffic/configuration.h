@@ -16,19 +16,30 @@ static const uint32_t kNumIterations = 1000;
 static const uint32_t kNumBenchmarkRuns = 1;
 
 // Number of objects.
-static const uint32_t kNumCells = 11433334; //7112859; //6428104;
+#ifdef LARGE_DATASET
+static const uint32_t kNumCells = 11433334;
 const uint32_t kNumCars = 250000;
 static const uint32_t kNumSharedSignalGroups = 344418;
 static const uint32_t kNumTrafficLights = 79437;
 static const uint32_t kNumPriorityCtrls = 6000;
+#else
+// Small dataset can run on my laptop.
+static const uint32_t kNumCells = 950778;
+const uint32_t kNumCars = 50000;
+static const uint32_t kNumSharedSignalGroups = 344418;
+static const uint32_t kNumTrafficLights = 8000;
+static const uint32_t kNumPriorityCtrls = 1000;
+#endif  // LARGE
 
 // Layout mode: SOA or AOS.
-static const int kCellLayoutMode = kLayoutModeSoa;
-static const int kCarLayoutMode = kLayoutModeSoa;
-static const int kSharedSignalGroupLayoutMode = kLayoutModeSoa;
-static const int kPriorityCtrlLayoutMode = kLayoutModeSoa;
-static const int kTrafficLightLayoutMode = kLayoutModeSoa;
+#define BENCH_LAYOUT_MODE kLayoutModeAos
+static const int kCellLayoutMode = BENCH_LAYOUT_MODE;
+static const int kCarLayoutMode = BENCH_LAYOUT_MODE;
+static const int kSharedSignalGroupLayoutMode = BENCH_LAYOUT_MODE;
+static const int kPriorityCtrlLayoutMode = BENCH_LAYOUT_MODE;
+static const int kTrafficLightLayoutMode = BENCH_LAYOUT_MODE;
 
+// Manual padding for AOS mode.
 static const uint32_t kCellAlignmentPadding = 2;
 static const uint32_t kCarAlignmentPadding = 7;
 static const uint32_t kSharedSignalGroupAlignmentPadding = 4;
