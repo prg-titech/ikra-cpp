@@ -16,12 +16,13 @@ static const uint32_t kNumIterations = 1000;
 static const uint32_t kNumBenchmarkRuns = 1;
 
 // Number of objects.
+#define LARGE_DATASET
 #ifdef LARGE_DATASET
-static const uint32_t kNumCells = 11433334;
+static const uint32_t kNumCells = 8339802;
 const uint32_t kNumCars = 250000;
-static const uint32_t kNumSharedSignalGroups = 344418;
-static const uint32_t kNumTrafficLights = 79437;
-static const uint32_t kNumPriorityCtrls = 6000;
+static const uint32_t kNumSharedSignalGroups = 205129;
+static const uint32_t kNumTrafficLights = 62819;
+static const uint32_t kNumPriorityCtrls = 4792;
 #else
 // Small dataset can run on my laptop.
 static const uint32_t kNumCells = 950778;
@@ -30,6 +31,13 @@ static const uint32_t kNumSharedSignalGroups = 344418;
 static const uint32_t kNumTrafficLights = 8000;
 static const uint32_t kNumPriorityCtrls = 1000;
 #endif  // LARGE
+
+// Maximum array sizes.
+static const uint32_t kMaxNumCellIncoming = 8;
+static const uint32_t kMaxNumCellOutgoing = 8;
+static const uint32_t kMaxNumCarPath = 30;
+static const uint32_t kMaxNumSharedSignalGroupCells = 8;
+static const uint32_t kMaxNumTrafficLightGroups = 6;
 
 // Layout mode: SOA or AOS.
 #define BENCH_LAYOUT_MODE kLayoutModeAos
@@ -47,12 +55,91 @@ static const uint32_t kPriorityCtrlAlignmentPadding = 4;
 // No padding required for traffic lights.
 // static const uint32_t kTrafficLightAlignmentPadding = 0;
 
-// Inlining sizes of arrays.
-static const uint32_t kArrInlineOutgoingCells = 4;
-static const uint32_t kArrInlineIncomingCells = 4;
-static const uint32_t kArrInlinePath = 5;
-static const uint32_t kArrInlineSignalGroupCells = 4;
-static const uint32_t kArrInlineTrafficLightSignalGroups = 4;
+// Dummy configuration
+#define BENCH_CELL_IN_M_OBJECT 1
+#define BENCH_CELL_OUT_M_OBJECT 1
+#define BENCH_CAR_M_OBJECT 1
+#define BENCH_SIGNAL_GROUP_M_OBJECT 1
+#define BENCH_TRAFFIC_LIGHT_M_OBJECT 1
+
+// Array configurations.
+#if BENCH_CELL_IN_M_PARTIAL == 1
+static const uint32_t kArrInlineIncomingCells = BENCH_CELL_IN_INLINE;   // 4
+#define ARRAY_CELL_INCOMING \
+    array_(Cell*, kArrInlineIncomingCells, partially_inlined)
+#define ARRAY_CELL_IN_IS_PARTIAL
+#elif BENCH_CELL_IN_M_OBJECT == 1
+#define ARRAY_CELL_INCOMING \
+    array_(Cell*, kMaxNumCellIncoming, object)
+#elif BENCH_CELL_IN_M_FULL == 1
+#define ARRAY_CELL_INCOMING \
+    array_(Cell*, kMaxNumCellIncoming, fully_inlined)
+#else
+#error Missing configuration for BENCH_CELL_IN
+#endif
+
+#if BENCH_CELL_OUT_M_PARTIAL == 1
+static const uint32_t kArrInlineOutgoingCells = BENCH_CELL_OUT_INLINE;   // 4
+#define ARRAY_CELL_OUTGOING \
+    array_(Cell*, kArrInlineOutgoingCells, partially_inlined)
+#define ARRAY_CELL_OUT_IS_PARTIAL
+#elif BENCH_CELL_OUT_M_OBJECT == 1
+#define ARRAY_CELL_OUTGOING \
+    array_(Cell*, kMaxNumCellOutgoing, object)
+#elif BENCH_CELL_OUT_M_FULL == 1
+#define ARRAY_CELL_OUTGOING \
+    array_(Cell*, kMaxNumCellOutgoing, fully_inlined)
+#else
+#error Missing configuration for BENCH_CELL_OUT
+#endif
+
+#if BENCH_CAR_M_PARTIAL == 1
+static const uint32_t kArrInlinePath = BENCH_CAR_INLINE;   // 5
+#define ARRAY_CAR_PATH \
+    array_(Cell*, kArrInlinePath, partially_inlined)
+#define ARRAY_CAR_IS_PARTIAL
+#elif BENCH_CAR_M_OBJECT == 1
+#define ARRAY_CAR_PATH \
+    array_(Cell*, kMaxNumCarPath, object)
+#elif BENCH_CAR_M_FULL == 1
+#define ARRAY_CAR_PATH \
+    array_(Cell*, kMaxNumCarPath, fully_inlined)
+#else
+#error Missing configuration for BENCH_CAR
+#endif
+
+#if BENCH_SIGNAL_GROUP_M_PARTIAL == 1
+static const uint32_t kArrInlineSignalGroupCells =
+    BENCH_SIGNAL_GROUP_INLINE;    // 4
+#define ARRAY_SIGNAL_GROUP_CELLS \
+    array_(Cell*, kArrInlineSignalGroupCells, partially_inlined)
+#define ARRAY_SIGNAL_GROUP_IS_PARTIAL
+#elif BENCH_SIGNAL_GROUP_M_OBJECT == 1
+#define ARRAY_SIGNAL_GROUP_CELLS \
+    array_(Cell*, kMaxNumSharedSignalGroupCells, object)
+#elif BENCH_SIGNAL_GROUP_M_FULL == 1
+#define ARRAY_SIGNAL_GROUP_CELLS \
+    array_(Cell*, kMaxNumSharedSignalGroupCells, fully_inlined)
+#else
+#error Missing configuration for BENCH_SIGNAL_GROUP
+#endif
+
+#if BENCH_TRAFFIC_LIGHT_M_PARTIAL == 1
+static const uint32_t kArrInlineTrafficLightSignalGroups =
+    BENCH_TRAFFIC_LIGHT_INLINE;    // 4
+#define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \
+    array_(SharedSignalGroup*, kArrInlineTrafficLightSignalGroups, \
+           partially_inlined)
+#define ARRAY_TRAFFIC_LIGHT_IS_PARTIAL
+#elif BENCH_TRAFFIC_LIGHT_M_OBJECT == 1
+#define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \
+    array_(SharedSignalGroup*, kMaxNumTrafficLightGroups, object)
+#elif BENCH_TRAFFIC_LIGHT_M_FULL == 1
+#define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \
+    array_(SharedSignalGroup*, kMaxNumTrafficLightGroups, fully_inlined)
+#else
+#error Missing configuration for BENCH_TRAFFIC_LIGHT
+#endif
 
 // Sizes of arena.
 // Worse case: avg = 1.05 each, so share 3 slots/instance.
@@ -66,24 +153,7 @@ static const uint32_t kTrafficLightArenaSize =
     kNumTrafficLights*3*sizeof(SharedSignalGroup*);
 static const uint32_t kPriorityCtrlArenaSize = 0;
 
-// Types of arrays.
-#define ARRAY_CELL_IS_PARTIAL
-//#define ARRAY_CAR_IS_PARTIAL
-#define ARRAY_SIGNAL_GROUP_IS_PARTIAL
-#define ARRAY_TRAFFIC_LIGHT_IS_PARTIAL
-// #define ARRAY_PRIORITY_CTRL_IS_PARTIAL
-
-#define ARRAY_CELL_INCOMING \
-    array_(Cell*, kArrInlineIncomingCells, partially_inlined)
-#define ARRAY_CELL_OUTGOING \
-    array_(Cell*, kArrInlineOutgoingCells, partially_inlined)
-#define ARRAY_CAR_PATH \
-    array_(Cell*, 16, fully_inlined)
-#define ARRAY_SIGNAL_GROUP_CELLS \
-    array_(Cell*, kArrInlineSignalGroupCells, partially_inlined)
-#define ARRAY_TRAFFIC_LIGHT_SIGNAL_GROUPS \
-    array_(SharedSignalGroup*, kArrInlineTrafficLightSignalGroups, partially_inlined)
-
+// Types of other arrays.
 // Priority controller have always two signal groups.
 #define ARRAY_PRIORITY_CTRL_SIGNAL_GROUPS \
     array_(SharedSignalGroup*, 2, fully_inlined)
