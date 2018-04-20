@@ -1,4 +1,6 @@
-#define STRINGIFY(val) #val
+
+#define STRINGIFY(s) STRINGIFY2(s)
+#define STRINGIFY2(val) #val
 
 #define PRINT_HISTORAM(class, function, maxval) \
 { \
@@ -90,7 +92,13 @@ void print_statistics(unsigned long time_cars, unsigned long time_controllers,
       + storage_TrafficLight + storage_PriorityCtrl;
 
   fprintf(stderr,
-      "%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%llu,%llu,%llu,%llu,%llu,%llu\n",
+      "%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%llu,%llu,%llu,%llu,%llu,%llu,"
+      STRINGIFY(BENCH_LAYOUT_MODE) ","
+      STRINGIFY(BENCH_CELL_IN_MODE) ","
+      STRINGIFY(BENCH_CELL_OUT_MODE) ","
+      STRINGIFY(BENCH_CAR_MODE) ","
+      STRINGIFY(BENCH_SIGNAL_GROUP_MODE) ","
+      STRINGIFY(BENCH_TRAFFIC_LIGHT_MODE) "\n",
       time_cars,
       time_controllers,
       time_total,

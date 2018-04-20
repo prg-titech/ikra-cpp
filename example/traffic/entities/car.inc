@@ -107,28 +107,20 @@ class Car : public SoaLayout<Car, kNumCars, kAddressModeZero,
 IKRA_DEVICE_STORAGE(Car);
 
 
-#ifndef MOVE_ONTO_LARGE_STREETS
-__device__ Cell* Car::next_step(Cell* position) {
-  // Random walk.
-  uint32_t num_cells = position->num_outgoing_cells();
-  return position->outgoing_cell(rand32(num_cells));
-}
-#else
 __device__ Cell* Car::next_step(Cell* position) {
   // Almost random walk.
   const uint32_t num_outgoing = position->num_outgoing_cells();
   assert(num_outgoing > 0);
 
+#ifdef MOVE_ONTO_LARGE_STREETS
   // Collect probabilities of outgoing cells.
   int prob_sum = 0;
   for (int i = 0; i < num_outgoing; ++i) {
     Cell* candidate = position->outgoing_cell(i);
 
     // More likely to drive onto larger roads.
-    int difference_type = candidate->type() - position->type();
-    int adjusted_difference =
-        (difference_type < 0 ? 0 : difference_type) + 1;
-    prob_sum += 100*adjusted_difference;
+    int difference = candidate->type() - position->type() + Cell::kMaxType;
+    prob_sum += 100*difference;
   }
 
   // Now choose a path randomly.
@@ -138,10 +130,8 @@ __device__ Cell* Car::next_step(Cell* position) {
     Cell* candidate = position->outgoing_cell(i);
 
     // More likely to drive onto larger roads.
-    int difference_type = candidate->type() - position->type();
-    int adjusted_difference =
-        (difference_type < 0 ? 0 : difference_type) + 1;
-    threshold += 100*adjusted_difference;
+    int difference = candidate->type() - position->type() + Cell::kMaxType;
+    threshold += 100*difference;
 
     if (rand_select < threshold) {
       assert(candidate != position);
@@ -151,8 +141,12 @@ __device__ Cell* Car::next_step(Cell* position) {
 
   // We should never end up here.
   assert(false);
-}
 #endif  // MOVE_ONTO_LARGE_STREETS
+
+  // Need some kind of return statement here.
+  return position->outgoing_cell(rand32(num_outgoing));
+}
+
 
 __device__ void Car::step_initialize_iteration() {
   // Reset calculated path. This forces cars with a random moving behavior to

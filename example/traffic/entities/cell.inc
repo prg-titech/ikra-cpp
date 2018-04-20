@@ -6,11 +6,13 @@ class Cell : public SoaLayout<Cell, kNumCells, kAddressModeZero,
 
   enum Type {
     // Sorted from smallest to largest.
+    kService,
     kResidential,
+    kUnclassified,
     kTertiary,
     kSecondary,
     kPrimary,
-    kMotorwayLink,
+    kTrunk,
     kMotorway,
 
     kMaxType
@@ -52,9 +54,12 @@ class Cell : public SoaLayout<Cell, kNumCells, kAddressModeZero,
                            Type type = kResidential)
       : max_velocity_(max_velocity), x_(x), y_(y), type_(type),
         num_incoming_cells_(num_incoming), num_outgoing_cells_(num_outgoing),
-#ifdef ARRAY_CELL_IS_PARTIAL
-        incoming_cells_(num_incoming), outgoing_cells_(num_outgoing),
-#endif  // ARRAY_CELL_IS_PARTIAL
+#ifdef ARRAY_CELL_OUT_IS_PARTIAL
+        outgoing_cells_(num_outgoing),
+#endif  // ARRAY_CELL_OUT_IS_PARTIAL
+#ifdef ARRAY_CELL_IN_IS_PARTIAL
+        incoming_cells_(num_incoming),
+#endif  // ARRAY_CELL_IN_IS_PARTIAL
         car_(car), is_free_(is_free), is_sink_(is_sink) {
     for (uint32_t i = 0; i < num_incoming; ++i) {
       incoming_cells_[i] = Cell::get_uninitialized(incoming[i]);

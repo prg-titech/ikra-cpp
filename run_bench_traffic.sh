@@ -1,42 +1,62 @@
 #!/bin/bash
-cmake -DCMAKE_BUILD_TYPE=Release -D num_cars=250000 CMakeLists.txt
-make
+# MODES: object == -1
+#        fully inlined == -2
 
-ERR_SF=$((
-(
-bin/traffic ~/Downloads/graphml_urbanized/San_Francisco--Oakland__CA_Urbanized_Area_78904.graphml
-) 1>/dev/null
-) 2>&1)
+function build_and_run() {
+  cmake -DCMAKE_BUILD_TYPE=Release \
+        -DBENCHMARK_MODE=1 \
+        -DBENCH_CELL_IN_MODE=$1 \
+        -DBENCH_CELL_OUT_MODE=$2 \
+        -DBENCH_CAR_MODE=$3 \
+        -DBENCH_SIGNAL_GROUP_MODE=$4 \
+        -DBENCH_TRAFFIC_LIGHT_MODE=$5 \
+        -DBENCH_LAYOUT_MODE=$6 \
+        CMakeLists.txt
+  make
 
+  output=$((
+  (
+    bin/traffic ~/Downloads/graphml_urbanized/Denver--Aurora__CO_Urbanized_Area_23527.graphml
+  ) 1>/dev/null
+  ) 2>&1)
 
-ERR_LOS=$((
-(
-bin/traffic ~/Downloads/graphml/0644000_Los_Angeles.graphml
-) 1>/dev/null
-) 2>&1)
+  echo ${output} >> result_bench.txt
+}
 
+for v_layout_mode in "kLayoutModeSoa" "kLayoutModeAos"
+do
+  # cell_in: [0; 8]
+  for i in $(seq -2 8)
+  do
+    build_and_run ${i} -2 -2 -2 -2 ${v_layout_mode}
+  done
 
-cmake -DCMAKE_BUILD_TYPE=Release -D num_cars=200000 CMakeLists.txt
-make
+  # cell_out: [0; 8]
+  for i in $(seq -2 8)
+  do
+    build_and_run -2 ${i} -2 -2 -2 ${v_layout_mode}
+  done
 
-ERR_NYC=$((
-(
-bin/traffic ~/Downloads/graphml/3651000_New_York.graphml
-) 1>/dev/null
-) 2>&1)
+  # car: [0; 30]
+  for i in $(seq -2 30)
+  do
+    build_and_run -2 -2 ${i} -2 -2 ${v_layout_mode}
+  done
 
-cmake -DCMAKE_BUILD_TYPE=Release -D num_cars=100000 CMakeLists.txt
-make
+  # signal group: [0; 8]
+  for i in $(seq -2 8)
+  do
+    build_and_run -2 -2 -2 ${i} -2 ${v_layout_mode}
+  done
 
-ERR_SD=$((
-(
-bin/traffic ~/Downloads/graphml/0666000_San_Diego.graphml
-) 1>/dev/null
-) 2>&1)
+  # traffic light [0; 6]
+  for i in $(seq -2 6)
+  do
+    build_and_run -2 -2 -2 -2 ${i} ${v_layout_mode}
+  done
 
+  build_and_run -1 -1 -1 -1 -1 ${v_layout_mode}
+  build_and_run -1 -1 -1 -1 -1 ${v_layout_mode}
+  build_and_run 3 3 5 4 4 ${v_layout_mode}
+done
 
-echo "SF, LOS, NYC, SD"
-echo $ERR_SF
-echo $ERR_LOS
-echo $ERR_NYC
-echo $ERR_SD
