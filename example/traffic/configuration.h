@@ -155,7 +155,7 @@ static const uint32_t kSharedSignalGroupArenaSize =
     kNumSharedSignalGroups*4*sizeof(Cell*);
 // Worse case: ~40% have 4 signal groups or more.
 static const uint32_t kTrafficLightArenaSize =
-    kNumTrafficLights*3*sizeof(SharedSignalGroup*);
+    kNumTrafficLights*4*sizeof(SharedSignalGroup*);
 static const uint32_t kPriorityCtrlArenaSize = 0;
 
 // Types of other arrays.
