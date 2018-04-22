@@ -48,12 +48,12 @@ struct Edge {
 class Vertex : public SoaLayout<Vertex, kMaxVertices,
   ikra::soa::kAddressModeZero, 
   ikra::soa::StaticStorageWithArena<1024*1024*500>,
-  ikra::soa::kLayoutModeAos> {
+  ikra::soa::kLayoutModeSoa> {
  public:
   IKRA_INITIALIZE_CLASS
 
   __device__ Vertex(int num_neighbors) : adj_list_size_(num_neighbors),
-      adj_list_(kMaxDegree) {
+      adj_list_(num_neighbors) {
     // If this check fails, we the dataset cannot be run with this
     // implementation.
     assert(num_neighbors <= kMaxDegree);
@@ -100,7 +100,7 @@ class Vertex : public SoaLayout<Vertex, kMaxVertices,
   int_ adj_list_size_;
 
   // A fully inlined SOA array.
-  array_(Vertex*, 0, partially_inlined) adj_list_;
+  array_(Vertex*, 10, partially_inlined) adj_list_;
 };
 
 IKRA_DEVICE_STORAGE(Vertex)
@@ -113,12 +113,25 @@ __global__ void reset_kernel() {
   }
 }
 
+__global__ void launch_kernel_measures(int iteration) {
+  unsigned int tid = blockIdx.x *blockDim.x + threadIdx.x;
+  if (tid < Vertex::size()) {
+    Vertex::get(tid)->visit(iteration);
+  }
+}
+
+Vertex* v_first;
+int num_vert;
 void run_measured() {
   for (int iteration = 0; iteration < 786; ++iteration) {
+    /*
     cuda_execute(&Vertex::visit,
-                 Vertex::get_uninitialized(0),
+                 v_first,
                  Vertex::size(),
                  iteration);
+                 */
+    //printf("%i\n",num_vert);
+    launch_kernel_measures<<<num_vert/1024+1, 1024>>>(iteration);
     cudaDeviceSynchronize();
   }
 }
@@ -179,6 +192,7 @@ int get_real_index(int id) {
 void load_file(const char* filename, IndexType num_vertices, IndexType num_edges) {
   ifstream file;
   file.open(filename);
+  num_vert = num_vertices;
 
   if (!file) {
     printf("Unable to open file: %s\n", filename);
@@ -240,9 +254,11 @@ int main(int argc, char* argv[]) {
 
   Vertex::initialize_storage();
   load_file(argv[1], atoi(argv[2]), atoi(argv[3]));
+  printf("Num vertices: %i\n", next_index);
   printf("Loading done!\n");
 
   // Start algorithm.
+  v_first = Vertex::get_uninitialized(0);
   run(atoi(argv[4]));
   printf("Processing done!\n");
 
