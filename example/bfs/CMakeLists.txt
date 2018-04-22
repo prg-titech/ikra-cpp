@@ -13,3 +13,7 @@ target_link_libraries(bfs_std_vector ikra)
 include_directories(${CMAKE_SOURCE_DIR}/ikra)
 cuda_add_executable(bfs_const_size_array_cuda bfs_const_size_array.cu)
 target_link_libraries(bfs_const_size_array_cuda ikra)
+
+include_directories(${CMAKE_SOURCE_DIR}/ikra)
+cuda_add_executable(bfs_bench bfs_bench.cu)
+target_link_libraries(bfs_bench ikra)
