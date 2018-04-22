@@ -48,7 +48,7 @@ static const uint32_t kPriorityCtrlAlignmentPadding = 4;
 // static const uint32_t kTrafficLightAlignmentPadding = 0;
 
 
-/*
+
 #if BENCHMARK_MODE != 1
 // Dummy configuration
 #define BENCH_CELL_IN_MODE -1
@@ -58,7 +58,7 @@ static const uint32_t kPriorityCtrlAlignmentPadding = 4;
 #define BENCH_TRAFFIC_LIGHT_MODE -1
 #define BENCH_LAYOUT_MODE kLayoutModeSoa
 #endif
-*/
+
 
 // Layout mode: SOA or AOS.
 static const int kCellLayoutMode = BENCH_LAYOUT_MODE;
