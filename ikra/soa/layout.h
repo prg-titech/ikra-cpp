@@ -113,6 +113,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
   };
 
   static const int kAddressMode = AddressMode;
+  static const int kLayoutMode = LayoutMode;
 
   // Create a new instance of this class. Data will be allocated inside
   // storage.data.
@@ -269,7 +270,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
     auto buffer_offset = reinterpret_cast<uintptr_t>(this) - buffer_location;
 
     assert(buffer_offset % Self::ObjectSize::value == 0);
-    return buffer_offset / Self::ObjectSize::value  - 1;
+    return buffer_offset / Self::ObjectSize::value - 1;
   }
 
 #ifdef __CUDACC__

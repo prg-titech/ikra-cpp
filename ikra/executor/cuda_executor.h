@@ -15,6 +15,8 @@ namespace cuda {
 
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
+using ikra::soa::kLayoutModeSoa;
+using ikra::soa::kLayoutModeAos;
 
 IndexType cuda_blocks_1d(IndexType length) {
   return (length + 256 - 1) / 256;
@@ -23,6 +25,39 @@ IndexType cuda_blocks_1d(IndexType length) {
 IndexType cuda_threads_1d(IndexType length) {
   return length < 256 ? length : 256;
 }
+
+// Translate pointers from host to device or vice versa. Only needed for AOS
+// mode.
+template<typename Owner>
+struct PointerTranslator {
+  template<int L = Owner::kLayoutMode>
+  static typename std::enable_if<L == kLayoutModeAos, Owner*>::type
+  host_to_device(Owner* ptr) {
+    // Convert pointer to device-side pointer.
+    return Owner::storage().translate_address_host_to_device(ptr);
+  }
+
+  template<int L = Owner::kLayoutMode>
+  static typename std::enable_if<L == kLayoutModeSoa, Owner*>::type
+  host_to_device(Owner* ptr) {
+    // Object pointers are the same on device and host in SOA mode.
+    return ptr;
+  }
+
+  template<int L = Owner::kLayoutMode>
+  static typename std::enable_if<L == kLayoutModeAos, Owner*>::type
+  device_to_host(Owner* ptr) {
+    // Convert pointer to device-side pointer.
+    return Owner::storage().translate_address_device_to_host(ptr);
+  }
+
+  template<int L = Owner::kLayoutMode>
+  static typename std::enable_if<L == kLayoutModeSoa, Owner*>::type
+  device_to_host(Owner* ptr) {
+    // Object pointers are the same on device and host in SOA mode.
+    return ptr;
+  }
+};
 
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
@@ -74,7 +109,7 @@ T* construct(size_t count, Args... args) {
                                                    args...);
   cudaThreadSynchronize();
 
-  return h_storage_data_head;
+  return PointerTranslator<T>::device_to_host(h_storage_data_head);
 }
 
 // Calls a device lambda function with an arbitrary number of arguments.
@@ -120,7 +155,8 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     };
     
     kernel_call_lambda<<<num_blocks, num_threads>>>(
-        invoke_function, first, num_objects, args...);
+        invoke_function, PointerTranslator<T>::host_to_device(first),
+        num_objects, args...);
     gpuErrchk(cudaDeviceSynchronize());
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
@@ -201,7 +237,8 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
     };
 
     kernel_call_lambda_collect_result<<<num_blocks, num_threads>>>(
-        invoke_function, d_result, first, num_objects, args...);
+        invoke_function, d_result,
+        PointerTranslator<T>::host_to_device(first), num_objects, args...);
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
 
