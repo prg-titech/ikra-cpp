@@ -4,6 +4,7 @@
 // Asserts active only in debug mode (NDEBUG).
 #include <cassert>
 #include <functional>
+#include <type_traits>
 
 #include "executor/util.h"
 #include "soa/constants.h"
@@ -16,6 +17,7 @@ namespace cuda {
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
 
+// TODO: These two functions should be within KernelConfiguration.
 IndexType cuda_blocks_1d(IndexType length) {
   return (length + 256 - 1) / 256;
 }
@@ -23,6 +25,54 @@ IndexType cuda_blocks_1d(IndexType length) {
 IndexType cuda_threads_1d(IndexType length) {
   return length < 256 ? length : 256;
 }
+
+class KernelConfiguration;
+
+class KernelConfigurationStrategy {
+ public:
+  // For SFINAE overload selection.
+  static const bool kIsConfigurationStrategy = true;
+};
+
+// Build a kernel configuration based on the number of objects.
+class DefaultKernelConfigurationStrategy : public KernelConfigurationStrategy {
+ public:
+  KernelConfiguration build_configuration(IndexType num_threads) const;
+};
+
+class KernelConfiguration {
+ public:
+  KernelConfiguration(IndexType num_blocks, IndexType num_threads,
+                      IndexType nested_replicated = 1)
+      : num_blocks_(num_blocks), num_threads_(num_threads),
+        nested_replicated_(nested_replicated) {
+    assert(nested_replicated <= num_threads);
+  }
+
+  KernelConfiguration(IndexType num_objects)
+      : KernelConfiguration(cuda_blocks_1d(num_objects),
+                            cuda_threads_1d(num_objects)) {}
+
+  IndexType num_blocks() const { return num_blocks_; }
+  IndexType num_threads() const { return num_threads_; }
+  IndexType nested_replicated() const { return nested_replicated_; }
+
+  static const DefaultKernelConfigurationStrategy standard;
+
+ private:
+  const IndexType num_blocks_;
+  const IndexType num_threads_;
+  const IndexType nested_replicated_;
+};
+
+KernelConfiguration DefaultKernelConfigurationStrategy::build_configuration(
+    IndexType num_threads) const {
+  return KernelConfiguration(num_threads);
+}
+
+// TODO: Not sure if it's a good idea to define this in a header file.
+const DefaultKernelConfigurationStrategy KernelConfiguration::standard =
+    DefaultKernelConfigurationStrategy();
 
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
@@ -105,11 +155,9 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  static void call(T* first, IndexType num_objects, Args... args)
+  static void call(const KernelConfiguration& config, T* first,
+                   IndexType num_objects, Args... args)
   {
-    IndexType num_blocks = cuda_blocks_1d(num_objects);
-    IndexType num_threads = cuda_threads_1d(num_objects);
-
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -119,38 +167,22 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       }
     };
     
-    kernel_call_lambda<<<num_blocks, num_threads>>>(
+    kernel_call_lambda<<<config.num_blocks(), config.num_threads()>>>(
         invoke_function, first, num_objects, args...);
     gpuErrchk(cudaDeviceSynchronize());
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
   // Invoke CUDA kernel on all objects.
-  static void call(Args... args) {
-    IndexType num_objects = T::size();
-    IndexType num_blocks = cuda_blocks_1d(num_objects);
-    IndexType num_threads = cuda_threads_1d(num_objects);
-
-    auto invoke_function = [] __device__ (Args... args) {
-      int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      if (tid < T::size()) {
-        auto* object = T::get(tid);
-        return (object->*func)(args...);
-      }
-    };
-
-    kernel_call_lambda<<<num_blocks, num_threads>>>(invoke_function, args...);
-    gpuErrchk(cudaDeviceSynchronize());
-    assert(cudaPeekAtLastError() == cudaSuccess);
+  static void call(const KernelConfiguration& config, Args... args) {
+    call(config, T::get(0), T::size(), args...);
   }
 
   // Invoke CUDA kernel on all objects. This is an optimized version where the
   // number of objects is a compile-time constant.
   template<IndexType num_objects>
-  static void call_fixed_size(Args... args) {
-    IndexType num_blocks = cuda_blocks_1d(num_objects);
-    IndexType num_threads = cuda_threads_1d(num_objects);
-
+  static void call_fixed_size(const KernelConfiguration& config,
+                              Args... args) {
     auto invoke_function = [] __device__ (Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
       if (tid < num_objects) {
@@ -159,9 +191,43 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       }
     };
 
-    kernel_call_lambda<<<num_blocks, num_threads>>>(invoke_function, args...);
+    kernel_call_lambda<<<config.num_blocks(), config.num_threads()>>>(
+        invoke_function, args...);
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
+  }
+
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
+  call(const Config& strategy, T* first, IndexType num_objects, Args... args) {
+    call(strategy.build_configuration(num_objects),
+         first, num_objects, args...);
+  }
+
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
+  call(const Config& strategy, Args... args) {
+    const IndexType num_objects = T::size();
+    call(strategy.build_configuration(num_objects), args...);
+  }
+
+  template<IndexType num_objects, typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
+  call(const Config& strategy, Args... args) {
+    call_fixed_size(strategy.build_configuration(num_objects), args...);
+  }
+
+  static void call(T* first, IndexType num_objects, Args... args) {
+    call(KernelConfiguration::standard, first, num_objects, args...);
+  }
+
+  static void call(Args... args) {
+    call(KernelConfiguration::standard, args...);
+  }
+
+  template<IndexType num_objects>
+  static void call_fixed_size(Args... args) {
+    call<num_objects>(KernelConfiguration::standard, args...);
   }
 };
 
@@ -181,15 +247,12 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  static R* call(T* first, IndexType num_objects, Args... args)
+  static R* call(const KernelConfiguration& config, T* first,
+                 IndexType num_objects, Args... args)
   {
     // Allocate memory for result of kernel run.
     R* d_result;
     cudaMalloc(&d_result, sizeof(R)*num_objects);
-
-    // Kernel configuration.
-    IndexType num_blocks = cuda_blocks_1d(num_objects);
-    IndexType num_threads = cuda_threads_1d(num_objects);
 
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
@@ -200,7 +263,8 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
       }
     };
 
-    kernel_call_lambda_collect_result<<<num_blocks, num_threads>>>(
+    kernel_call_lambda_collect_result<<<config.num_blocks(),
+                                        config.num_threads()>>>(
         invoke_function, d_result, first, num_objects, args...);
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
@@ -209,30 +273,30 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
+  static R* call(const KernelConfiguration& config, Args... args) {
+    return call(config, T::get(0), T::size(), args...);
+  }
+
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, R*>::type
+  call(const Config& strategy, T* first, IndexType num_objects, Args... args) {
+    return call(strategy.build_configuration(num_objects),
+                first, num_objects, args...);
+  }
+
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, R*>::type
+  call(const Config& strategy, Args... args) {
+    const IndexType num_objects = T::size();
+    return call(strategy.build_configuration(num_objects), args...);
+  }
+
+  static R* call(T* first, IndexType num_objects, Args... args) {
+    return call(KernelConfiguration::standard, first, num_objects, args...);
+  }
+
   static R* call(Args... args) {
-    // Kernel configuration.
-    IndexType num_objects = T::size();
-    IndexType num_blocks = cuda_blocks_1d(num_objects);
-    IndexType num_threads = cuda_threads_1d(num_objects);
-
-    // Allocate memory for result of kernel run.
-    R* d_result;
-    cudaMalloc(&d_result, sizeof(R)*num_objects);
-
-    auto invoke_function = [] __device__ (Args... args) {
-      int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      if (tid < T::size()) {
-        auto* object = T::get(tid);
-        return (object->*func)(args...);
-      }
-    };
-
-    kernel_call_lambda_collect_result<<<num_blocks, num_threads>>>(
-        invoke_function, d_result, args...);
-    cudaDeviceSynchronize();
-    assert(cudaPeekAtLastError() == cudaSuccess);
-
-    return d_result;
+    return call(KernelConfiguration::standard, args...);
   }
 };
 
@@ -250,9 +314,10 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
   template<typename Reducer>
-  static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
+  static R call(const KernelConfiguration& config, T* first,
+                IndexType num_objects, Reducer red, Args... args) {
     R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
-        ::call(first, num_objects, args...);
+        ::call(config, first, num_objects, args...);
 
     R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*num_objects));
     cudaMemcpy(h_result, d_result, sizeof(R)*num_objects,
@@ -273,26 +338,34 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
 
   // Invoke CUDA kernel on all objects.
   template<typename Reducer>
+  static R call(const KernelConfiguration& config, Reducer red, Args... args) {
+    return call(config, T::get(0), T::size(), red, args...);
+  }
+
+  template<typename Reducer, typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, R>::type
+  call(const Config& strategy, T* first, IndexType num_objects,
+       Reducer red, Args... args) {
+    return call(strategy.build_configuration(num_objects),
+                red, first, num_objects, args...);
+  }
+
+  template<typename Reducer, typename Config>
+  static typename std::enable_if<Config::kIsConfigurationStrategy, R>::type
+  call(const Config& strategy, Reducer red, Args... args) {
+    const IndexType num_objects = T::size();
+    return call(strategy.build_configuration(num_objects), red, args...);
+  }
+
+  template<typename Reducer>
+  static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
+    return call(KernelConfiguration::standard, first,
+                num_objects, red, args...);
+  }
+
+  template<typename Reducer>
   static R call(Reducer red, Args... args) {
-    R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
-        ::call(args...);
-    IndexType num_objects = T::size();
-
-    R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*num_objects));
-    cudaMemcpy(h_result, d_result, sizeof(R)*num_objects,
-               cudaMemcpyDeviceToHost);
-    cudaFree(d_result);
-    assert(cudaPeekAtLastError() == cudaSuccess);
-
-    // TODO: Not sure why but Reducer does work when code is moved to a
-    // separate method.
-    R accumulator = h_result[0];
-    for (IndexType i = 1; i < num_objects; ++i) {
-      accumulator = red(accumulator, h_result[i]);
-    }
-
-    free(h_result);
-    return accumulator;
+    return call(KernelConfiguration::standard, red, args...);
   }
 };
 
