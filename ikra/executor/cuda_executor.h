@@ -267,7 +267,7 @@ struct ExtractVirtualWarpSize {
         ::type::kVirtualWarpSize;
   }
 
-  // Default case.
+  // Default case. No virtual warp size specified.
   template<typename U = T>
   static constexpr typename std::enable_if<
       !std::is_base_of<KernelConfigurationStrategy, U>::value &&
