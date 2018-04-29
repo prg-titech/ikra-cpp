@@ -32,6 +32,7 @@ class KernelConfiguration {
   IndexType num_blocks() const { return num_blocks_; }
   IndexType num_threads() const { return num_threads_; }
 
+  static const bool kIsConfiguration = true;
   static const IndexType kVirtualWarpSize = VirtualWarpSize;
 
  private:
@@ -62,9 +63,12 @@ class StandardKernelConfigurationStrategy
   }
 };
 
-// TODO: Not sure if it's a good idea to define this in a header file.
-static const StandardKernelConfigurationStrategy kKernelConfigStandard =
-    StandardKernelConfigurationStrategy();
+// Contains factories for kernel configurations.
+struct KernelConfig {
+  static StandardKernelConfigurationStrategy standard() {
+    return StandardKernelConfigurationStrategy();
+  }
+};
 
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
@@ -95,9 +99,9 @@ __global__ void construct_kernel(IndexType base_id, IndexType num_objects,
   }
 }
 
-template<typename T, IndexType VirtualWarpSize, typename... Args>
-T* construct(const KernelConfiguration<VirtualWarpSize>& config,
-             size_t count, Args... args) {
+template<typename T, typename Config, typename... Args>
+typename std::enable_if<Config::kIsConfiguration, T*>::type
+construct(const Config& config, size_t count, Args... args) {
   assert(count > 0);
 
   // Increment class size. "h_storage_size" is the size (number of instances)
@@ -118,15 +122,15 @@ T* construct(const KernelConfiguration<VirtualWarpSize>& config,
   return h_storage_data_head;
 }
 
-template<typename T, typename Config, typename... Args>
-typename std::enable_if<Config::kIsConfigurationStrategy, T*>::type
-construct(const Config& strategy, size_t count, Args... args) {
+template<typename T, typename Strategy, typename... Args>
+typename std::enable_if<Strategy::kIsConfigurationStrategy, T*>::type
+construct(const Strategy& strategy, size_t count, Args... args) {
   return construct<T>(strategy.build_configuration(count), count, args...);
 }
 
 template<typename T, typename... Args>
 T* construct(size_t count, Args... args) {
-  return construct<T>(kKernelConfigStandard, count, args...);
+  return construct<T>(KernelConfig::standard(), count, args...);
 }
 
 // Calls a device lambda function with an arbitrary number of arguments.
@@ -157,9 +161,9 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  template<IndexType VirtualWarpSize>
-  static void call(const KernelConfiguration<VirtualWarpSize>& config,
-                   T* first, IndexType num_objects, Args... args)
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, void>::type
+  call(const Config& config, T* first, IndexType num_objects, Args... args)
   {
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
@@ -177,17 +181,17 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  template<IndexType VirtualWarpSize>
-  static void call(const KernelConfiguration<VirtualWarpSize>& config,
-                   Args... args) {
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, void>::type
+  call(const Config& config, Args... args) {
     call(config, T::get(0), T::size(), args...);
   }
 
   // Invoke CUDA kernel on all objects. This is an optimized version where the
   // number of objects is a compile-time constant.
-  template<IndexType num_objects, IndexType VirtualWarpSize>
-  static void call_fixed_size(
-      const KernelConfiguration<VirtualWarpSize>& config, Args... args) {
+  template<IndexType num_objects, typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, void>::type
+  call_fixed_size(const Config& config, Args... args) {
     auto invoke_function = [] __device__ (Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
       if (tid < num_objects) {
@@ -202,37 +206,41 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
-  template<typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
-  call(const Config& strategy, T* first, IndexType num_objects, Args... args) {
+  template<typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy,
+                                 void>::type
+  call(const Strategy& strategy, T* first, IndexType num_objects,
+       Args... args) {
     call(strategy.build_configuration(num_objects),
          first, num_objects, args...);
   }
 
-  template<typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
-  call(const Config& strategy, Args... args) {
+  template<typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy,
+                                 void>::type
+  call(const Strategy& strategy, Args... args) {
     const IndexType num_objects = T::size();
     call(strategy.build_configuration(num_objects), args...);
   }
 
-  template<IndexType num_objects, typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, void>::type
-  call(const Config& strategy, Args... args) {
+  template<IndexType num_objects, typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy,
+                                 void>::type
+  call(const Strategy& strategy, Args... args) {
     call_fixed_size(strategy.build_configuration(num_objects), args...);
   }
 
   static void call(T* first, IndexType num_objects, Args... args) {
-    call(kKernelConfigStandard, first, num_objects, args...);
+    call(KernelConfig::standard(), first, num_objects, args...);
   }
 
   static void call(Args... args) {
-    call(kKernelConfigStandard, args...);
+    call(KernelConfig::standard(), args...);
   }
 
   template<IndexType num_objects>
   static void call_fixed_size(Args... args) {
-    call<num_objects>(kKernelConfigStandard, args...);
+    call<num_objects>(KernelConfig::standard(), args...);
   }
 };
 
@@ -252,10 +260,9 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  template<IndexType VirtualWarpSize>
-  static R* call(const KernelConfiguration<VirtualWarpSize>& config, T* first,
-                 IndexType num_objects, Args... args)
-  {
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R*>::type
+  call(const Config& config, T* first, IndexType num_objects, Args... args) {
     // Allocate memory for result of kernel run.
     R* d_result;
     cudaMalloc(&d_result, sizeof(R)*num_objects);
@@ -279,32 +286,33 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  template<IndexType VirtualWarpSize>
-  static R* call(const KernelConfiguration<VirtualWarpSize>& config,
-                 Args... args) {
+  template<typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R*>::type
+  call(const Config& config, Args... args) {
     return call(config, T::get(0), T::size(), args...);
   }
 
-  template<typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, R*>::type
-  call(const Config& strategy, T* first, IndexType num_objects, Args... args) {
+  template<typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
+  call(const Strategy& strategy, T* first, IndexType num_objects,
+       Args... args) {
     return call(strategy.build_configuration(num_objects),
                 first, num_objects, args...);
   }
 
-  template<typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, R*>::type
-  call(const Config& strategy, Args... args) {
+  template<typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
+  call(const Strategy& strategy, Args... args) {
     const IndexType num_objects = T::size();
     return call(strategy.build_configuration(num_objects), args...);
   }
 
   static R* call(T* first, IndexType num_objects, Args... args) {
-    return call(kKernelConfigStandard, first, num_objects, args...);
+    return call(KernelConfig::standard(), first, num_objects, args...);
   }
 
   static R* call(Args... args) {
-    return call(kKernelConfigStandard, args...);
+    return call(KernelConfig::standard(), args...);
   }
 };
 
@@ -321,9 +329,10 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  template<typename Reducer, IndexType VirtualWarpSize>
-  static R call(const KernelConfiguration<VirtualWarpSize>& config, T* first,
-                IndexType num_objects, Reducer red, Args... args) {
+  template<typename Reducer, typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R>::type
+  call(const Config& config, T* first,
+       IndexType num_objects, Reducer red, Args... args) {
     R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
         ::call(config, first, num_objects, args...);
 
@@ -345,36 +354,36 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  template<typename Reducer, IndexType VirtualWarpSize>
-  static R call(const KernelConfiguration<VirtualWarpSize>& config,
-                Reducer red, Args... args) {
+  template<typename Reducer, typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R>::type
+  call(const Config& config, Reducer red, Args... args) {
     return call(config, T::get(0), T::size(), red, args...);
   }
 
-  template<typename Reducer, typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, R>::type
-  call(const Config& strategy, T* first, IndexType num_objects,
+  template<typename Reducer, typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy, R>::type
+  call(const Strategy& strategy, T* first, IndexType num_objects,
        Reducer red, Args... args) {
     return call(strategy.build_configuration(num_objects),
                 red, first, num_objects, args...);
   }
 
-  template<typename Reducer, typename Config>
-  static typename std::enable_if<Config::kIsConfigurationStrategy, R>::type
-  call(const Config& strategy, Reducer red, Args... args) {
+  template<typename Reducer, typename Strategy>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy, R>::type
+  call(const Strategy& strategy, Reducer red, Args... args) {
     const IndexType num_objects = T::size();
     return call(strategy.build_configuration(num_objects), red, args...);
   }
 
   template<typename Reducer>
   static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
-    return call(kKernelConfigStandard, first,
+    return call(KernelConfig::standard(), first,
                 num_objects, red, args...);
   }
 
   template<typename Reducer>
   static R call(Reducer red, Args... args) {
-    return call(kKernelConfigStandard, red, args...);
+    return call(KernelConfig::standard(), red, args...);
   }
 };
 
