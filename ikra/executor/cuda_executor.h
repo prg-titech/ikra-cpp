@@ -17,8 +17,10 @@ namespace cuda {
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
 
+class KernelConfigurationBase {};
+
 template<IndexType VirtualWarpSize>
-class KernelConfiguration {
+class KernelConfiguration : public KernelConfigurationBase {
  public:
   KernelConfiguration(IndexType num_blocks, IndexType num_threads)
       : num_blocks_(num_blocks), num_threads_(num_threads) {
@@ -243,6 +245,45 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     call<num_objects>(KernelConfig::standard(), args...);
   }
 };
+
+// The constexpr function `value` will extract the virtual warp size from a
+// kernel configuration or kernel configuration strategy. For other types, it
+// will return the default value 1.
+template<typename T = int>
+struct ExtractVirtualWarpSize {
+  template<typename U = T>
+  static constexpr
+  typename std::enable_if<std::is_base_of<KernelConfigurationBase, U>::value,
+                          IndexType>::type value() {
+    return U::kVirtualWarpSize;
+  }
+
+  template<typename U = T>
+  static constexpr
+  typename std::enable_if<
+      std::is_base_of<KernelConfigurationStrategy, U>::value,
+                      IndexType>::type value() {
+    return std::result_of<decltype(&U::build_configuration)(T, IndexType)>
+        ::type::kVirtualWarpSize;
+  }
+
+  // Default case.
+  template<typename U = T>
+  static constexpr typename std::enable_if<
+      !std::is_base_of<KernelConfigurationStrategy, U>::value &&
+      !std::is_base_of<KernelConfigurationBase, U>::value,
+          IndexType>::type value() {
+    return 1;
+  }
+};
+
+#define extract_virtual_warp_size(first, ...) \
+    ikra::executor::cuda::ExtractVirtualWarpSize<decltype(first)>::value()
+
+#define cuda_execute_vw(func, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy< \
+      decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
+      func<extract_virtual_warp_size(__VA_ARGS__)>>::call(__VA_ARGS__)
 
 #define cuda_execute(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
