@@ -17,16 +17,35 @@ namespace cuda {
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
 
-// TODO: These two functions should be within KernelConfiguration.
-IndexType cuda_blocks_1d(IndexType length) {
-  return (length + 256 - 1) / 256;
-}
+template<IndexType VirtualWarpSize>
+class KernelConfiguration {
+ public:
+  KernelConfiguration(IndexType num_blocks, IndexType num_threads)
+      : num_blocks_(num_blocks), num_threads_(num_threads) {
+    assert(VirtualWarpSize <= num_threads);
+  }
 
-IndexType cuda_threads_1d(IndexType length) {
-  return length < 256 ? length : 256;
-}
+  KernelConfiguration(IndexType num_objects)
+      : KernelConfiguration<VirtualWarpSize>(cuda_blocks_1d(num_objects),
+                                             cuda_threads_1d(num_objects)) {}
 
-class KernelConfiguration;
+  IndexType num_blocks() const { return num_blocks_; }
+  IndexType num_threads() const { return num_threads_; }
+
+  static const IndexType kVirtualWarpSize = VirtualWarpSize;
+
+ private:
+  const IndexType num_blocks_;
+  const IndexType num_threads_;
+
+  static IndexType cuda_blocks_1d(IndexType length) {
+    return (length + 256 - 1) / 256;
+  }
+
+  static IndexType cuda_threads_1d(IndexType length) {
+    return length < 256 ? length : 256;
+  }
+};
 
 class KernelConfigurationStrategy {
  public:
@@ -35,44 +54,17 @@ class KernelConfigurationStrategy {
 };
 
 // Build a kernel configuration based on the number of objects.
-class DefaultKernelConfigurationStrategy : public KernelConfigurationStrategy {
+class StandardKernelConfigurationStrategy
+    : public KernelConfigurationStrategy {
  public:
-  KernelConfiguration build_configuration(IndexType num_threads) const;
-};
-
-class KernelConfiguration {
- public:
-  KernelConfiguration(IndexType num_blocks, IndexType num_threads,
-                      IndexType nested_replicated = 1)
-      : num_blocks_(num_blocks), num_threads_(num_threads),
-        nested_replicated_(nested_replicated) {
-    assert(nested_replicated <= num_threads);
+  KernelConfiguration<1> build_configuration(IndexType num_threads) const {
+    return KernelConfiguration<1>(num_threads);
   }
-
-  KernelConfiguration(IndexType num_objects)
-      : KernelConfiguration(cuda_blocks_1d(num_objects),
-                            cuda_threads_1d(num_objects)) {}
-
-  IndexType num_blocks() const { return num_blocks_; }
-  IndexType num_threads() const { return num_threads_; }
-  IndexType nested_replicated() const { return nested_replicated_; }
-
-  static const DefaultKernelConfigurationStrategy standard;
-
- private:
-  const IndexType num_blocks_;
-  const IndexType num_threads_;
-  const IndexType nested_replicated_;
 };
-
-KernelConfiguration DefaultKernelConfigurationStrategy::build_configuration(
-    IndexType num_threads) const {
-  return KernelConfiguration(num_threads);
-}
 
 // TODO: Not sure if it's a good idea to define this in a header file.
-const DefaultKernelConfigurationStrategy KernelConfiguration::standard =
-    DefaultKernelConfigurationStrategy();
+static const StandardKernelConfigurationStrategy kKernelConfigStandard =
+    StandardKernelConfigurationStrategy();
 
 // Helper variables for easier data transfer.
 // Storage size (number of instances).
@@ -103,8 +95,9 @@ __global__ void construct_kernel(IndexType base_id, IndexType num_objects,
   }
 }
 
-template<typename T, typename... Args>
-T* construct(size_t count, Args... args) {
+template<typename T, IndexType VirtualWarpSize, typename... Args>
+T* construct(const KernelConfiguration<VirtualWarpSize>& config,
+             size_t count, Args... args) {
   assert(count > 0);
 
   // Increment class size. "h_storage_size" is the size (number of instances)
@@ -116,15 +109,24 @@ T* construct(size_t count, Args... args) {
   T* h_storage_data_head;
   cudaMemcpyFromSymbol(&h_storage_data_head, d_storage_data_head,
                        sizeof(h_storage_data_head), 0, cudaMemcpyDeviceToHost);
-  cudaThreadSynchronize();
 
-  IndexType num_blocks = cuda_blocks_1d(count);
-  IndexType num_threads = cuda_threads_1d(count);
-  construct_kernel<T><<<num_blocks, num_threads>>>(h_storage_size, count,
-                                                   args...);
-  cudaThreadSynchronize();
+  construct_kernel<T><<<config.num_blocks(), config.num_threads()>>>(
+      h_storage_size, count, args...);
+  gpuErrchk(cudaDeviceSynchronize());
+  assert(cudaPeekAtLastError() == cudaSuccess);
 
   return h_storage_data_head;
+}
+
+template<typename T, typename Config, typename... Args>
+typename std::enable_if<Config::kIsConfigurationStrategy, T*>::type
+construct(const Config& strategy, size_t count, Args... args) {
+  return construct<T>(strategy.build_configuration(count), count, args...);
+}
+
+template<typename T, typename... Args>
+T* construct(size_t count, Args... args) {
+  return construct<T>(kKernelConfigStandard, count, args...);
 }
 
 // Calls a device lambda function with an arbitrary number of arguments.
@@ -155,8 +157,9 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  static void call(const KernelConfiguration& config, T* first,
-                   IndexType num_objects, Args... args)
+  template<IndexType VirtualWarpSize>
+  static void call(const KernelConfiguration<VirtualWarpSize>& config,
+                   T* first, IndexType num_objects, Args... args)
   {
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
@@ -174,15 +177,17 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  static void call(const KernelConfiguration& config, Args... args) {
+  template<IndexType VirtualWarpSize>
+  static void call(const KernelConfiguration<VirtualWarpSize>& config,
+                   Args... args) {
     call(config, T::get(0), T::size(), args...);
   }
 
   // Invoke CUDA kernel on all objects. This is an optimized version where the
   // number of objects is a compile-time constant.
-  template<IndexType num_objects>
-  static void call_fixed_size(const KernelConfiguration& config,
-                              Args... args) {
+  template<IndexType num_objects, IndexType VirtualWarpSize>
+  static void call_fixed_size(
+      const KernelConfiguration<VirtualWarpSize>& config, Args... args) {
     auto invoke_function = [] __device__ (Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
       if (tid < num_objects) {
@@ -218,16 +223,16 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   }
 
   static void call(T* first, IndexType num_objects, Args... args) {
-    call(KernelConfiguration::standard, first, num_objects, args...);
+    call(kKernelConfigStandard, first, num_objects, args...);
   }
 
   static void call(Args... args) {
-    call(KernelConfiguration::standard, args...);
+    call(kKernelConfigStandard, args...);
   }
 
   template<IndexType num_objects>
   static void call_fixed_size(Args... args) {
-    call<num_objects>(KernelConfiguration::standard, args...);
+    call<num_objects>(kKernelConfigStandard, args...);
   }
 };
 
@@ -247,7 +252,8 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  static R* call(const KernelConfiguration& config, T* first,
+  template<IndexType VirtualWarpSize>
+  static R* call(const KernelConfiguration<VirtualWarpSize>& config, T* first,
                  IndexType num_objects, Args... args)
   {
     // Allocate memory for result of kernel run.
@@ -273,7 +279,9 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  static R* call(const KernelConfiguration& config, Args... args) {
+  template<IndexType VirtualWarpSize>
+  static R* call(const KernelConfiguration<VirtualWarpSize>& config,
+                 Args... args) {
     return call(config, T::get(0), T::size(), args...);
   }
 
@@ -292,11 +300,11 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   }
 
   static R* call(T* first, IndexType num_objects, Args... args) {
-    return call(KernelConfiguration::standard, first, num_objects, args...);
+    return call(kKernelConfigStandard, first, num_objects, args...);
   }
 
   static R* call(Args... args) {
-    return call(KernelConfiguration::standard, args...);
+    return call(kKernelConfigStandard, args...);
   }
 };
 
@@ -313,8 +321,8 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
  public:
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  template<typename Reducer>
-  static R call(const KernelConfiguration& config, T* first,
+  template<typename Reducer, IndexType VirtualWarpSize>
+  static R call(const KernelConfiguration<VirtualWarpSize>& config, T* first,
                 IndexType num_objects, Reducer red, Args... args) {
     R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
         ::call(config, first, num_objects, args...);
@@ -337,8 +345,9 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
-  template<typename Reducer>
-  static R call(const KernelConfiguration& config, Reducer red, Args... args) {
+  template<typename Reducer, IndexType VirtualWarpSize>
+  static R call(const KernelConfiguration<VirtualWarpSize>& config,
+                Reducer red, Args... args) {
     return call(config, T::get(0), T::size(), red, args...);
   }
 
@@ -359,13 +368,13 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
 
   template<typename Reducer>
   static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
-    return call(KernelConfiguration::standard, first,
+    return call(kKernelConfigStandard, first,
                 num_objects, red, args...);
   }
 
   template<typename Reducer>
   static R call(Reducer red, Args... args) {
-    return call(KernelConfiguration::standard, red, args...);
+    return call(kKernelConfigStandard, red, args...);
   }
 };
 
