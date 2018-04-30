@@ -50,6 +50,17 @@ class KernelConfiguration : public KernelConfigurationBase {
   }
 };
 
+template<IndexType VirtualWarpSize>
+class VirtualWarpConfiguration : KernelConfigurationBase {
+ public:
+  static const bool kIsConfiguration = true;
+  static const IndexType kVirtualWarpSize = VirtualWarpSize;
+
+  // TODO: DELETE BELOW!
+  __device__ IndexType num_threads() const { return 0; }
+  __device__ IndexType num_blocks() const { return 0; }
+};
+
 class KernelConfigurationStrategy {
  public:
   // For SFINAE overload selection.
@@ -67,8 +78,20 @@ class StandardKernelConfigurationStrategy
 
 // Contains factories for kernel configurations.
 struct KernelConfig {
+#ifdef __CUDA_ARCH__
+  // Standard configuration in device mode.
+  __device__ static VirtualWarpConfiguration<1> standard() {
+    return virtual_warp<1>();
+  }
+#else
   static StandardKernelConfigurationStrategy standard() {
     return StandardKernelConfigurationStrategy();
+  }
+#endif  // __CUDA_ARCH__
+
+  template<int VirtualWarpSize>
+  __device__ static VirtualWarpConfiguration<VirtualWarpSize> virtual_warp() {
+    return VirtualWarpConfiguration<VirtualWarpSize>();
   }
 };
 
@@ -105,6 +128,11 @@ __global__ void construct_kernel(IndexType base_id, IndexType num_objects,
 template<typename T, typename Config, typename... Args>
 typename std::enable_if<Config::kIsConfiguration, T*>::type
 construct(const Config& config, size_t count, Args... args) {
+  // Constructors with nested parallelism are not possible in this
+  // implementation because constructor templates cannot be specified
+  // explicitly.
+  static_assert(Config::kVirtualWarpSize == 1,
+                "Virtual warp size must be 1 in constructors.");
   assert(count > 0);
 
   // Increment class size. "h_storage_size" is the size (number of instances)
@@ -155,20 +183,39 @@ template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
 class ExecuteKernelProxy<R (T::*)(Args...), func>
 {
  public:
+#ifdef __CUDA_ARCH__
+  // Running on device. Invoke nested parallelism.
+  template<int OuterVirtualWarpSize, typename Config>
+  __device__ static
+  typename std::enable_if<Config::kIsConfiguration, void>::type
+  call(const Config& config, T* first, IndexType num_objects, Args... args) {
+    assert(Config::kVirtualWarpSize <= OuterVirtualWarpSize);
+    const int tid = threadIdx.x % OuterVirtualWarpSize;
+    const IndexType base_id = first->id();
+
+    for (IndexType i = tid;
+         i < Config::kVirtualWarpSize*num_objects;
+         i += OuterVirtualWarpSize) {
+      auto* object = T::get(base_id + i/Config::kVirtualWarpSize);
+      (object->*func)(args...);
+    }
+  }
+#else
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  template<typename Config>
+  template<int OuterVirtualWarpSize, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, void>::type
-  call(const Config& config, T* first, IndexType num_objects, Args... args)
-  {
+  call(const Config& config, T* first, IndexType num_objects, Args... args) {
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
-      int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      IndexType base_id = first->id();
+      const int tid = threadIdx.x + blockIdx.x * blockDim.x;
+      const IndexType base_id = first->id();
 
       // Grid-stride processing.
-      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
-        auto* object = T::get(base_id + i);
+      for (IndexType i = tid;
+           i < Config::kVirtualWarpSize*num_objects;
+           i += blockDim.x*gridDim.x) {
+        auto* object = T::get(base_id + i/Config::kVirtualWarpSize);
         (object->*func)(args...);
       }
     };
@@ -178,12 +225,14 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     gpuErrchk(cudaDeviceSynchronize());
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
+#endif  // __CUDA_ARCH__
 
   // Invoke CUDA kernel on all objects.
-  template<typename Config>
-  static typename std::enable_if<Config::kIsConfiguration, void>::type
+  template<int OuterVirtualWarpSize, typename Config>
+  __device__ __host__ static
+  typename std::enable_if<Config::kIsConfiguration, void>::type
   call(const Config& config, Args... args) {
-    call(config, T::get(0), T::size(), args...);
+    call<OuterVirtualWarpSize>(config, T::get(0), T::size(), args...);
   }
 
   // Invoke CUDA kernel on all objects. This is an optimized version where the
@@ -195,8 +244,10 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
       // Grid-stride processing.
-      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
-        auto* object = T::get(i);
+      for (IndexType i = tid;
+           i < Config::kVirtualWarpSize*num_objects;
+           i += blockDim.x*gridDim.x) {
+        auto* object = T::get(i/Config::kVirtualWarpSize);
         (object->*func)(args...);
       }
     };
@@ -207,21 +258,22 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
-  template<typename Strategy>
-  static typename std::enable_if<Strategy::kIsConfigurationStrategy,
-                                 void>::type
+  template<int OuterVirtualWarpSize, typename Strategy>
+  __device__ __host__ static
+  typename std::enable_if<Strategy::kIsConfigurationStrategy, void>::type
   call(const Strategy& strategy, T* first, IndexType num_objects,
        Args... args) {
-    call(strategy.build_configuration(num_objects),
-         first, num_objects, args...);
+    call<OuterVirtualWarpSize>(strategy.build_configuration(num_objects),
+                               first, num_objects, args...);
   }
 
-  template<typename Strategy>
-  static typename std::enable_if<Strategy::kIsConfigurationStrategy,
-                                 void>::type
+  template<int OuterVirtualWarpSize, typename Strategy>
+  __device__ __host__ static
+  typename std::enable_if<Strategy::kIsConfigurationStrategy, void>::type
   call(const Strategy& strategy, Args... args) {
     const IndexType num_objects = T::size();
-    call(strategy.build_configuration(num_objects), args...);
+    call<OuterVirtualWarpSize>(strategy.build_configuration(num_objects),
+                               args...);
   }
 
   template<IndexType num_objects, typename Strategy>
@@ -231,12 +283,16 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     call_fixed_size(strategy.build_configuration(num_objects), args...);
   }
 
-  static void call(T* first, IndexType num_objects, Args... args) {
-    call(KernelConfig::standard(), first, num_objects, args...);
+  template<int OuterVirtualWarpSize>
+  __device__ __host__ static
+  void call(T* first, IndexType num_objects, Args... args) {
+    call<OuterVirtualWarpSize>(KernelConfig::standard(), first,
+                               num_objects, args...);
   }
 
-  static void call(Args... args) {
-    call(KernelConfig::standard(), args...);
+  template<int OuterVirtualWarpSize>
+  __device__ __host__ static void call(Args... args) {
+    call<OuterVirtualWarpSize>(KernelConfig::standard(), args...);
   }
 
   template<IndexType num_objects>
@@ -279,14 +335,23 @@ struct ExtractVirtualWarpSize {
 #define extract_virtual_warp_size(first, ...) \
     ikra::executor::cuda::ExtractVirtualWarpSize<decltype(first)>::value()
 
+#ifdef __CUDA_ARCH__
+// Running on device. Utilize nested parallelism.
 #define cuda_execute_vw(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy< \
       decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
-      func<extract_virtual_warp_size(__VA_ARGS__)>>::call(__VA_ARGS__)
+      func<extract_virtual_warp_size(__VA_ARGS__)>>::call<W_SZ>(__VA_ARGS__)
+#else
+// Running on host. Generate kernel invocation.
+#define cuda_execute_vw(func, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy< \
+      decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
+      func<extract_virtual_warp_size(__VA_ARGS__)>>::call<0>(__VA_ARGS__)
+#endif  // __CUDA_ARCH__
 
 #define cuda_execute(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
-      ::call(__VA_ARGS__)
+      ::call<0>(__VA_ARGS__)
 
 #define cuda_execute_fixed_size(func, size, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
@@ -314,8 +379,10 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
       IndexType base_id = first->id();
 
       // Grid-stride processing.
-      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
-        auto* object = T::get(base_id + i);
+      for (IndexType i = tid;
+           i < Config::kVirtualWarpSize*num_objects;
+           i += blockDim.x*gridDim.x) {
+        auto* object = T::get(base_id + i/Config::kVirtualWarpSize);
         result[i] = (object->*func)(args...);
       }
     };
