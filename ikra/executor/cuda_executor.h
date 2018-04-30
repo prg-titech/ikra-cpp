@@ -95,9 +95,10 @@ __global__ void construct_kernel(IndexType base_id, IndexType num_objects,
   static_assert(T::kAddressMode == kAddressModeZero,
       "Not implemented: Valid addressing mode.");
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  
-  if (tid < num_objects) {
-    new (T::get_uninitialized(base_id + tid)) T(args...);
+
+  // Grid-stride processing.
+  for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
+    new (T::get_uninitialized(base_id + i)) T(args...);
   }
 }
 
@@ -141,13 +142,6 @@ __global__ void kernel_call_lambda(F func, Args... args) {
   func(args...);
 }
 
-template<typename F, typename R, typename... Args>
-__global__ void kernel_call_lambda_collect_result(
-    F func, R* result, Args... args) {
-  int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  result[tid] = func(args...);
-}
-
 // Proxy idea based on:
 // https://stackoverflow.com/questions/9779105/generic-member-function-pointer-as-a-template-parameter
 // This class is used to extract the class name, return type and argument
@@ -170,9 +164,12 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     auto invoke_function = [] __device__ (T* first, IndexType num_objects,
                                           Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      if (tid < num_objects) {
-        auto* object = T::get(first->id() + tid);
-        return (object->*func)(args...);
+      IndexType base_id = first->id();
+
+      // Grid-stride processing.
+      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
+        auto* object = T::get(base_id + i);
+        (object->*func)(args...);
       }
     };
     
@@ -196,9 +193,11 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   call_fixed_size(const Config& config, Args... args) {
     auto invoke_function = [] __device__ (Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      if (tid < num_objects) {
-        auto* object = T::get(tid);
-        return (object->*func)(args...);
+
+      // Grid-stride processing.
+      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
+        auto* object = T::get(i);
+        (object->*func)(args...);
       }
     };
 
@@ -308,17 +307,20 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
     R* d_result;
     cudaMalloc(&d_result, sizeof(R)*num_objects);
 
-    auto invoke_function = [] __device__ (T* first, IndexType num_objects,
+    auto invoke_function = [] __device__ (R* result, T* first,
+                                          IndexType num_objects,
                                           Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      if (tid < num_objects) {
-        auto* object = T::get(first->id() + tid);
-        return (object->*func)(args...);
+      IndexType base_id = first->id();
+
+      // Grid-stride processing.
+      for (IndexType i = tid; i < num_objects; i += blockDim.x*gridDim.x) {
+        auto* object = T::get(base_id + i);
+        result[i] = (object->*func)(args...);
       }
     };
 
-    kernel_call_lambda_collect_result<<<config.num_blocks(),
-                                        config.num_threads()>>>(
+    kernel_call_lambda<<<config.num_blocks(), config.num_threads()>>>(
         invoke_function, d_result, first, num_objects, args...);
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
