@@ -64,7 +64,7 @@ void run_test_outer_cuda_execute_strategy() {
   DummyClass* first = construct<DummyClass>(kTestSize, 5, 6);
   gpuErrchk(cudaPeekAtLastError());
 
-  cuda_execute_vw(&DummyClass::add_fields, KernelConfig::standard(),
+  cuda_execute_vw(&DummyClass::add_fields, KernelConfig<>::standard(),
                   first, 12, 10);
 
   // Check result.
