@@ -22,14 +22,14 @@ class DummyClass : public SoaLayout<DummyClass, 1000> {
   int_ field0;
   int_ field1;
 
-  template<int W_SZ>
+  template<int Ikra_VW_SZ>
   __device__ void add_fields(int increment) {
-    field0 = field0 + field1 + increment + this->id() + W_SZ;
+    field0 = field0 + field1 + increment + this->id() + Ikra_VW_SZ;
   }
 
-  template<int W_SZ>
+  template<int Ikra_VW_SZ>
   __device__ void add_fields_no_arg() {
-    field0 = field0 + field1 + this->id() + W_SZ;
+    field0 = field0 + field1 + this->id() + Ikra_VW_SZ;
   }
 };
 

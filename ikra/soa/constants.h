@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#define Ikra_VW_Size __Ikra_VW_SZ
+
 namespace ikra {
 namespace soa {
 

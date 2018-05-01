@@ -12,7 +12,7 @@
 
 // This constant is used to check if cuda_execute is invoked inside of a
 // device function. Dev. functions shadow this constant with a template arg.
-static const int __Ikra_W_SZ = 0;
+static const int Ikra_VW_SZ = 0;
 
 namespace ikra {
 namespace executor {
@@ -20,6 +20,11 @@ namespace cuda {
 
 using ikra::soa::IndexType;
 using ikra::soa::kAddressModeZero;
+
+// TODO: Should we make this explicit?
+// The benefit would be that programmers can see that such functions must be
+// instantiated before they can be called.
+// #define __vw__ template<int Ikra_VW_SZ>
 
 class KernelConfigurationBase {};
 
@@ -378,34 +383,34 @@ struct ExtractVirtualWarpSize {
   }
 };
 
-#define extract_virtual_warp_size(first, ...) \
+#define IKRA_extract_virtual_warp_size(first, ...) \
     ikra::executor::cuda::ExtractVirtualWarpSize<decltype(first)>::value()
 
 // Templatize function name by current (outer) virtual warp size. Add a dummy
 // argument in case no arguments were passed to the function call.
-#define func_to_vw(func, ...) \
-    func<extract_virtual_warp_size(__VA_ARGS__, 1)>
+#define IKRA_func_to_vw(func, ...) \
+    func<IKRA_extract_virtual_warp_size(__VA_ARGS__, 1)>
 
 #define cuda_execute(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
-      ::call<__Ikra_W_SZ>(__VA_ARGS__)
+      ::call<Ikra_VW_SZ>(__VA_ARGS__)
 
 // If running on device, utilize nested parallelism.
 #define cuda_execute_vw(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy< \
-      decltype(func_to_vw(func, __VA_ARGS__ )), \
-      func_to_vw(func, __VA_ARGS__ )> \
-          ::call<__Ikra_W_SZ>(__VA_ARGS__)
+      decltype(IKRA_func_to_vw(func, __VA_ARGS__)), \
+      IKRA_func_to_vw(func, __VA_ARGS__)> \
+          ::call<Ikra_VW_SZ>(__VA_ARGS__)
 
 #define cuda_execute_fixed_size(func, size, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
-      ::call_fixed_size<__Ikra_W_SZ, size>(__VA_ARGS__)
+      ::call_fixed_size<Ikra_VW_SZ, size>(__VA_ARGS__)
 
 #define cuda_execute_fixed_size_vw(func, size, ...) \
   ikra::executor::cuda::ExecuteKernelProxy< \
-      decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
-      func<extract_virtual_warp_size(__VA_ARGS__)>> \
-          ::call_fixed_size<__Ikra_W_SZ, size>(__VA_ARGS__)
+      decltype(IKRA_func_to_vw(func, __VA_ARGS__)), \
+      IKRA_func_to_vw(func, __VA_ARGS__)> \
+          ::call_fixed_size<Ikra_VW_SZ, size>(__VA_ARGS__)
 
 template<typename T, T> class ExecuteAndReturnKernelProxy;
 
@@ -489,7 +494,7 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
 
 #define cuda_execute_and_return(func, ...) \
   ikra::executor::cuda::ExecuteAndReturnKernelProxy<decltype(func), func> \
-      ::call<__Ikra_W_SZ>(__VA_ARGS__)
+      ::call<Ikra_VW_SZ>(__VA_ARGS__)
 
 
 template<typename T, T> class ExecuteAndReduceKernelProxy;
@@ -570,7 +575,7 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
 
 #define cuda_execute_and_reduce(func, ...) \
   ikra::executor::cuda::ExecuteAndReduceKernelProxy<decltype(func), func> \
-      ::call<__Ikra_W_SZ>(__VA_ARGS__)
+      ::call<Ikra_VW_SZ>(__VA_ARGS__)
 
 }  // cuda
 }  // executor
