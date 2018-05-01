@@ -18,6 +18,7 @@ static const int kTestSize = 40;
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
+#undef IKRA_TEST_LAYOUT_MODE
 IKRA_HOST_STORAGE(TestClassZ_Soa)
 
 #define IKRA_TEST_CLASSNAME TestClassZ_Aos
@@ -26,6 +27,7 @@ IKRA_HOST_STORAGE(TestClassZ_Soa)
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
+#undef IKRA_TEST_LAYOUT_MODE
 IKRA_HOST_STORAGE(TestClassZ_Aos)
 
 // Valid addressing mode.
@@ -35,6 +37,7 @@ IKRA_HOST_STORAGE(TestClassZ_Aos)
 #include "basic_class_test_layout.inc"
 #undef IKRA_TEST_CLASSNAME
 #undef IKRA_TEST_ADDRESS_MODE
+#undef IKRA_TEST_LAYOUT_MODE
 IKRA_HOST_STORAGE(TestClassV)
 
 
@@ -133,7 +136,7 @@ TYPED_TEST_P(BasicClassTest, PlacementNew) {
   EXPECT_EQ(TypeParam::size(), 0UL);
 
   TypeParam* obj = new(TypeParam::get_uninitialized(4)) TypeParam();
-  EXPECT_EQ(obj->id(), 4);
+  EXPECT_EQ(obj->id(), 4UL);
 }
 
 REGISTER_TYPED_TEST_CASE_P(BasicClassTest,

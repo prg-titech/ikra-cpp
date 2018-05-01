@@ -116,7 +116,7 @@ void run_test_placement_new() {
   EXPECT_EQ(Vertex::size(), 0UL);
   EXPECT_EQ(v1->field0, 10);
   EXPECT_EQ(v1->field1, 20);
-  EXPECT_EQ(v1->id(), 4);
+  EXPECT_EQ(v1->id(), 4UL);
 
   // Make sure that we had no CUDA failures.
   gpuErrchk(cudaPeekAtLastError());

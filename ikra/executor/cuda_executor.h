@@ -71,7 +71,6 @@ class KernelConfigurationStrategy {
 class StandardKernelConfigurationStrategy
     : public KernelConfigurationStrategy {
  public:
-  __device__ __host__   // Never called from device, but silences warnings.
   KernelConfiguration<1> build_configuration(IndexType num_threads) const {
     return KernelConfiguration<1>(num_threads);
   }
@@ -244,6 +243,7 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Config>
   __device__ __host__ static
   typename std::enable_if<Config::kIsConfiguration, void>::type
@@ -251,6 +251,7 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     call<OuterVirtualWarpSize>(config, T::get(0), T::size(), args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Strategy>
   __device__ __host__ static
   typename std::enable_if<Strategy::kIsConfigurationStrategy, void>::type
@@ -260,6 +261,7 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
                                first, num_objects, args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Strategy>
   __device__ __host__ static
   typename std::enable_if<Strategy::kIsConfigurationStrategy, void>::type
@@ -310,8 +312,7 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   static typename std::enable_if<Config::kIsConfiguration &&
                                  OuterVirtualWarpSize == 0, void>::type
   call_fixed_size(const Config& config, T* first, Args... args) {
-    auto invoke_function = [] __device__ (T* first, IndexType num_objects,
-                                          Args... args) {
+    auto invoke_function = [] __device__ (T* first, Args... args) {
       const int tid = threadIdx.x + blockIdx.x * blockDim.x;
       const IndexType base_id = first->id();
 
@@ -325,11 +326,12 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
     };
     
     kernel_call_lambda<<<config.num_blocks(), config.num_threads()>>>(
-        invoke_function, first, num_objects, args...);
+        invoke_function, first, args...);
     gpuErrchk(cudaDeviceSynchronize());
     assert(cudaPeekAtLastError() == cudaSuccess);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, IndexType num_objects, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy,
                                  void>::type
@@ -379,18 +381,27 @@ struct ExtractVirtualWarpSize {
 #define extract_virtual_warp_size(first, ...) \
     ikra::executor::cuda::ExtractVirtualWarpSize<decltype(first)>::value()
 
-// If running on device, utilize nested parallelism.
-#define cuda_execute_vw(func, ...) \
-  ikra::executor::cuda::ExecuteKernelProxy< \
-      decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
-      func<extract_virtual_warp_size(__VA_ARGS__)>> \
-          ::call<__Ikra_W_SZ>(__VA_ARGS__)
+// Templatize function name by current (outer) virtual warp size. Add a dummy
+// argument in case no arguments were passed to the function call.
+#define func_to_vw(func, ...) \
+    func<extract_virtual_warp_size(__VA_ARGS__, 1)>
 
 #define cuda_execute(func, ...) \
   ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
       ::call<__Ikra_W_SZ>(__VA_ARGS__)
 
+// If running on device, utilize nested parallelism.
+#define cuda_execute_vw(func, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy< \
+      decltype(func_to_vw(func, __VA_ARGS__ )), \
+      func_to_vw(func, __VA_ARGS__ )> \
+          ::call<__Ikra_W_SZ>(__VA_ARGS__)
+
 #define cuda_execute_fixed_size(func, size, ...) \
+  ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
+      ::call_fixed_size<__Ikra_W_SZ, size>(__VA_ARGS__)
+
+#define cuda_execute_fixed_size_vw(func, size, ...) \
   ikra::executor::cuda::ExecuteKernelProxy< \
       decltype(func<extract_virtual_warp_size(__VA_ARGS__)>), \
       func<extract_virtual_warp_size(__VA_ARGS__)>> \
@@ -436,12 +447,14 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, R*>::type
   call(const Config& config, Args... args) {
     return call<OuterVirtualWarpSize>(config, T::get(0), T::size(), args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
   call(const Strategy& strategy, T* first, IndexType num_objects,
@@ -451,6 +464,7 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
         first, num_objects, args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
   call(const Strategy& strategy, Args... args) {
@@ -513,6 +527,7 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   }
 
   // Invoke CUDA kernel on all objects.
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Reducer, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, R>::type
   call(const Config& config, Reducer red, Args... args) {
@@ -520,6 +535,7 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
                                       red, args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Reducer, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R>::type
   call(const Strategy& strategy, T* first, IndexType num_objects,
@@ -529,6 +545,7 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
         num_objects, args...);
   }
 
+  #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Reducer, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R>::type
   call(const Strategy& strategy, Reducer red, Args... args) {

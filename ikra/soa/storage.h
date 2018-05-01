@@ -316,7 +316,7 @@ class alignas(8) StaticStorage_
 
   __ikra_device__ char* allocate_in_arena_internal(size_t bytes) {
     assert(arena_base_ != nullptr);
-    assert(arena_head_ + bytes < ArenaSize);
+    assert(ArenaSize == 0 || arena_head_ + bytes < ArenaSize);
     auto new_head = SuperT::atomic_add(&arena_head_,
                                        static_cast<ArenaIndexType>(bytes));
     return arena_base_ + new_head;

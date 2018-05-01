@@ -26,6 +26,11 @@ class DummyClass : public SoaLayout<DummyClass, 1000> {
   __device__ void add_fields(int increment) {
     field0 = field0 + field1 + increment + this->id() + W_SZ;
   }
+
+  template<int W_SZ>
+  __device__ void add_fields_no_arg() {
+    field0 = field0 + field1 + this->id() + W_SZ;
+  }
 };
 
 IKRA_DEVICE_STORAGE(DummyClass);
@@ -47,6 +52,31 @@ void run_test_outer_cuda_execute_configuration() {
   for (int i = 0; i < kTestSize; ++i) {
     int actual = DummyClass::get(i)->field0;
     int expected = 10 + 5 + 6 + i + 4;
+    EXPECT_EQ(actual, expected);
+  }
+
+  // Copy size to host memory and compare.
+  EXPECT_EQ(DummyClass::size(), static_cast<IndexType>(kTestSize));
+
+  // Make sure that we had no CUDA failures.
+  gpuErrchk(cudaPeekAtLastError());
+}
+
+void run_test_outer_cuda_execute_configuration_no_arg() {
+  DummyClass::initialize_storage();
+  EXPECT_EQ(DummyClass::size(), 0UL);
+
+  DummyClass* first = construct<DummyClass>(kTestSize, 5, 6);
+  gpuErrchk(cudaPeekAtLastError());
+
+  // Use a virtual warp size of 4.
+  cuda_execute_vw(&DummyClass::add_fields_no_arg, KernelConfiguration<4>(12),
+                  first, 12);
+
+  // Check result.
+  for (int i = 0; i < kTestSize; ++i) {
+    int actual = DummyClass::get(i)->field0;
+    int expected = 5 + 6 + i + 4;
     EXPECT_EQ(actual, expected);
   }
 
@@ -107,6 +137,11 @@ void run_test_outer_cuda_execute_none() {
 
 TEST(VirtualWarpTest, TestOuterCudaExecuteStrategy) {
   run_test_outer_cuda_execute_strategy();
+}
+
+TEST(VirtualWarpTest, TestOuterCudaExecuteStrategyNoArg) {
+  // Call member function with no argument.
+  run_test_outer_cuda_execute_configuration_no_arg();
 }
 
 TEST(VirtualWarpTest, TestOuterCudaExecuteNone) {
