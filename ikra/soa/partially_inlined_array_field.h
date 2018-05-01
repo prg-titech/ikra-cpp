@@ -132,12 +132,45 @@ class PartiallyInlinedArrayField_ {
   }
 
   template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<
+      A == kAddressModeZero && L == kLayoutModeSoa, IndexType**>::type
+  get_size_addr_internal() const {
+    // Use constant-folded value for address computation.
+    constexpr auto cptr_data_offset =
+        StorageDataOffset<typename Owner::Storage>::value;
+    constexpr auto cptr_storage_buffer = Owner::storage_buffer();
+    constexpr auto array_location =
+        cptr_storage_buffer + cptr_data_offset +
+        (Capacity+1)*(Offset + InlinedSize*sizeof(B) + sizeof(B**));
+
+#ifdef __clang__
+    // Clang does not allow reinterpret_cast in constexprs.
+    constexpr IndexType** soa_array =
+        IKRA_fold(reinterpret_cast<IndexType**>(array_location));
+#else
+    constexpr IndexType** soa_array =
+        reinterpret_cast<IndexType**>(array_location);
+#endif  // __clang__
+
+    return soa_array + reinterpret_cast<uintptr_t>(this);
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
   __ikra_device__ typename std::enable_if<A == kAddressModeZero &&
                                           L == kLayoutModeAos, B**>::type
   get_external_pointer_addr_internal() const {
     return reinterpret_cast<B**>(
         reinterpret_cast<char*>(const_cast<Self*>(this))
         + Offset + InlinedSize*sizeof(B));
+  }
+
+  template<int A = AddressMode, int L = LayoutMode>
+  __ikra_device__ typename std::enable_if<
+      A == kAddressModeZero && L == kLayoutModeAos, IndexType**>::type
+  get_size_addr_internal() const {
+    return reinterpret_cast<IndexType**>(
+        reinterpret_cast<char*>(const_cast<Self*>(this))
+        + Offset + InlinedSize*sizeof(B) + sizeof(B**));
   }
 
 #if defined(__CUDA_ARCH__) || !defined(__CUDACC__)
@@ -148,6 +181,10 @@ class PartiallyInlinedArrayField_ {
 
   __ikra_device__ void set_external_pointer(B* ptr) {
     set_external_pointer_internal(ptr);
+  }
+
+  __ikra_device__ IndexType size() const {
+    return *get_size_addr_internal();
   }
 #else
 // Running on host, but data is located on GPU.
@@ -173,6 +210,18 @@ class PartiallyInlinedArrayField_ {
     cudaMemcpy(d_p_external_addr, &d_p_external, sizeof(B*),
                cudaMemcpyHostToDevice);
     assert(cudaPeekAtLastError() == cudaSuccess);
+  }
+
+  IndexType size() const {
+    // Copy external pointer from GPU.
+    IndexType* dev_p_size = Owner::storage().translate_address_host_to_device(
+        reinterpret_cast<IndexType*>(get_size_addr_internal()));
+    IndexType dev_result;
+    cudaMemcpy(&dev_result, dev_p_size, sizeof(IndexType),
+               cudaMemcpyDeviceToHost);
+    assert(cudaPeekAtLastError() == cudaSuccess);
+
+    return dev_result;
   }
 #endif
 

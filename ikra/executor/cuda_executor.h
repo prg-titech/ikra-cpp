@@ -135,8 +135,6 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
 
   // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
   // from object "first".
-  // TODO: Figure out how to remove warnings here. (Calling __host__ function
-  // from __device__ function.)
   template<int OuterVirtualWarpSize, typename Config>
   static typename std::enable_if<Config::kIsConfiguration &&
                                  OuterVirtualWarpSize == 0, void>::type

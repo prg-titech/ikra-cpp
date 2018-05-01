@@ -32,6 +32,9 @@ class ArrayObjectField_ {
   static_assert(kSize == sizeof(B)*ArraySize,
                 "Internal error: Array size mismatch.");
 
+  __ikra_device__ IndexType size() const { return ArraySize; }
+
+ protected:
   template<size_t Pos>
   __ikra_device__ B* array_data_ptr() const {
     static_assert(Pos < ArraySize, "Array index out of bounds.");
@@ -80,6 +83,8 @@ class FullyInlinedArrayField_ {
   B& get() const = delete;
 
   operator B&() const = delete;
+
+  __ikra_device__ IndexType size() const { return ArraySize; }
 
   // TODO: Implement iterator and other methods.
 
