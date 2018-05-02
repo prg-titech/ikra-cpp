@@ -89,6 +89,32 @@ class FullyInlinedArrayField_ {
   // TODO: Implement iterator and other methods.
 
  protected:
+  template<int OuterVirtualWarpSize, int VirtualWarpSize>
+  class VirtualWarpRangeArray {
+   public:
+    Iterator begin() const {
+
+    }
+
+    Iterator end() const {
+
+    }
+
+   private:
+    class Iterator {
+     public:
+      Iterator& operator++() {    // Prefix increment.
+        index_++;
+        return *this;
+      }
+
+     private:
+      IndexType index_;
+    };
+
+    Self& array_self_;
+  };
+
   // Calculate the address of an array element. For details, see comment
   // of data_ptr in Field_.
   template<size_t Pos, int A = AddressMode>
