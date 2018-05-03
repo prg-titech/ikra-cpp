@@ -67,74 +67,6 @@ class FullyInlinedArrayField_ {
   using Self = FullyInlinedArrayField_<B, ArraySize, Capacity, Offset,
                                        AddressMode, StorageMode,
                                        LayoutMode, Owner>;
-
-  // TODO: Implement host-side functions.
-  template<int OuterVirtualWarpSize, int VirtualWarpSize>
-  class VirtualWarpRangeArray {
-   private:
-    // TODO: Consider using pointers instead of array reference + index as
-    // internal state.
-    class Iterator {
-     public:
-      __ikra_device__ Iterator(Self& array_self, IndexType index)
-          : array_self_(array_self), index_(index) {}
-
-      __ikra_device__ Iterator& operator++() {    // Prefix increment.
-        index_ += OuterVirtualWarpSize/VirtualWarpSize;
-        return *this;
-      }
-
-      __ikra_device__ B& operator*() const {
-        return array_self_[index_];
-      }
-
-      __ikra_device__ bool operator==(const Iterator& other) const {
-        // TODO: Should also check if array is the same one.
-        return index_ == other.index_;
-      }
-
-      __ikra_device__ bool operator!=(const Iterator& other) const {
-        return !(*this == other);
-      }
-
-     private:
-      Self& array_self_;
-      IndexType index_;
-    };
-
-    Self& array_self_;
-
-   public:
-    __ikra_device__ VirtualWarpRangeArray(Self& array_self)
-        : array_self_(array_self) {
-      assert(VirtualWarpSize <= OuterVirtualWarpSize);
-    }
-
-    __ikra_device__ Iterator begin() const {
-#if __CUDA_ARCH__
-      const int tid = threadIdx.x % OuterVirtualWarpSize;
-#else
-      const int tid = 0;
-#endif  // __CUDA_ARCH__
-      return Iterator(array_self_, tid/VirtualWarpSize);
-    }
-
-    __ikra_device__ Iterator end() const {
-#if __CUDA_ARCH__
-      const int first_idx =
-          (threadIdx.x % OuterVirtualWarpSize)/VirtualWarpSize;
-#else
-      const int first_idx = 0;
-#endif  // __CUDA_ARCH__
-      // Formula: R(ArraySize - first_idx) + first_idx
-      //          R(i): Round up to next multiple of OuterVWS/VWS
-      const int step_size = OuterVirtualWarpSize/VirtualWarpSize;
-      const IndexType end_idx = ((ArraySize - first_idx + step_size - 1)
-          /step_size)*step_size + first_idx;
-      return Iterator(array_self_, end_idx);
-    }
-  };
-
  public:
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
 
@@ -152,23 +84,6 @@ class FullyInlinedArrayField_ {
   operator B&() const = delete;
 
   __ikra_device__ IndexType size() const { return ArraySize; }
-
-  // TODO: Implement iterator and other methods..
-#ifdef __CUDA_ARCH__
-  // TODO: Make this function and self references const.
-  template<int OuterVirtualWarpSize, int VirtualWarpSize = 1>
-  __ikra_device__ VirtualWarpRangeArray<OuterVirtualWarpSize, VirtualWarpSize>
-      vw_iterator() {
-    return VirtualWarpRangeArray<OuterVirtualWarpSize, VirtualWarpSize>(*this);
-  }
-#else
-  template<int OuterVirtualWarpSize, int VirtualWarpSize = 1>
-  __ikra_device__ VirtualWarpRangeArray<OuterVirtualWarpSize, VirtualWarpSize>
-      vw_iterator() {
-    assert(OuterVirtualWarpSize == 0 && VirtualWarpSize == 1);
-    return VirtualWarpRangeArray<1, 1>(*this);
-  }
-#endif
 
  protected:
   // Calculate the address of an array element. For details, see comment

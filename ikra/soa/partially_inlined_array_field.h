@@ -64,8 +64,6 @@ class PartiallyInlinedArrayField_ {
 
   operator B&() const = delete;
 
-  // TODO: Implement iterator and other methods.
-
  protected:
   __ikra_device__ PartiallyInlinedArrayField_() {
     this->set_external_pointer(nullptr);
