@@ -58,7 +58,8 @@ class SoaLayout : SizeNDummy<AddressMode> {
  public:
   using Storage = typename StorageStrategy::template type<Self>;
   static const IndexType kCapacity = Capacity;
-  static const bool kIsSoaClass = true;
+  static const bool kIsIkraClass = true;
+  static const int kLayoutMode = LayoutMode;
 
   // Cannot access members of Storge in here because Storage depends on this
   // class and must not be instantiated yet.
@@ -269,7 +270,7 @@ class SoaLayout : SizeNDummy<AddressMode> {
     auto buffer_offset = reinterpret_cast<uintptr_t>(this) - buffer_location;
 
     assert(buffer_offset % Self::ObjectSize::value == 0);
-    return buffer_offset / Self::ObjectSize::value  - 1;
+    return buffer_offset / Self::ObjectSize::value - 1;
   }
 
 #ifdef __CUDACC__
