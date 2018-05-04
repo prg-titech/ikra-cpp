@@ -293,37 +293,41 @@ template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
 class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
 {
  public:
-  // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
-  // from object "first".
-  template<int OuterVirtualWarpSize, typename Config>
+  // Invoke CUDA kernel. Call method on object range.
+  template<int OuterVirtualWarpSize, typename Config, typename RangeT>
   static typename std::enable_if<Config::kIsConfiguration &&
                                  OuterVirtualWarpSize == 0, R*>::type
-  call(const Config& config, T* first, IndexType num_objects, Args... args) {
+  call(const Config& config, const RangeT& range, Args... args) {
     // Allocate memory for result of kernel run.
     R* d_result;
-    cudaMalloc(&d_result, sizeof(R)*num_objects);
+    cudaMalloc(&d_result, sizeof(R)*range.size());
 
-    auto invoke_function = [] __device__ (R* result, T* first,
-                                          IndexType num_objects,
+    auto invoke_function = [] __device__ (R* result, RangeT range,
                                           Args... args) {
       int tid = threadIdx.x + blockIdx.x * blockDim.x;
-      IndexType base_id = first->id();
 
       // Grid-stride processing.
       for (IndexType i = tid;
-           i < Config::kVirtualWarpSize*num_objects;
+           i < Config::kVirtualWarpSize*range.size();
            i += blockDim.x*gridDim.x) {
-        auto* object = T::get(base_id + i/Config::kVirtualWarpSize);
+        auto* object = range.get(i/Config::kVirtualWarpSize);
         result[i] = (object->*func)(args...);
       }
     };
 
     kernel_call_lambda<<<config.num_blocks(), config.num_threads()>>>(
-        invoke_function, d_result, first, num_objects, args...);
+        invoke_function, d_result, range, args...);
     cudaDeviceSynchronize();
     assert(cudaPeekAtLastError() == cudaSuccess);
 
     return d_result;
+  }
+
+  template<int OuterVirtualWarpSize, typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R*>::type
+  call(const Config& config, T* first, IndexType num_objects, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        config, SequenceObjectRange<T>(first, num_objects), args...);
   }
 
   // Invoke CUDA kernel on all objects.
@@ -331,17 +335,24 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   template<int OuterVirtualWarpSize, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, R*>::type
   call(const Config& config, Args... args) {
-    return call<OuterVirtualWarpSize>(config, T::get(0), T::size(), args...);
+    return call<OuterVirtualWarpSize>(config, FullObjectRange<T>(), args...);
   }
 
   #pragma nv_exec_check_disable
+  template<int OuterVirtualWarpSize, typename Strategy, typename RangeT>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
+  call(const Strategy& strategy, const RangeT& range, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        strategy.build_configuration(range.size()), range, args...);
+  }
+
   template<int OuterVirtualWarpSize, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
   call(const Strategy& strategy, T* first, IndexType num_objects,
        Args... args) {
     return call<OuterVirtualWarpSize>(
         strategy.build_configuration(num_objects),
-        first, num_objects, args...);
+        SequenceObjectRange<T>(first, num_objects), args...);
   }
 
   #pragma nv_exec_check_disable
@@ -356,8 +367,8 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
   template<int OuterVirtualWarpSize>
   static R* call(T* first, IndexType num_objects, Args... args) {
     return call<OuterVirtualWarpSize>(
-        KernelConfig<OuterVirtualWarpSize>::standard(), first,
-        num_objects, args...);
+        KernelConfig<OuterVirtualWarpSize>::standard(),
+        SequenceObjectRange<T>(first, num_objects), args...);
   }
 
   template<int OuterVirtualWarpSize>
@@ -378,19 +389,17 @@ template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
 class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
 {
  public:
-  // Invoke CUDA kernel. Call method on "num_objects" many objects, starting
-  // from object "first".
-  template<int OuterVirtualWarpSize, typename Reducer, typename Config>
+  // Invoke CUDA kernel on object range.
+  template<int OuterVirtualWarpSize, typename Reducer, typename Config,
+           typename RangeT>
   static typename std::enable_if<Config::kIsConfiguration &&
                                  OuterVirtualWarpSize == 0, R>::type
-  call(const Config& config, T* first,
-       IndexType num_objects, Reducer red, Args... args) {
+  call(const Config& config, const RangeT& range, Reducer red, Args... args) {
     R* d_result = ExecuteAndReturnKernelProxy<R(T::*)(Args...), func>
-        ::template call<OuterVirtualWarpSize>(config, first,
-                                              num_objects, args...);
+        ::template call<OuterVirtualWarpSize>(config, range, args...);
 
-    R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*num_objects));
-    cudaMemcpy(h_result, d_result, sizeof(R)*num_objects,
+    R* h_result = reinterpret_cast<R*>(malloc(sizeof(R)*range.size()));
+    cudaMemcpy(h_result, d_result, sizeof(R)*range.size(),
                cudaMemcpyDeviceToHost);
     cudaFree(d_result);
     assert(cudaPeekAtLastError() == cudaSuccess);
@@ -398,7 +407,7 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
     // TODO: Not sure why but Reducer does work when code is moved to a
     // separate method.
     R accumulator = h_result[0];
-    for (IndexType i = 1; i < num_objects; ++i) {
+    for (IndexType i = 1; i < range.size(); ++i) {
       accumulator = red(accumulator, h_result[i]);
     }
 
@@ -406,12 +415,20 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
     return accumulator;
   }
 
+  template<int OuterVirtualWarpSize, typename Reducer, typename Config>
+  static typename std::enable_if<Config::kIsConfiguration, R>::type
+  call(const Config& config, T* first,
+       IndexType num_objects, Reducer red, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        config, SequenceObjectRange<T>(first, num_objects), red, args...);
+  }
+
   // Invoke CUDA kernel on all objects.
   #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Reducer, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, R>::type
   call(const Config& config, Reducer red, Args... args) {
-    return call<OuterVirtualWarpSize>(config, T::get(0), T::size(),
+    return call<OuterVirtualWarpSize>(config, FullObjectRange<T>(),
                                       red, args...);
   }
 
@@ -421,8 +438,8 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   call(const Strategy& strategy, T* first, IndexType num_objects,
        Reducer red, Args... args) {
     return call<OuterVirtualWarpSize>(
-        strategy.build_configuration(num_objects), red, first,
-        num_objects, args...);
+        strategy.build_configuration(num_objects), red,
+        SequenceObjectRange<T>(first, num_objects), args...);
   }
 
   #pragma nv_exec_check_disable
@@ -437,8 +454,8 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
   template<int OuterVirtualWarpSize, typename Reducer>
   static R call(T* first, IndexType num_objects, Reducer red, Args... args) {
     return call<OuterVirtualWarpSize>(
-        KernelConfig<OuterVirtualWarpSize>::standard(), first,
-        num_objects, red, args...);
+        KernelConfig<OuterVirtualWarpSize>::standard(),
+        SequenceObjectRange<T>(first, num_objects), red, args...);
   }
 
   template<int OuterVirtualWarpSize, typename Reducer>
