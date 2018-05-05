@@ -314,6 +314,8 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
     return d_result;
   }
 
+  // TODO: Implement device-side version.
+
   template<int OuterVirtualWarpSize, typename Config>
   static typename std::enable_if<Config::kIsConfiguration, R*>::type
   call(const Config& config, T* first, IndexType num_objects, Args... args) {
@@ -416,6 +418,47 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
 
     free(h_result);
     return accumulator;
+  }
+
+  template<int OuterVirtualWarpSize, typename Reducer, typename Config,
+           typename RangeT>
+  __device__ static typename std::enable_if<
+      Config::kIsConfiguration && (OuterVirtualWarpSize > 0), R>::type
+  call(const Config& config, const RangeT& range, Reducer red, Args... args) {
+    assert(Config::kVirtualWarpSize <= OuterVirtualWarpSize);
+    const int tid = threadIdx.x % OuterVirtualWarpSize;
+    
+    R partial_reduction;
+
+    if (tid < Config::kVirtualWarpSize*range.size()) {
+      // There is work to do for this thread.
+      auto* object = range.get(tid/Config::kVirtualWarpSize);
+      partial_reduction = (object->*func)(args...);
+    }
+
+    for (IndexType i = tid + OuterVirtualWarpSize;
+         i < Config::kVirtualWarpSize*range.size();
+         i += OuterVirtualWarpSize) {
+      // Call function and reduce.
+      auto* object = range.get(i/Config::kVirtualWarpSize);
+      partial_reduction = red(partial_reduction, (object->*func)(args...));
+    }
+
+    // Gather partial reduction results.
+    __shared__ R reduction[OuterVirtualWarpSize/Config::kVirtualWarpSize];
+    reduction[tid/Config::kVirtualWarpSize] = partial_reduction;
+    __syncthreads();
+
+    // Master thread reduces partial results.
+    // TODO: Reduce in parallel.
+    if (tid == 0) {
+      for (int i = 1; i < OuterVirtualWarpSize/Config::kVirtualWarpSize; ++i) {
+        reduction[0] = red(reduction[0], reduction[i]);
+      }
+    }
+    __syncthreads();
+
+    return reduction[0];
   }
 
   template<int OuterVirtualWarpSize, typename Reducer, typename Config>
