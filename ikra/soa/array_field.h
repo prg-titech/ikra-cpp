@@ -32,6 +32,8 @@ class ArrayObjectField_ {
   static_assert(kSize == sizeof(B)*ArraySize,
                 "Internal error: Array size mismatch.");
 
+  static const bool kIsArray = true;
+
   __ikra_device__ IndexType size() const { return ArraySize; }
 
  protected:
@@ -71,6 +73,8 @@ class FullyInlinedArrayField_ {
   static const uint32_t DBG_OFFSET = Offset;  // For debugging.
 
   static const int kSize = sizeof(B)*ArraySize;
+
+  static const bool kIsArray = true;
 
   // Support calling methods using -> syntax.
   __ikra_device__ const Self* operator->() const {

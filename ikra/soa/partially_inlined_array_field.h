@@ -40,6 +40,8 @@ class PartiallyInlinedArrayField_ {
  public:
   static const int kSize = InlinedSize*sizeof(B) + sizeof(B*);
 
+  static const bool kIsArray = true;
+
   __ikra_device__ PartiallyInlinedArrayField_(B* external_storage) {
     this->set_external_pointer(external_storage);
   }

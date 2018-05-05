@@ -46,6 +46,7 @@ class KernelConfiguration : public KernelConfigurationBase {
   }
 };
 
+// This one is only for devices. TODO: Rename.
 template<IndexType VirtualWarpSize>
 class VirtualWarpConfiguration : KernelConfigurationBase {
  public:
@@ -60,11 +61,13 @@ class KernelConfigurationStrategy {
 };
 
 // Build a kernel configuration based on the number of objects.
+template<int VirtualWarpSize>
 class StandardKernelConfigurationStrategy
     : public KernelConfigurationStrategy {
  public:
-  KernelConfiguration<1> build_configuration(IndexType num_threads) const {
-    return KernelConfiguration<1>(num_threads);
+  KernelConfiguration<VirtualWarpSize>
+      build_configuration(IndexType num_threads) const {
+    return KernelConfiguration<VirtualWarpSize>(num_threads);
   }
 };
 
@@ -81,21 +84,31 @@ struct KernelConfig {
 
   template<int O = OuterVirtualWarpSize>
   static 
-  typename std::enable_if<O == 0, StandardKernelConfigurationStrategy>::type
+  typename std::enable_if<O == 0, StandardKernelConfigurationStrategy<1>>::type
   standard() {
     return standard_host();
   }
 
-  static StandardKernelConfigurationStrategy standard_host() {
-    return StandardKernelConfigurationStrategy();
+  static StandardKernelConfigurationStrategy<1> standard_host() {
+    return StandardKernelConfigurationStrategy<1>();
   }
 
   __device__ static VirtualWarpConfiguration<1> standard_device() {
     return virtual_warp<1>();
   }
 
-  template<int VirtualWarpSize>
-  __device__ static VirtualWarpConfiguration<VirtualWarpSize> virtual_warp() {
+  template<int VirtualWarpSize, int O = OuterVirtualWarpSize>
+  static typename std::enable_if<
+      O == 0, StandardKernelConfigurationStrategy<VirtualWarpSize>>::type
+  virtual_warp() {
+    return StandardKernelConfigurationStrategy<VirtualWarpSize>();
+  }
+
+  // This one is only for using parallelism on the device.
+  template<int VirtualWarpSize, int O = OuterVirtualWarpSize>
+  __device__ static typename std::enable_if<
+      (O > 0), VirtualWarpConfiguration<VirtualWarpSize>>::type
+  virtual_warp() {
     return VirtualWarpConfiguration<VirtualWarpSize>();
   }
 };

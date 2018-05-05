@@ -6,11 +6,13 @@
 #include <functional>
 #include <type_traits>
 
+#include "executor/cuda_executor_macros.h"
 #include "executor/kernel_configuration.h"
 #include "executor/object_range.h"
 #include "executor/util.h"
 #include "soa/constants.h"
 #include "soa/cuda.h"
+#include "soa/type_helper.h"
 
 // This constant is used to check if cuda_execute is invoked inside of a
 // device function. Dev. functions shadow this constant with a template arg.
@@ -108,6 +110,11 @@ __global__ void kernel_call_lambda(F func, Args... args) {
   func(args...);
 }
 
+template<typename... Args>
+struct ExecuteArgsParser {
+
+};
+
 // Proxy idea based on:
 // https://stackoverflow.com/questions/9779105/generic-member-function-pointer-as-a-template-parameter
 // This class is used to extract the class name, return type and argument
@@ -169,6 +176,16 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   call(const Config& config, T* first, IndexType num_objects, Args... args) {
     call<OuterVirtualWarpSize>(config,
                                SequenceObjectRange<T>(first, num_objects),
+                               args...);
+  }
+
+  #pragma nv_exec_check_disable
+  template<int OuterVirtualWarpSize, typename Config, typename ArrayT>
+  __device__ __host__ static
+  typename std::enable_if<Config::kIsConfiguration &&
+                          ArrayT::kIsArray, void>::type
+  call(const Config& config, const ArrayT& array, Args... args) {
+    call<OuterVirtualWarpSize>(config, ArrayObjectRange<T, ArrayT>(array),
                                args...);
   }
 
@@ -261,32 +278,6 @@ class ExecuteKernelProxy<R (T::*)(Args...), func>
   }
 };
 
-// Templatize function name by current (outer) virtual warp size. Add a dummy
-// argument in case no arguments were passed to the function call.
-#define IKRA_func_to_vw(func, ...) \
-    func<IKRA_extract_virtual_warp_size(__VA_ARGS__, 1)>
-
-#define cuda_execute(func, ...) \
-  ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
-      ::call<Ikra_VW_SZ>(__VA_ARGS__)
-
-// If running on device, utilize nested parallelism.
-#define cuda_execute_vw(func, ...) \
-  ikra::executor::cuda::ExecuteKernelProxy< \
-      decltype(IKRA_func_to_vw(func, __VA_ARGS__)), \
-      IKRA_func_to_vw(func, __VA_ARGS__)> \
-          ::call<Ikra_VW_SZ>(__VA_ARGS__)
-
-#define cuda_execute_fixed_size(func, size, ...) \
-  ikra::executor::cuda::ExecuteKernelProxy<decltype(func), func> \
-      ::call_fixed_size<Ikra_VW_SZ, size>(__VA_ARGS__)
-
-#define cuda_execute_fixed_size_vw(func, size, ...) \
-  ikra::executor::cuda::ExecuteKernelProxy< \
-      decltype(IKRA_func_to_vw(func, __VA_ARGS__)), \
-      IKRA_func_to_vw(func, __VA_ARGS__)> \
-          ::call_fixed_size<Ikra_VW_SZ, size>(__VA_ARGS__)
-
 template<typename T, T> class ExecuteAndReturnKernelProxy;
 
 template<typename T, typename R, typename... Args, R (T::*func)(Args...)>
@@ -330,6 +321,14 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
         config, SequenceObjectRange<T>(first, num_objects), args...);
   }
 
+  template<int OuterVirtualWarpSize, typename Config, typename ArrayT>
+  static typename std::enable_if<Config::kIsConfiguration &&
+                                 ArrayT::kIsArray, R*>::type
+  call(const Config& config, const ArrayT& array, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        config, ArrayObjectRange<T, ArrayT>(array), args...);
+  }
+
   // Invoke CUDA kernel on all objects.
   #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Config>
@@ -355,6 +354,15 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
         SequenceObjectRange<T>(first, num_objects), args...);
   }
 
+  template<int OuterVirtualWarpSize, typename Strategy, typename ArrayT>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy &&
+                                 ArrayT::kIsArray, R*>::type
+  call(const Strategy& strategy, const ArrayT& array, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        strategy.build_configuration(array.size()),
+        ArrayObjectRange<T, ArrayT>(array), args...);
+  }
+
   #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Strategy>
   static typename std::enable_if<Strategy::kIsConfigurationStrategy, R*>::type
@@ -377,11 +385,6 @@ class ExecuteAndReturnKernelProxy<R (T::*)(Args...), func>
         KernelConfig<OuterVirtualWarpSize>::standard(), args...);
   }
 };
-
-#define cuda_execute_and_return(func, ...) \
-  ikra::executor::cuda::ExecuteAndReturnKernelProxy<decltype(func), func> \
-      ::call<Ikra_VW_SZ>(__VA_ARGS__)
-
 
 template<typename T, T> class ExecuteAndReduceKernelProxy;
 
@@ -423,6 +426,15 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
         config, SequenceObjectRange<T>(first, num_objects), red, args...);
   }
 
+  template<int OuterVirtualWarpSize, typename Reducer, typename Config,
+           typename ArrayT>
+  static typename std::enable_if<Config::kIsConfiguration &&
+                                 ArrayT::kIsArray, R>::type
+  call(const Config& config, const ArrayT& array, Reducer red, Args... args) {
+    return call<OuterVirtualWarpSize>(
+        config, ArrayObjectRange<T, ArrayT>(array), red, args...);
+  }
+
   // Invoke CUDA kernel on all objects.
   #pragma nv_exec_check_disable
   template<int OuterVirtualWarpSize, typename Reducer, typename Config>
@@ -440,6 +452,18 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
     return call<OuterVirtualWarpSize>(
         strategy.build_configuration(num_objects), red,
         SequenceObjectRange<T>(first, num_objects), args...);
+  }
+
+  #pragma nv_exec_check_disable
+  template<int OuterVirtualWarpSize, typename Reducer, typename Strategy,
+           typename ArrayT>
+  static typename std::enable_if<Strategy::kIsConfigurationStrategy &&
+                                 ArrayT::kIsArray, R>::type
+  call(const Strategy& strategy, const ArrayT& array, Reducer red,
+       Args... args) {
+    return call<OuterVirtualWarpSize>(
+        strategy.build_configuration(array.size()), red,
+        ArrayObjectRange<T, ArrayT>(array), args...);
   }
 
   #pragma nv_exec_check_disable
@@ -464,10 +488,6 @@ class ExecuteAndReduceKernelProxy<R (T::*)(Args...), func>
         KernelConfig<OuterVirtualWarpSize>::standard(), red, args...);
   }
 };
-
-#define cuda_execute_and_reduce(func, ...) \
-  ikra::executor::cuda::ExecuteAndReduceKernelProxy<decltype(func), func> \
-      ::call<Ikra_VW_SZ>(__VA_ARGS__)
 
 }  // cuda
 }  // executor
